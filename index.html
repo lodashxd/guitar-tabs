@@ -16,7 +16,7 @@
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23181825'/%3E%3Cpath d='M32 10c12 0 19 8 19 19 0 13-13 25-19 25S13 42 13 29c0-11 7-19 19-19z' fill='%2389b4fa'/%3E%3Ccircle cx='32' cy='28' r='5' fill='%23181825'/%3E%3C/svg%3E"
   />
 
-  <!-- Fonts: Inter for UI, JetBrains Mono for Tablature & Readouts -->
+  <!-- Fonts: Inter for UI, JetBrains Mono for Tablature, Rhythm Grid & Readouts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -44,12 +44,14 @@
               surface1: '#45475a',
               surface2: '#585b70',
               overlay0: '#6c7086',
-              subtext: '#a6adc8',
+              overlay2: '#9399b2',
+              subtext0: '#a6adc8',
               text: '#cdd6f4',
               blue: '#89b4fa',
+              lavender: '#b4befe',
               mauve: '#cba6f7',
               green: '#a6e3a1',
-              gold: '#f9e2af',
+              yellow: '#f9e2af',
               peach: '#fab387',
               maroon: '#eba0ac',
               red: '#f38ba8',
@@ -96,20 +98,24 @@
       cursor: pointer;
     }
 
-    /* Interactive SVG TAB Note & Live Judgment States */
+    /* Interactive SVG TAB Note & Rhythm Lane States */
     .tab-note {
       cursor: pointer;
     }
-    .tab-note .note-bg {
-      transition: fill 0.09s ease, stroke 0.09s ease;
+    .tab-note .note-bg,
+    .tab-note .rhythm-pill {
+      transition: fill 0.08s ease, stroke 0.08s ease, opacity 0.08s ease;
     }
     .tab-note:hover .note-bg {
       fill: #313244;
       stroke: #89b4fa;
       stroke-width: 1.4;
     }
+    .tab-note:hover .rhythm-pill {
+      opacity: 0.35;
+    }
 
-    /* Active Playhead Cursor State (when unjudged or in normal mode) */
+    /* Active Playhead Cursor State on Fret Pill (when unjudged or in normal mode) */
     .tab-note.is-active:not(.judged-perfect):not(.judged-good):not(.judged-miss) .note-bg {
       fill: #fab387 !important;
       stroke: #fde2cf !important;
@@ -121,6 +127,24 @@
     }
     .tab-note.is-active .note-halo {
       opacity: 0.30 !important;
+    }
+
+    /* Active Playhead Highlight on Pick Rhythm Lane (Downstroke = Peach, Upstroke = Lavender/Blue) */
+    .tab-note.is-active.stroke-d .rhythm-pill {
+      fill: #fab387 !important;
+      opacity: 1 !important;
+    }
+    .tab-note.is-active.stroke-u .rhythm-pill {
+      fill: #89b4fa !important;
+      opacity: 1 !important;
+    }
+    .tab-note.is-active .rhythm-arrow {
+      stroke: #11111b !important;
+      stroke-width: 2.3 !important;
+    }
+    .tab-note.is-active .rhythm-beat {
+      fill: #11111b !important;
+      font-weight: 800 !important;
     }
 
     /* Score Mode Judgments: Perfect (Green), Good (Blue), Miss (Red) */
@@ -157,7 +181,7 @@
     /* Subtle Halo Pop Animation on Hit */
     @keyframes hitPop {
       0% {
-        opacity: 0.85;
+        opacity: 0.9;
         transform: scale(0.92);
       }
       100% {
@@ -168,17 +192,32 @@
     .hit-pop-anim {
       transform-box: fill-box;
       transform-origin: center;
-      animation: hitPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: hitPop 0.36s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Count-in Pulse Animation */
+    @keyframes countPulse {
+      0% {
+        transform: scale(1.18);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.92;
+      }
+    }
+    .count-pulse {
+      animation: countPulse 0.22s ease-out forwards;
     }
   </style>
 </head>
 
 <body class="bg-mocha-base text-mocha-text font-sans antialiased min-h-[100dvh] flex flex-col select-none">
 
-  <!-- ==================== 1. SLIM 48px TOP HEADER ==================== -->
+  <!-- ==================== 1. SLIM 48px TOP HEADER BAR ==================== -->
   <header class="sticky top-0 z-30 h-12 bg-mocha-mantle border-b border-mocha-surface0">
-    <div class="max-w-5xl mx-auto h-full px-3 sm:px-5 flex items-center justify-between gap-2">
-      <!-- Left: Compact Song Title + 2-Way Key/Mode Pill (Gm / Em) -->
+    <div class="max-w-5xl mx-auto h-full px-2.5 sm:px-5 flex items-center justify-between gap-2">
+      <!-- Left: Song Title + Segmented Key/Mode Pill (Gm | Em) -->
       <div class="flex items-center gap-2 min-w-0">
         <h1 class="text-[13px] sm:text-base font-semibold tracking-tight text-mocha-text truncate">
           A Chance I'd Never Have
@@ -205,7 +244,7 @@
             role="tab"
             aria-selected="false"
             title="Open Shapes — E minor (or Capo 3)"
-            class="px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text"
+            class="px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext0 hover:text-mocha-text"
           >
             Em
           </button>
@@ -218,7 +257,7 @@
           id="btn-chord-toggle"
           type="button"
           aria-pressed="false"
-          class="h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext border-mocha-surface0 hover:text-mocha-text"
+          class="h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext0 border-mocha-surface0 hover:text-mocha-text"
         >
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <rect x="4" y="3" width="16" height="18" rx="2" />
@@ -234,7 +273,7 @@
           type="button"
           aria-label="Settings"
           aria-expanded="false"
-          class="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-mocha-surface0 bg-mocha-base text-mocha-subtext hover:text-mocha-text hover:bg-mocha-surface0 transition active:scale-95"
+          class="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-mocha-surface0 bg-mocha-base text-mocha-subtext0 hover:text-mocha-text hover:bg-mocha-surface0 transition active:scale-95"
         >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3" />
@@ -245,30 +284,77 @@
     </div>
   </header>
 
-  <!-- ==================== 2. ULTRA-SLIM 30px LIVE MIC STRIP ==================== -->
-  <!-- Completely hidden unless Score mode is ON -->
+  <!-- ==================== 2. ULTRA-SLIM 26px LIVE WRIST-PENDULUM & RHYTHM STRIP ==================== -->
+  <div
+    id="rhythm-strip"
+    class="sticky top-12 z-20 h-[26px] bg-mocha-crust/90 backdrop-blur border-b border-mocha-surface0/80"
+  >
+    <div class="max-w-5xl mx-auto h-full px-2.5 sm:px-5 flex items-center justify-between gap-2 relative">
+      <!-- Left: Crosspicking Label + Info Tap Tooltip -->
+      <button
+        id="btn-rhythm-info"
+        type="button"
+        aria-expanded="false"
+        class="inline-flex items-center gap-1 text-[11px] text-mocha-subtext0 hover:text-mocha-text transition min-w-0 truncate"
+      >
+        <span class="font-medium truncate">Crosspicking (Let Ring)</span>
+        <span class="w-3.5 h-3.5 rounded-full bg-mocha-surface0 text-mocha-blue font-mono text-[9px] font-bold inline-flex items-center justify-center shrink-0">i</span>
+      </button>
+
+      <!-- Right: Live Wrist-Pendulum Badges (↓ DOWN | ↑ UP) + Current Beat Pill -->
+      <div class="flex items-center gap-1 shrink-0 font-mono text-[10px]">
+        <span
+          id="pendulum-down"
+          class="px-1.5 py-[1px] rounded font-extrabold tracking-tight transition-all duration-75 bg-mocha-peach text-mocha-crust shadow-sm"
+        >↓ DOWN</span>
+        <span
+          id="pendulum-up"
+          class="px-1.5 py-[1px] rounded font-bold tracking-tight transition-all duration-75 bg-mocha-surface0/70 text-mocha-overlay0"
+        >↑ UP</span>
+        <span
+          id="pendulum-beat"
+          class="w-5 text-center py-[1px] rounded bg-mocha-mantle border border-mocha-surface0 font-extrabold text-mocha-peach tabular-nums"
+        >1</span>
+      </div>
+
+      <!-- Tap-to-view Crosspicking Tooltip Popover -->
+      <div
+        id="rhythm-tooltip"
+        role="tooltip"
+        class="hidden absolute top-[28px] left-2.5 sm:left-5 z-40 w-[290px] sm:w-[340px] bg-mocha-mantle border border-mocha-surface1 rounded-xl p-2.5 shadow-2xl text-[11px] text-mocha-text leading-relaxed"
+      >
+        Pluck single strings in a steady <b class="text-mocha-peach">Down-Up-Down-Up</b> wrist motion—let every chord note ring out.
+        <span class="block text-[10px] text-mocha-subtext0 mt-1">
+          <b class="text-mocha-peach">↓ Down</b> on beats <span class="font-mono">1, 2, 3, 4</span> · <b class="text-mocha-lavender">↑ Up</b> on <span class="font-mono">&amp;</span> off-beats.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 3. SLIM 30px LIVE MIC SCORE STRIP ==================== -->
+  <!-- Visible ONLY when Score mode is active -->
   <div
     id="mic-strip"
-    class="hidden sticky top-12 z-20 h-[30px] bg-mocha-crust/95 backdrop-blur border-b border-mocha-surface0"
+    class="hidden sticky top-[74px] z-20 h-[30px] bg-mocha-crust/95 backdrop-blur border-b border-mocha-surface0"
   >
-    <div class="max-w-5xl mx-auto h-full px-3 sm:px-5 flex items-center justify-between gap-2 text-[11px] font-mono">
-      <!-- Left: Live Mic Level Dot & Bar -->
+    <div class="max-w-5xl mx-auto h-full px-2.5 sm:px-5 flex items-center justify-between gap-2 text-[11px] font-mono">
+      <!-- Left: Live Mic Level Dot, Meter Bar & Detected Pitch -->
       <div class="flex items-center gap-2 min-w-0">
         <span id="mic-dot" class="w-2 h-2 rounded-full bg-mocha-surface2 transition-colors shrink-0"></span>
         <div class="w-11 sm:w-14 h-1.5 rounded-full bg-mocha-surface0 overflow-hidden shrink-0">
           <div id="mic-meter-fill" class="h-full w-0 bg-mocha-green rounded-full transition-[width] duration-75"></div>
         </div>
-        <span id="mic-pitch-readout" class="text-mocha-subtext truncate">Listening…</span>
+        <span id="mic-pitch-readout" class="text-mocha-subtext0 truncate">Listening…</span>
       </div>
 
-      <!-- Right: Tappable Running Grade, Accuracy & Streak Pill -->
+      <!-- Right: Tappable Running Grade Pill (opens full F-S Grade Modal anytime) -->
       <button
         id="btn-live-grade"
         type="button"
-        title="Tap to view detailed Score Card"
+        title="Tap to open full F–S Grade Breakdown"
         class="shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-mocha-mantle hover:bg-mocha-surface0 border border-mocha-surface1 transition active:scale-95"
       >
-        <span id="live-grade-letter" class="font-extrabold text-mocha-subtext">—</span>
+        <span id="live-grade-letter" class="font-extrabold text-mocha-subtext0">—</span>
         <span class="text-mocha-surface2">·</span>
         <span id="live-grade-pct" class="text-mocha-text">--%</span>
         <span class="text-mocha-surface2">·</span>
@@ -277,40 +363,41 @@
     </div>
   </div>
 
-  <!-- Non-blocking Inline Toast Banner (for mic permission or status feedback) -->
+  <!-- Non-blocking Inline Toast Banner -->
   <div
     id="toast-banner"
     role="status"
     aria-live="polite"
-    class="hidden fixed top-[58px] left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-md px-3.5 py-2 rounded-xl bg-mocha-mantle/95 backdrop-blur border border-mocha-surface1 shadow-xl text-xs text-mocha-text items-center gap-2"
+    class="hidden fixed top-[82px] left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-md px-3.5 py-2 rounded-xl bg-mocha-mantle/95 backdrop-blur border border-mocha-surface1 shadow-xl text-xs text-mocha-text items-center gap-2"
   >
     <span id="toast-dot" class="w-2 h-2 rounded-full bg-mocha-blue shrink-0"></span>
     <span id="toast-text" class="leading-snug"></span>
   </div>
 
-  <!-- ==================== 3. COMPACT 92px CHORD DRAWER / OVERLAY ==================== -->
-  <!-- Hidden by default on mobile (<768px) so all 8 bars fit cleanly -->
+  <!-- ==================== 4. COMPACT 92px HORIZONTAL CHORD DRAWER ==================== -->
+  <!-- Hidden by default on mobile to maximize TAB space -->
   <aside
     id="chord-panel"
-    class="hidden sticky top-12 z-20 h-[92px] bg-mocha-mantle/95 backdrop-blur-md border-b border-mocha-surface0 md:fixed md:top-auto md:bottom-[68px] md:right-4 md:w-[308px] md:h-[96px] md:rounded-2xl md:border md:border-mocha-surface1 md:shadow-2xl"
+    class="hidden sticky top-[74px] z-20 h-[92px] bg-mocha-mantle/95 backdrop-blur-md border-b border-mocha-surface0 md:fixed md:top-auto md:bottom-[68px] md:right-4 md:w-[320px] md:h-[96px] md:rounded-2xl md:border md:border-mocha-surface1 md:shadow-2xl"
     aria-label="Active Chord Diagram"
   >
     <div class="max-w-5xl mx-auto h-full px-3 flex items-center justify-between gap-3 relative w-full">
       <!-- Mini Fretboard SVG -->
       <div class="shrink-0 bg-mocha-base/90 border border-mocha-surface0 rounded-xl px-1.5 py-1 flex items-center justify-center">
-        <svg id="mini-chord-svg" width="126" height="74" viewBox="0 0 134 80" aria-label="Mini Chord Fretboard"></svg>
+        <svg id="mini-chord-svg" width="124" height="74" viewBox="0 0 134 80" aria-label="Mini Chord Fretboard"></svg>
       </div>
 
-      <!-- Chord Name, Active Pitch & Finger Legend -->
+      <!-- Chord Name, Active Plucked String + Pick Direction & Finger Legend -->
       <div class="flex-1 min-w-0 flex flex-col justify-center pr-5">
-        <div class="flex items-baseline gap-2">
+        <div class="flex items-center gap-2">
           <span id="chord-name" class="font-mono text-lg font-bold text-mocha-text leading-none">Gm</span>
           <span id="chord-bar-label" class="font-mono text-[11px] text-mocha-overlay0">Bar 1</span>
+          <span id="chord-stroke-pill" class="px-1.5 py-0.5 rounded font-mono text-[10px] font-bold bg-mocha-peach/20 text-mocha-peach leading-none">↓ 1</span>
         </div>
         <div id="chord-note-detail" class="font-mono text-xs text-mocha-peach font-semibold mt-1 truncate">
           E string · Fret 3 (G2)
         </div>
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-mono text-mocha-subtext mt-1.5">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-mono text-mocha-subtext0 mt-1.5">
           <span><b class="text-mocha-blue">1</b> Idx</span>
           <span><b class="text-mocha-blue">2</b> Mid</span>
           <span><b class="text-mocha-blue">3</b> Rng</span>
@@ -333,16 +420,26 @@
     </div>
   </aside>
 
-  <!-- ==================== 4. UNIFIED 4-ROW SVG TABLATURE SHEET ==================== -->
-  <main class="flex-1 w-full max-w-5xl mx-auto px-2 sm:px-5 py-1.5 sm:py-3 flex flex-col justify-center">
-    <div id="tab-rows" class="flex flex-col gap-1.5 sm:gap-2.5 w-full">
+  <!-- ==================== 5. 4-ROW UNIFIED SVG TABLATURE SHEET ==================== -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-1.5 sm:px-5 py-1 sm:py-2.5 flex flex-col justify-center relative">
+    <!-- Floating Visual 4-Beat Count-In Overlay Badge (4 - 3 - 2 - 1) -->
+    <div
+      id="countin-overlay"
+      aria-live="assertive"
+      class="hidden pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 px-5 py-3 rounded-2xl bg-mocha-crust/90 backdrop-blur-md border border-mocha-peach/60 shadow-2xl flex-col items-center justify-center"
+    >
+      <span class="text-[10px] font-mono uppercase tracking-widest text-mocha-subtext0">Count-In</span>
+      <span id="countin-big-num" class="font-mono text-4xl font-extrabold text-mocha-peach leading-none mt-1">4</span>
+    </div>
+
+    <div id="tab-rows" class="flex flex-col gap-1 sm:gap-2 w-full">
       <!-- 4 crisp 2-bars-per-row SVG systems injected by renderTabSheet() -->
     </div>
   </main>
 
-  <!-- ==================== 5. DOCKED 56px BOTTOM TRANSPORT BAR ==================== -->
-  <footer class="sticky bottom-0 z-30 h-14 bg-mocha-mantle border-t border-mocha-surface0">
-    <div class="max-w-5xl mx-auto h-full px-2.5 sm:px-5 flex items-center justify-between gap-1.5 sm:gap-3 relative">
+  <!-- ==================== 6. DOCKED 56px BOTTOM TRANSPORT BAR ==================== -->
+  <footer class="sticky bottom-0 z-30 bg-mocha-mantle border-t border-mocha-surface0 pb-[env(safe-area-inset-bottom)]">
+    <div class="max-w-5xl mx-auto h-14 px-2.5 sm:px-5 flex items-center justify-between gap-1.5 sm:gap-3 relative">
 
       <!-- Left Group: Play/Pause + Mic Score Toggle + Restart -->
       <div class="flex items-center gap-1.5">
@@ -360,7 +457,7 @@
             <path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z" />
           </svg>
           <span id="label-play" class="hidden sm:inline">Play</span>
-          <span id="badge-countin" class="hidden font-mono text-xs font-extrabold">1</span>
+          <span id="badge-countin" class="hidden font-mono text-xs font-extrabold">4</span>
         </button>
 
         <!-- Mic Score Mode Toggle Button -->
@@ -395,7 +492,7 @@
         </button>
       </div>
 
-      <!-- Right Group: Compact BPM Pill + Loop Selector Pill -->
+      <!-- Right Group: Compact BPM Pill + Loop Cycle Button -->
       <div class="flex items-center gap-1.5">
         <!-- BPM Pill & Floating Popover -->
         <div class="relative">
@@ -407,20 +504,20 @@
             class="h-10 px-2.5 sm:px-3.5 rounded-xl bg-mocha-base hover:bg-mocha-surface0 active:scale-95 border border-mocha-surface0 font-mono text-xs font-semibold text-mocha-text inline-flex items-center gap-1 transition tabular-nums"
           >
             <span id="bpm-text" class="text-mocha-peach font-bold">60</span>
-            <span class="text-mocha-subtext text-[11px]">BPM</span>
+            <span class="text-mocha-subtext0 text-[11px]">BPM</span>
           </button>
 
-          <!-- Sleek BPM Popover -->
+          <!-- Compact BPM Popover -->
           <div
             id="bpm-popover"
             class="hidden absolute bottom-[52px] right-0 sm:left-1/2 sm:-translate-x-1/2 z-40 w-64 bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-3.5 shadow-2xl"
           >
             <div class="flex items-center justify-between text-xs mb-2.5">
-              <span class="text-mocha-subtext font-medium">Tempo</span>
+              <span class="text-mocha-subtext0 font-medium">Tempo</span>
               <div class="flex items-center gap-1.5">
-                <button id="btn-bpm-minus" type="button" class="w-6 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono font-bold text-mocha-text inline-flex items-center justify-center">−</button>
+                <button id="btn-bpm-minus" type="button" class="px-1.5 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono text-[11px] font-bold text-mocha-text inline-flex items-center justify-center">-5</button>
                 <span id="bpm-popover-val" class="font-mono font-bold text-mocha-peach w-14 text-center tabular-nums">60 BPM</span>
-                <button id="btn-bpm-plus" type="button" class="w-6 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono font-bold text-mocha-text inline-flex items-center justify-center">+</button>
+                <button id="btn-bpm-plus" type="button" class="px-1.5 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono text-[11px] font-bold text-mocha-text inline-flex items-center justify-center">+5</button>
               </div>
             </div>
             <input
@@ -433,24 +530,24 @@
               class="w-full cursor-pointer mb-3"
             />
             <div class="grid grid-cols-3 gap-1.5">
-              <button type="button" data-bpm="50" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
-                50% (50)
+              <button type="button" data-bpm="50" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 border border-mocha-surface0 transition">
+                50 BPM
               </button>
-              <button type="button" data-bpm="75" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
-                75% (75)
+              <button type="button" data-bpm="75" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 border border-mocha-surface0 transition">
+                75 BPM
               </button>
-              <button type="button" data-bpm="100" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
-                100% (100)
+              <button type="button" data-bpm="100" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 border border-mocha-surface0 transition">
+                100 BPM
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Loop Selector Pill (1–8 -> 1–4 -> 5–8) -->
+        <!-- Loop Selector Pill (1-8 -> 1-4 -> 5-8) -->
         <button
           id="btn-loop"
           type="button"
-          title="Cycle Loop Bars (1–8, 1–4, 5–8)"
+          title="Cycle Loop Bars (1-8, 1-4, 5-8)"
           class="h-10 px-2.5 sm:px-3 rounded-xl border text-xs font-mono font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0"
         >
           <svg class="w-3.5 h-3.5 text-mocha-blue shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -459,64 +556,84 @@
             <polyline points="7 23 3 19 7 15" />
             <path d="M21 13v2a4 4 0 0 1-4 4H3" />
           </svg>
-          <span id="label-loop">1–8</span>
+          <span id="label-loop">1-8</span>
         </button>
       </div>
 
     </div>
   </footer>
 
-  <!-- ==================== 6. SETTINGS POPOVER (⚙️) ==================== -->
+  <!-- ==================== 7. SETTINGS POPOVER SHEET (⚙) ==================== -->
   <div
     id="settings-popover"
     role="dialog"
     aria-label="Player and Microphone Settings"
-    class="hidden fixed top-[54px] right-2.5 sm:right-5 z-40 w-[calc(100vw-20px)] max-w-[320px] bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-4 shadow-2xl max-h-[82dvh] overflow-y-auto"
+    class="hidden fixed top-[54px] right-2.5 sm:right-5 z-40 w-[calc(100vw-20px)] max-w-[330px] bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-4 shadow-2xl max-h-[82dvh] overflow-y-auto"
   >
     <div class="text-[11px] font-semibold uppercase tracking-wider text-mocha-overlay0 mb-2.5">
-      Playback &amp; Display
+      Pick Rhythm &amp; Audio
     </div>
 
-    <div class="flex flex-col gap-2.5">
-      <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3">
+      <!-- Segmented Pick Rhythm Display Choice -->
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-medium text-mocha-text">Pick Rhythm Display</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1 bg-mocha-base p-1 rounded-xl border border-mocha-surface0" role="group" aria-label="Pick Rhythm Display">
+          <button type="button" data-rhythm="full" class="rhythm-mode-btn py-1 rounded-lg font-mono text-[11px] font-bold bg-mocha-surface0 text-mocha-blue transition">
+            ↓↑ + 1&amp;2&amp;
+          </button>
+          <button type="button" data-rhythm="arrows" class="rhythm-mode-btn py-1 rounded-lg font-mono text-[11px] font-semibold text-mocha-subtext0 hover:text-mocha-text transition">
+            ↓↑ Only
+          </button>
+          <button type="button" data-rhythm="off" class="rhythm-mode-btn py-1 rounded-lg font-mono text-[11px] font-semibold text-mocha-subtext0 hover:text-mocha-text transition">
+            Off
+          </button>
+        </div>
+      </div>
+
+      <!-- Guitar Synth Audio -->
+      <div class="flex items-center justify-between gap-2">
         <div>
-          <div class="text-xs font-medium text-mocha-text">Guitar Audio</div>
-          <div id="sub-guitar-audio" class="text-[10px] text-mocha-subtext">Synthesized steel-string plucks</div>
+          <div class="text-xs font-medium text-mocha-text">Guitar Synth Audio</div>
+          <div id="sub-guitar-audio" class="text-[10px] text-mocha-subtext0">Let-ring steel-string plucks</div>
         </div>
         <button id="sw-audio" type="button" role="switch" aria-checked="true" class="w-9 h-5 rounded-full bg-mocha-blue p-0.5 transition-colors relative shrink-0">
           <span class="block w-4 h-4 rounded-full bg-mocha-crust translate-x-4 transition-transform"></span>
         </button>
       </div>
 
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-medium text-mocha-text">Metronome Click</span>
-        <button id="sw-metro" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
-        </button>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-medium text-mocha-text">4-Beat Count-in</span>
-        <button id="sw-countin" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
-        </button>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-medium text-mocha-text">Pick Strokes (D/U)</span>
-        <button id="sw-strokes" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
-        </button>
-      </div>
-
-      <!-- Capo 3 Pitch Toggle (active in Em Open Shapes mode) -->
-      <div id="row-capo3" class="hidden pt-1 items-center justify-between">
+      <!-- Metronome Click -->
+      <div class="flex items-center justify-between gap-2">
         <div>
-          <div class="text-xs font-medium text-mocha-text">Capo 3 Pitch (+3 st)</div>
-          <div class="text-[10px] text-mocha-subtext">Match original Gm pitch in Em mode</div>
+          <div class="text-xs font-medium text-mocha-text">Metronome Click</div>
+          <div class="text-[10px] text-mocha-subtext0">Accented beat 1, woodblock 2–4</div>
+        </div>
+        <button id="sw-metro" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext0 transition-transform"></span>
+        </button>
+      </div>
+
+      <!-- 4-Beat Count-In (Default ON) -->
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">4-Beat Count-In</div>
+          <div class="text-[10px] text-mocha-subtext0">4 - 3 - 2 - 1 visual &amp; click lead-in</div>
+        </div>
+        <button id="sw-countin" type="button" role="switch" aria-checked="true" class="w-9 h-5 rounded-full bg-mocha-blue p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-crust translate-x-4 transition-transform"></span>
+        </button>
+      </div>
+
+      <!-- Capo 3 Pitch (in Em mode) -->
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Capo 3 Pitch (in Em mode)</div>
+          <div class="text-[10px] text-mocha-subtext0">Shifts Em audio &amp; mic +3 st to Gm</div>
         </div>
         <button id="sw-capo3" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext0 transition-transform"></span>
         </button>
       </div>
     </div>
@@ -528,48 +645,50 @@
     </div>
 
     <div class="flex flex-col gap-3">
-      <!-- Mic Sensitivity Segmented Selector -->
+      <!-- Headphones Mode -->
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Headphones Mode</div>
+          <div class="text-[10px] text-mocha-subtext0">Keep guitar synth audible in Score</div>
+        </div>
+        <button id="sw-headphones" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext0 transition-transform"></span>
+        </button>
+      </div>
+
+      <!-- Mic Sensitivity -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
           <span class="text-xs font-medium text-mocha-text">Mic Sensitivity</span>
-          <span id="label-sens" class="font-mono text-[10px] text-mocha-subtext">Normal</span>
+          <span id="label-sens" class="font-mono text-[10px] text-mocha-subtext0">Normal</span>
         </div>
         <div class="grid grid-cols-3 gap-1 bg-mocha-base p-1 rounded-xl border border-mocha-surface0">
-          <button type="button" data-sens="low" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition">
+          <button type="button" data-sens="low" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext0 hover:text-mocha-text transition">
             Low
           </button>
           <button type="button" data-sens="normal" class="sens-btn py-1 rounded-lg text-xs font-semibold bg-mocha-surface0 text-mocha-blue transition">
             Normal
           </button>
-          <button type="button" data-sens="high" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition">
+          <button type="button" data-sens="high" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext0 hover:text-mocha-text transition">
             High
           </button>
         </div>
       </div>
 
-      <div class="flex items-center justify-between gap-2">
-        <div>
-          <div class="text-xs font-medium text-mocha-text">Headphones Mode</div>
-          <div class="text-[10px] text-mocha-subtext">Keep synth audio ON in Score mode</div>
-        </div>
-        <button id="sw-headphones" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
-        </button>
-      </div>
-
+      <!-- Endless Score Loop -->
       <div class="flex items-center justify-between gap-2">
         <div>
           <div class="text-xs font-medium text-mocha-text">Endless Loop in Score</div>
-          <div class="text-[10px] text-mocha-subtext">Keep looping without end modal</div>
+          <div class="text-[10px] text-mocha-subtext0">Keep looping without summary modal</div>
         </div>
         <button id="sw-endless" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
-          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext0 transition-transform"></span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 7. END-OF-RUN F–S GRADE CARD MODAL ==================== -->
+  <!-- ==================== 8. GRADE SUMMARY MODAL (F TO S) ==================== -->
   <div
     id="grade-modal"
     role="dialog"
@@ -580,14 +699,14 @@
     <div class="w-full max-w-sm bg-mocha-mantle border border-mocha-surface1 rounded-3xl p-5 shadow-2xl relative">
       <!-- Top Row: Context Tag + Close -->
       <div class="flex items-center justify-between mb-3">
-        <span id="modal-run-meta" class="font-mono text-[11px] text-mocha-subtext bg-mocha-base px-2.5 py-1 rounded-full border border-mocha-surface0">
-          Gm · 60 BPM · Bars 1–8
+        <span id="modal-run-meta" class="font-mono text-[11px] text-mocha-subtext0 bg-mocha-base px-2.5 py-1 rounded-full border border-mocha-surface0">
+          Gm · 60 BPM · Bars 1-8
         </span>
         <button
           id="btn-modal-x"
           type="button"
           aria-label="Close Grade Card"
-          class="w-7 h-7 rounded-full bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext hover:text-mocha-text inline-flex items-center justify-center transition"
+          class="w-7 h-7 rounded-full bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text inline-flex items-center justify-center transition"
         >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -596,13 +715,13 @@
         </button>
       </div>
 
-      <!-- Center: Glowing Letter Grade Badge & Accuracy -->
+      <!-- Center: Glowing Letter Grade Crest & Accuracy -->
       <div class="flex items-center gap-4 py-2">
         <div
           id="modal-grade-crest"
-          class="w-20 h-20 rounded-2xl bg-mocha-base border-2 border-mocha-gold flex items-center justify-center shrink-0 shadow-lg"
+          class="w-20 h-20 rounded-2xl bg-mocha-base border-2 border-mocha-yellow flex items-center justify-center shrink-0 shadow-lg"
         >
-          <span id="modal-grade-letter" class="font-mono text-5xl font-extrabold leading-none text-mocha-gold">S</span>
+          <span id="modal-grade-letter" class="font-mono text-5xl font-extrabold leading-none text-mocha-yellow">S</span>
         </div>
         <div class="min-w-0">
           <h2 id="grade-modal-title" class="text-xl font-bold text-mocha-text tracking-tight leading-tight">
@@ -610,10 +729,10 @@
           </h2>
           <div class="flex items-baseline gap-2 mt-0.5">
             <span id="modal-accuracy" class="font-mono text-2xl font-extrabold text-mocha-text">98%</span>
-            <span class="text-xs text-mocha-subtext">accuracy</span>
+            <span class="text-xs text-mocha-subtext0">accuracy</span>
           </div>
           <div class="font-mono text-xs text-mocha-peach mt-0.5">
-            Best Streak: <span id="modal-streak" class="font-bold">16x</span>
+            Max Streak: <span id="modal-streak" class="font-bold">16x</span>
           </div>
         </div>
       </div>
@@ -622,22 +741,22 @@
       <div class="grid grid-cols-3 gap-2 my-3.5">
         <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
           <div id="modal-perfect" class="font-mono text-base font-bold text-mocha-green">0</div>
-          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Perfect</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext0">Perfect</div>
         </div>
         <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
           <div id="modal-good" class="font-mono text-base font-bold text-mocha-blue">0</div>
-          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Good</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext0">Good</div>
         </div>
         <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
           <div id="modal-miss" class="font-mono text-base font-bold text-mocha-red">0</div>
-          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Miss</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext0">Miss</div>
         </div>
       </div>
 
       <!-- Compact 8-Bar Mini Accuracy Chart -->
       <div class="bg-mocha-base/80 border border-mocha-surface0 rounded-2xl p-3 mb-3">
         <div class="flex items-center justify-between text-[10px] font-mono text-mocha-overlay0 uppercase mb-2">
-          <span>Bar Breakdown</span>
+          <span>8-Bar Accuracy</span>
           <span>1 – 8</span>
         </div>
         <div id="modal-bar-chart" class="grid grid-cols-8 gap-1.5 items-end h-16">
@@ -645,12 +764,12 @@
         </div>
       </div>
 
-      <!-- Smart Coaching Line -->
-      <p id="modal-coaching" class="text-xs text-mocha-subtext bg-mocha-base/60 border border-mocha-surface0/70 rounded-xl px-3 py-2 mb-4 leading-relaxed">
-        Clean pass across all bars!
+      <!-- Coaching Feedback -->
+      <p id="modal-coaching" class="text-xs text-mocha-subtext0 bg-mocha-base/60 border border-mocha-surface0/70 rounded-xl px-3 py-2 mb-4 leading-relaxed">
+        Steady Down-Up alternate picking across all bars!
       </p>
 
-      <!-- Action Buttons -->
+      <!-- Action Buttons: Retry + Loop Weak Half + Close -->
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
           <button
@@ -658,22 +777,22 @@
             type="button"
             class="flex-1 h-10 rounded-xl bg-mocha-blue hover:bg-mocha-blue/90 active:scale-95 text-mocha-crust font-bold text-xs inline-flex items-center justify-center gap-1.5 transition"
           >
-            <span>↻ Retry Run</span>
+            <span>↺ Retry</span>
           </button>
           <button
             id="btn-modal-weak"
             type="button"
-            class="hidden flex-1 h-10 rounded-xl bg-mocha-mauve/20 hover:bg-mocha-mauve/30 active:scale-95 text-mocha-mauve border border-mocha-mauve/40 font-semibold text-xs items-center justify-center transition"
+            class="flex-1 h-10 rounded-xl bg-mocha-mauve/20 hover:bg-mocha-mauve/30 active:scale-95 text-mocha-mauve border border-mocha-mauve/40 font-semibold text-xs inline-flex items-center justify-center transition"
           >
-            Loop Bars 1–4
+            Loop Weak Half (1-4)
           </button>
         </div>
         <button
           id="btn-modal-close"
           type="button"
-          class="w-full h-9 rounded-xl bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext hover:text-mocha-text border border-mocha-surface0 font-semibold text-xs transition"
+          class="w-full h-9 rounded-xl bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 hover:text-mocha-text border border-mocha-surface0 font-semibold text-xs transition"
         >
-          Close &amp; Review Sheet
+          Close &amp; Review TAB
         </button>
       </div>
     </div>
@@ -684,16 +803,31 @@
       'use strict';
 
       // =======================================================================
-      // 1. MUSICAL TUNING, TAB DATA & F–S GRADING CONSTANTS
+      // 1. SAFE LOCAL STORAGE HELPERS & MUSICAL CONSTANTS
       // =======================================================================
+      function readPref(key, fallback) {
+        try {
+          const val = window.localStorage.getItem(key);
+          return val !== null ? val : fallback;
+        } catch (_) {
+          return fallback;
+        }
+      }
+
+      function writePref(key, val) {
+        try {
+          window.localStorage.setItem(key, String(val));
+        } catch (_) {}
+      }
 
       // Top-to-bottom TAB string order (0=e4 .. 5=E2) vs Low-to-High Chord box order
       const TAB_STRINGS = ['e', 'B', 'G', 'D', 'A', 'E'];
       const CHORD_STRINGS = ['E', 'A', 'D', 'G', 'B', 'e'];
       const STRING_TO_TAB_ROW = { e: 0, B: 1, G: 2, D: 3, A: 4, E: 5 };
+      const BEAT_SUBDIVISIONS = ['1', '&', '2', '&', '3', '&', '4', '&'];
 
-      // Scientific Pitch Standard Tuning MIDI: e4=64, B3=59, G3=55, D3=50, A2=45, E2=40
-      const BASE_MIDI = { e: 64, B: 59, G: 55, D: 50, A: 45, E: 40 };
+      // Standard Tuning MIDI: E2=40, A2=45, D3=50, G3=55, B3=59, E4=64
+      const BASE_MIDI = { E: 40, A: 45, D: 50, G: 55, B: 59, e: 64 };
       const PITCH_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
       const TAB_LINE_WEIGHTS = [1.05, 1.2, 1.4, 1.65, 1.9, 2.2];
 
@@ -714,12 +848,13 @@
         B7:    { label: 'B7',     shape: ['x', 2, 1, 2, 0, 'x'],   fingers: [0, 2, 1, 3, 0, 0] },
       };
 
-      // Helper to create 8th-note arrays with strict D/U alternate picking
+      // Build 8 eighth-note slots per bar with strict alternate picking (even = Down, odd = Up)
       const notesFrom = (pairs) =>
         pairs.map(([str, fret], idx) => ({
           str,
           fret,
           stroke: idx % 2 === 0 ? 'D' : 'U',
+          beatLabel: BEAT_SUBDIVISIONS[idx],
         }));
 
       const GM_BAR = [['E',3],['D',0],['G',3],['D',0],['B',3],['G',3],['D',0],['G',3]];
@@ -727,6 +862,7 @@
       const EM_BAR = [['E',0],['D',2],['G',0],['D',2],['B',0],['G',0],['D',2],['G',0]];
       const D_OPEN = [['D',0],['G',2],['B',3],['G',2],['e',2],['B',3],['G',2],['B',3]];
 
+      // Exact 64-step (8-bar) musical transcriptions for Gm (No Capo) and Em (Open Shapes / Capo 3)
       const ARRANGEMENTS = {
         Gm: {
           bars: [
@@ -755,18 +891,18 @@
       };
 
       const LOOP_MODES = [
-        { id: '1-8', label: '1–8', start: 0, end: 7 },
-        { id: '1-4', label: '1–4', start: 0, end: 3 },
-        { id: '5-8', label: '5–8', start: 4, end: 7 },
+        { id: '1-8', label: '1-8', start: 0, end: 7 },
+        { id: '1-4', label: '1-4', start: 0, end: 3 },
+        { id: '5-8', label: '5-8', start: 4, end: 7 },
       ];
 
-      // F-to-S Grading Scale Thresholds
+      // Exact F-to-S Grading Thresholds: S>=95, A>=85, B>=75, C>=65, D>=50, F<50
       const GRADE_TIERS = [
         { min: 95, letter: 'S', title: 'Flawless',        color: '#f9e2af' },
         { min: 85, letter: 'A', title: 'Dialed In',       color: '#a6e3a1' },
-        { min: 72, letter: 'B', title: 'Solid Flow',      color: '#89b4fa' },
-        { min: 58, letter: 'C', title: 'Getting There',   color: '#fab387' },
-        { min: 40, letter: 'D', title: 'Rough Pass',      color: '#eba0ac' },
+        { min: 75, letter: 'B', title: 'Solid Flow',      color: '#89b4fa' },
+        { min: 65, letter: 'C', title: 'Getting There',   color: '#fab387' },
+        { min: 50, letter: 'D', title: 'Rough Pass',      color: '#eba0ac' },
         { min: 0,  letter: 'F', title: 'Keep Practicing', color: '#f38ba8' },
       ];
 
@@ -777,11 +913,10 @@
         return GRADE_TIERS[GRADE_TIERS.length - 1];
       }
 
-      // Mic Sensitivity Presets (RMS Gate & Spectral SNR Multiplier)
       const SENSITIVITY_CONFIG = {
         low:    { label: 'Low',    rmsGate: 0.015, snrMult: 5.2, onsetRatio: 1.42 },
-        normal: { label: 'Normal', rmsGate: 0.007, snrMult: 3.6, onsetRatio: 1.26 },
-        high:   { label: 'High',   rmsGate: 0.003, snrMult: 2.5, onsetRatio: 1.15 },
+        normal: { label: 'Normal', rmsGate: 0.007, snrMult: 3.6, onsetRatio: 1.25 },
+        high:   { label: 'High',   rmsGate: 0.003, snrMult: 2.5, onsetRatio: 1.14 },
       };
 
       const MIC_LATENCY_SEC = 0.035;
@@ -790,24 +925,26 @@
       // 2. APPLICATION & SCORING STATE
       // =======================================================================
       const desktopQuery = window.matchMedia('(min-width: 768px)');
+      const savedMode = readPref('gtab_mode', 'Gm');
+      const savedRhythm = readPref('gtab_rhythm', 'full');
 
       const state = {
-        mode: 'Gm',                        // 'Gm' | 'Em'
-        capo3Pitch: false,                 // +3 semitones when 'Em' is selected
-        bpm: 60,                           // 40..110
+        mode: savedMode === 'Em' ? 'Em' : 'Gm',
+        rhythmDisplay: ['full', 'arrows', 'off'].includes(savedRhythm) ? savedRhythm : 'full',
+        capo3Pitch: false,                 // +3 semitones when Em is selected
+        bpm: 60,                           // 40..110 (default 60 BPM)
         loopIdx: 0,                        // 0: 1-8, 1: 1-4, 2: 5-8
         showChord: desktopQuery.matches,   // Hidden by default on mobile (<768px)
-        guitarAudio: true,
-        metronome: false,
-        countIn: false,
-        showStrokes: false,
-        sensitivity: 'normal',             // 'low' | 'normal' | 'high'
-        headphonesMode: false,             // Keep synth ON in Score mode
-        endlessScoreLoop: false,           // Keep looping in Score mode without modal
+        guitarAudio: true,                 // Default ON
+        metronome: false,                  // Default OFF
+        countIn: true,                     // Default ON (4 - 3 - 2 - 1 lead-in)
+        sensitivity: 'normal',
+        headphonesMode: false,
+        endlessScoreLoop: false,
         isDesktop: desktopQuery.matches,
 
-        scoreMode: false,                  // Microphone listening & F-S grading mode
-        savedPrefsBeforeScore: null,       // Restores Audio/Metronome/Count-in when exiting Score mode
+        scoreMode: false,
+        savedPrefsBeforeScore: null,
 
         isPlaying: false,
         isCountingIn: false,
@@ -815,13 +952,13 @@
         activeNote: 0,
 
         // Current Score Run Tracking
-        judgments: Array.from({ length: 8 }, () => new Array(8).fill(null)), // 'perfect' | 'good' | 'miss' | null
+        judgments: Array.from({ length: 8 }, () => new Array(8).fill(null)),
         perfectCount: 0,
         goodCount: 0,
         missCount: 0,
         streak: 0,
         bestStreak: 0,
-        pendingEvalNotes: [],              // Scheduled notes awaiting mic evaluation
+        pendingEvalNotes: [],
         runFinishingTimer: null,
       };
 
@@ -849,7 +986,7 @@
       }
 
       // =======================================================================
-      // 3. KARPLUS-STRONG ACOUSTIC GUITAR SYNTHESIZER & HIGH-PITCH METRONOME
+      // 3. KARPLUS-STRONG STEEL-STRING ACOUSTIC ENGINE & WOODBLOCK METRONOME
       // =======================================================================
       class AcousticGuitarSynth {
         constructor() {
@@ -857,7 +994,7 @@
           this.bodyBus = null;
           this.master = null;
           this.bufferCache = new Map();
-          this.activeVoices = {};
+          this.activeVoices = {}; // Independent voice per string for natural "let ring" sustain
         }
 
         init() {
@@ -866,18 +1003,18 @@
               const AudioCtx = window.AudioContext || window.webkitAudioContext;
               this.ctx = new AudioCtx();
 
-              // Warm acoustic guitar body air & top-plate resonance filters
+              // Acoustic body air & spruce-top warmth filters
               const airResonance = this.ctx.createBiquadFilter();
               airResonance.type = 'peaking';
-              airResonance.frequency.setValueAtTime(202, this.ctx.currentTime);
+              airResonance.frequency.setValueAtTime(204, this.ctx.currentTime);
               airResonance.Q.setValueAtTime(1.2, this.ctx.currentTime);
-              airResonance.gain.setValueAtTime(3.2, this.ctx.currentTime);
+              airResonance.gain.setValueAtTime(3.3, this.ctx.currentTime);
 
               const woodWarmth = this.ctx.createBiquadFilter();
               woodWarmth.type = 'peaking';
-              woodWarmth.frequency.setValueAtTime(415, this.ctx.currentTime);
+              woodWarmth.frequency.setValueAtTime(420, this.ctx.currentTime);
               woodWarmth.Q.setValueAtTime(1.1, this.ctx.currentTime);
-              woodWarmth.gain.setValueAtTime(1.8, this.ctx.currentTime);
+              woodWarmth.gain.setValueAtTime(1.9, this.ctx.currentTime);
 
               const comp = this.ctx.createDynamicsCompressor();
               comp.threshold.setValueAtTime(-14, this.ctx.currentTime);
@@ -907,31 +1044,30 @@
         }
 
         /**
-         * Synthesizes & caches a fractional-delay Karplus-Strong steel-string pluck AudioBuffer
-         * for exact pitch accuracy and realistic harmonic decay.
+         * Fractional-delay Karplus-Strong steel-string pluck buffer with distinct
+         * Downstroke (fuller warm body accent) vs Upstroke (lighter crisp treble brush) timbre.
          */
         _getPluckBuffer(midi, stroke) {
           const key = `${midi}-${stroke}`;
           if (this.bufferCache.has(key)) return this.bufferCache.get(key);
 
           const sr = this.ctx.sampleRate;
-          const duration = 2.15;
+          const duration = 2.25;
           const length = Math.floor(sr * duration);
           const buf = this.ctx.createBuffer(1, length, sr);
           const out = buf.getChannelData(0);
 
           const freq = midiToFreq(midi);
-          // Account for ~0.5 sample phase delay of 2-point averaging filter
           const exactPeriod = Math.max(4, sr / freq - 0.5);
           const N = Math.floor(exactPeriod);
           const frac = exactPeriod - N;
 
-          // Seed excitation burst with pick-position comb filtering
-          const pickRatio = stroke === 'D' ? 0.14 : 0.10;
+          // Downstroke plucks slightly warmer/deeper; Upstroke brushes slightly brighter near bridge
+          const pickRatio = stroke === 'D' ? 0.15 : 0.095;
           const pickOffset = Math.max(1, Math.floor(N * pickRatio));
           const rawSeed = new Float32Array(N + 2);
           let lpPrev = 0;
-          const smoothAlpha = stroke === 'D' ? 0.52 : 0.64;
+          const smoothAlpha = stroke === 'D' ? 0.50 : 0.68;
 
           for (let i = 0; i <= N + 1; i++) {
             const white = Math.random() * 2 - 1;
@@ -941,12 +1077,12 @@
 
           for (let i = 0; i <= N; i++) {
             const combIdx = (i + pickOffset) % (N + 1);
-            out[i] = (rawSeed[i] - 0.65 * rawSeed[combIdx]) * 0.55;
+            out[i] = (rawSeed[i] - 0.66 * rawSeed[combIdx]) * 0.56;
           }
 
-          // Damping & brightness tailored across low wound strings vs plain treble strings
-          const stretchBrightness = midi < 50 ? 0.44 : 0.36;
-          const loopDecay = Math.pow(0.0018, 1 / (freq * duration));
+          const baseBright = midi < 50 ? 0.44 : 0.35;
+          const stretchBrightness = stroke === 'U' ? Math.max(0.28, baseBright - 0.04) : baseBright;
+          const loopDecay = Math.pow(0.0016, 1 / (freq * duration));
 
           for (let i = N + 1; i < length; i++) {
             const s0 = out[i - N];
@@ -966,13 +1102,13 @@
           if (!this.init()) return;
           const t = when !== null ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime;
 
-          // Choke prior note on the SAME string while allowing other strings to keep ringing
+          // Articulate re-plucked string cleanly while adjacent strings keep ringing naturally
           const prev = this.activeVoices[str];
           if (prev) {
             try {
               prev.gain.cancelScheduledValues(t);
               prev.gain.setValueAtTime(Math.max(prev.gain.value, 0.0005), t);
-              prev.gain.exponentialRampToValueAtTime(0.0001, t + 0.024);
+              prev.gain.exponentialRampToValueAtTime(0.0001, t + 0.022);
             } catch (_) {}
           }
 
@@ -980,22 +1116,23 @@
           src.buffer = this._getPluckBuffer(midi, stroke);
 
           const gain = this.ctx.createGain();
-          const vel = stroke === 'D' ? 0.72 : 0.60;
+          // Subtle alternate-picking accent: Downstrokes slightly weightier than Upstrokes
+          const vel = stroke === 'D' ? 0.75 : 0.59;
           gain.gain.setValueAtTime(0.001, t);
           gain.gain.linearRampToValueAtTime(vel, t + 0.003);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
 
           src.connect(gain);
           gain.connect(this.bodyBus);
 
           src.start(t);
-          src.stop(t + 2.12);
+          src.stop(t + 2.22);
           this.activeVoices[str] = gain;
         }
 
         /**
-         * High-frequency crisp metronome click (>1650 Hz, 18ms) so phone microphones
-         * never confuse metronome clicks with guitar string fundamentals (82–370 Hz).
+         * Crisp woodblock metronome click (accented beat 1, clean woodblock on 2, 3, 4).
+         * Kept above 1450 Hz so phone mics never confuse clicks with guitar fundamentals.
          */
         click(accent = false, when = null) {
           if (!this.init()) return;
@@ -1003,9 +1140,9 @@
 
           const osc = this.ctx.createOscillator();
           osc.type = 'triangle';
-          const startFreq = accent ? 2250 : 1780;
+          const startFreq = accent ? 2200 : 1720;
           osc.frequency.setValueAtTime(startFreq, t);
-          osc.frequency.exponentialRampToValueAtTime(startFreq * 0.72, t + 0.018);
+          osc.frequency.exponentialRampToValueAtTime(startFreq * 0.68, t + 0.020);
 
           const hp = this.ctx.createBiquadFilter();
           hp.type = 'highpass';
@@ -1013,22 +1150,22 @@
 
           const g = this.ctx.createGain();
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(accent ? 0.28 : 0.17, t + 0.0015);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.022);
+          g.gain.linearRampToValueAtTime(accent ? 0.30 : 0.18, t + 0.0015);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.024);
 
           osc.connect(hp);
           hp.connect(g);
           g.connect(this.master);
 
           osc.start(t);
-          osc.stop(t + 0.026);
+          osc.stop(t + 0.028);
         }
       }
 
       const audio = new AcousticGuitarSynth();
 
       // =======================================================================
-      // 4. REAL-TIME HYBRID ACOUSTIC GUITAR LISTENING & ARPEGGIO DETECTOR
+      // 4. REAL-TIME HYBRID MICROPHONE PITCH & ARPEGGIO SCORING ENGINE
       // =======================================================================
       class GuitarMicListener {
         constructor() {
@@ -1037,11 +1174,10 @@
           this.hpFilter = null;
           this.analyser = null;
           this.timeBuf = new Float32Array(2048);
-          this.freqDbBuf = new Float32Array(2048); // half of 4096 FFT
+          this.freqDbBuf = new Float32Array(2048);
           this.linMagBuf = new Float32Array(2048);
           this.yinBuf = new Float32Array(1024);
           this.rafId = null;
-          this.prevRms = 0;
           this.smoothedLevel = 0;
           this.lastHitTime = -1;
         }
@@ -1051,7 +1187,7 @@
             throw new Error('Web Audio unavailable');
           }
           if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            throw new Error('Microphone API unavailable in this browser');
+            throw new Error('Microphone API unavailable');
           }
 
           if (!this.stream) {
@@ -1064,7 +1200,6 @@
                 },
               });
             } catch (firstErr) {
-              // Fallback to basic constraints if raw audio flags are rejected by device
               if (firstErr && (firstErr.name === 'NotAllowedError' || firstErr.name === 'PermissionDeniedError')) {
                 throw firstErr;
               }
@@ -1073,7 +1208,7 @@
 
             this.source = audio.ctx.createMediaStreamSource(this.stream);
 
-            // Gentle 62 Hz sub-rumble filter keeps E2 (82.4 Hz) clean while rejecting handling thumps
+            // 62 Hz sub-rumble cut preserves E2 (82.4 Hz) while rejecting desk/body thumps
             this.hpFilter = audio.ctx.createBiquadFilter();
             this.hpFilter.type = 'highpass';
             this.hpFilter.frequency.setValueAtTime(62, audio.ctx.currentTime);
@@ -1122,18 +1257,16 @@
           }
           this.analyser = null;
           this.smoothedLevel = 0;
-          this.prevRms = 0;
         }
 
         /**
-         * YIN Time-Domain Fundamental Pitch Detector on latest 2048 samples.
-         * Returns { freq, midi, cents, clarity } or null if unpitched.
+         * Time-domain YIN fundamental pitch estimator on latest 2048 samples.
          */
         _detectYinPitch(sampleRate) {
           const buf = this.timeBuf;
           const W = 1024;
-          const minTau = Math.max(4, Math.floor(sampleRate / 900)); // ~900 Hz upper bound
-          const maxTau = Math.min(W - 2, Math.ceil(sampleRate / 68)); // ~68 Hz lower bound
+          const minTau = Math.max(4, Math.floor(sampleRate / 900));
+          const maxTau = Math.min(W - 2, Math.ceil(sampleRate / 68));
 
           const yin = this.yinBuf;
           yin[0] = 1;
@@ -1162,7 +1295,6 @@
             }
           }
 
-          // Fallback to global minimum if reasonably clear
           if (bestTau === -1) {
             let minVal = 0.30;
             for (let tau = minTau; tau <= maxTau - 1; tau++) {
@@ -1175,7 +1307,6 @@
 
           if (bestTau === -1) return null;
 
-          // Parabolic lag refinement
           const y0 = yin[bestTau - 1];
           const y1 = yin[bestTau];
           const y2 = yin[bestTau + 1];
@@ -1194,10 +1325,6 @@
           return { freq, exactMidi, midi: nearestMidi, cents, clarity };
         }
 
-        /**
-         * Parabolic FFT Bin Peak Measurement around expected frequency.
-         * Returns { mag, peakFreq, centsOff }.
-         */
         _measureSpectralPeak(centerFreq, centsWindow = 75) {
           const sr = audio.ctx.sampleRate;
           const binHz = sr / 4096;
@@ -1218,7 +1345,6 @@
             return { mag: 0, peakFreq: centerFreq, centsOff: 999 };
           }
 
-          // Parabolic log-magnitude bin interpolation
           const m0 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin - 1]));
           const m1 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin]));
           const m2 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin + 1]));
@@ -1231,16 +1357,12 @@
           return { mag: peakMag, peakFreq, centsOff };
         }
 
-        /**
-         * Combined harmonic energy for a candidate guitar pitch (f0 + 2*f0 + low-string 3*f0).
-         */
         _harmonicScore(freq, midi) {
           const p1 = this._measureSpectralPeak(freq, 70);
           const p2 = this._measureSpectralPeak(freq * 2, 70);
           const p3 = midi <= 47 ? this._measureSpectralPeak(freq * 3, 70) : { mag: 0, centsOff: 0 };
 
           const energy = p1.mag + 0.58 * p2.mag + (midi <= 47 ? 0.38 * p3.mag : 0);
-          // For low strings on tiny phone mics, 2*f0 often gives cleaner cent precision than f0
           const bestCents = (midi <= 47 && p2.mag > p1.mag * 1.15) ? p2.centsOff : p1.centsOff;
           return { energy, centsOff: bestCents, f0Mag: p1.mag, f2Mag: p2.mag, f3Mag: p3.mag };
         }
@@ -1248,20 +1370,16 @@
         processFrame() {
           if (!this.analyser || !audio.ctx) return;
 
-          // Read latest 2048 time-domain samples from 4096 analyser via temp slice
           const fullTime = this._fullTime || (this._fullTime = new Float32Array(this.analyser.fftSize));
           this.analyser.getFloatTimeDomainData(fullTime);
-          // Copy the freshest 2048 samples at the tail of the 4096 buffer
           this.timeBuf.set(fullTime.subarray(fullTime.length - 2048));
 
-          // Compute RMS energy
           let sumSq = 0;
           for (let i = 0; i < 2048; i++) {
             sumSq += this.timeBuf[i] * this.timeBuf[i];
           }
           const rms = Math.sqrt(sumSq / 2048);
 
-          // Update live UI level meter
           const sens = SENSITIVITY_CONFIG[state.sensitivity];
           const normLevel = Math.min(1, Math.pow(rms / 0.085, 0.55));
           this.smoothedLevel = normLevel > this.smoothedLevel
@@ -1270,7 +1388,6 @@
 
           updateMicStripLevel(this.smoothedLevel, rms >= sens.rmsGate);
 
-          // Read 4096-pt FFT spectrum & convert guitar band (60–1500 Hz) to linear magnitude
           this.analyser.getFloatFrequencyData(this.freqDbBuf);
           const sr = audio.ctx.sampleRate;
           const binHz = sr / 4096;
@@ -1290,27 +1407,22 @@
           }
           const avgFloor = floorCount > 0 ? floorSum / floorCount : 1e-6;
 
-          // Run YIN pitch detection when signal exceeds gate
           let yinRes = null;
           if (rms >= sens.rmsGate * 0.85) {
             yinRes = this._detectYinPitch(sr);
           }
 
           if (yinRes && yinRes.clarity >= 0.72) {
-            const sign = yinRes.cents >= 0 ? '+' : '';
-            dom.micPitchReadout.textContent = `Mic: ${formatNoteName(yinRes.midi)} (${sign}${yinRes.cents}¢)`;
+            dom.micPitchReadout.textContent = `Mic: ${formatNoteName(yinRes.midi)}`;
             dom.micPitchReadout.className = 'text-mocha-text font-semibold truncate';
           } else if (rms < sens.rmsGate * 0.6) {
             dom.micPitchReadout.textContent = 'Listening…';
-            dom.micPitchReadout.className = 'text-mocha-subtext truncate';
+            dom.micPitchReadout.className = 'text-mocha-subtext0 truncate';
           }
 
-          // Evaluate active scheduled TAB notes if playing in Score mode
           if (state.isPlaying && !state.isCountingIn && state.pendingEvalNotes.length > 0) {
             this._evaluateScheduledNotes(rms, avgFloor, yinRes, sens);
           }
-
-          this.prevRms = rms;
         }
 
         _evaluateScheduledNotes(rms, avgFloor, yinRes, sens) {
@@ -1320,7 +1432,6 @@
             const item = state.pendingEvalNotes[i];
             if (item.resolved) continue;
 
-            // 1) Snapshot pre-window energy right before note window opens so we detect fresh plucks
             if (!item.preSampled && effectiveNow >= item.windowStart - 0.045) {
               const preSpec = this._harmonicScore(item.targetFreq, item.midi);
               item.preEnergy = preSpec.energy;
@@ -1328,33 +1439,19 @@
               item.preSampled = true;
             }
 
-            // 2) Close expired window: either lock in pending Good or grade as Miss
             if (effectiveNow > item.windowEnd) {
-              if (item.goodCandidateAt !== null) {
-                resolveEvaluatedNote(item, 'good');
-              } else {
-                resolveEvaluatedNote(item, 'miss');
-              }
+              resolveEvaluatedNote(item, item.goodCandidateAt !== null ? 'good' : 'miss');
               continue;
             }
 
-            // 3) If a Good candidate was registered and 45ms elapsed without upgrading to Perfect, commit Good
             if (item.goodCandidateAt !== null && audio.ctx.currentTime - item.goodCandidateAt >= 0.045) {
               resolveEvaluatedNote(item, 'good');
               continue;
             }
 
-            // Wait until inside active window & signal above gate
-            if (effectiveNow < item.windowStart || rms < sens.rmsGate) {
-              continue;
-            }
+            if (effectiveNow < item.windowStart || rms < sens.rmsGate) continue;
+            if (effectiveNow - this.lastHitTime < 0.042) continue;
 
-            // Brief 42ms cooldown after a previous hit so a single pluck doesn't double-score identical notes
-            if (effectiveNow - this.lastHitTime < 0.042) {
-              continue;
-            }
-
-            // Measure target harmonic energy & adjacent +/- 1 semitone wrong-fret competitors
             const targetSpec = this._harmonicScore(item.targetFreq, item.midi);
             const downFreq = item.targetFreq * Math.pow(2, -1 / 12);
             const upFreq = item.targetFreq * Math.pow(2, 1 / 12);
@@ -1362,7 +1459,7 @@
             const adjUp = this._harmonicScore(upFreq, item.midi + 1).energy;
             const maxAdjacent = Math.max(adjDown, adjUp);
 
-            // Check Path A: Direct YIN Monophonic Lock (including phone-mic low-string harmonic compensation)
+            // Path A: YIN Fundamental Lock (+ low-E2/G2 2nd/3rd harmonic compensation for phone mics)
             let yinMatched = false;
             let yinAbsCents = 999;
 
@@ -1372,8 +1469,6 @@
                 yinMatched = true;
                 yinAbsCents = directCentsDiff;
               } else if (item.midi <= 47) {
-                // Phone mic low-string compensation (E2..B2): phone mics often emphasize 2*f0 (+12 st)
-                // Verify 3*f0 odd harmonic exists so an actual octave-higher string pluck isn't accepted
                 const octCentsDiff = Math.abs(yinRes.exactMidi - (item.midi + 12)) * 100;
                 if (octCentsDiff <= 60 && targetSpec.f3Mag > avgFloor * 1.8 && targetSpec.energy > maxAdjacent * 1.25) {
                   yinMatched = true;
@@ -1382,13 +1477,12 @@
               }
             }
 
-            // Freshness check so passively decaying strings don't self-trigger without being plucked
             const hasOnsetOrPresence =
               targetSpec.energy > item.preEnergy * sens.onsetRatio ||
               rms > Math.max(0.002, item.preRms) * 1.18 ||
               (yinMatched && targetSpec.energy > avgFloor * (sens.snrMult * 1.4));
 
-            // Check Path B: High-res 4096-FFT Polyphonic "Let Ring" Spectral Target Matcher
+            // Path B: 4096-FFT Target-Harmonic Check against adjacent semitones
             const snrPassed = targetSpec.energy > avgFloor * sens.snrMult;
             const beatsAdjacentFrets = targetSpec.energy > maxAdjacent * 1.32;
             const specAbsCents = Math.abs(targetSpec.centsOff);
@@ -1428,13 +1522,18 @@
       const micListener = new GuitarMicListener();
 
       // =======================================================================
-      // 5. DOM REFERENCES & TOAST HELPER
+      // 5. DOM REFERENCES & HELPERS
       // =======================================================================
       const dom = {
         pillGm: document.getElementById('pill-gm'),
         pillEm: document.getElementById('pill-em'),
         btnChordToggle: document.getElementById('btn-chord-toggle'),
         btnSettings: document.getElementById('btn-settings'),
+        btnRhythmInfo: document.getElementById('btn-rhythm-info'),
+        rhythmTooltip: document.getElementById('rhythm-tooltip'),
+        pendulumDown: document.getElementById('pendulum-down'),
+        pendulumUp: document.getElementById('pendulum-up'),
+        pendulumBeat: document.getElementById('pendulum-beat'),
         micStrip: document.getElementById('mic-strip'),
         micDot: document.getElementById('mic-dot'),
         micMeterFill: document.getElementById('mic-meter-fill'),
@@ -1450,8 +1549,11 @@
         miniChordSvg: document.getElementById('mini-chord-svg'),
         chordName: document.getElementById('chord-name'),
         chordBarLabel: document.getElementById('chord-bar-label'),
+        chordStrokePill: document.getElementById('chord-stroke-pill'),
         chordNoteDetail: document.getElementById('chord-note-detail'),
         btnChordClose: document.getElementById('btn-chord-close'),
+        countinOverlay: document.getElementById('countin-overlay'),
+        countinBigNum: document.getElementById('countin-big-num'),
         tabRows: document.getElementById('tab-rows'),
         btnPlay: document.getElementById('btn-play'),
         iconPlay: document.getElementById('icon-play'),
@@ -1471,16 +1573,15 @@
         btnLoop: document.getElementById('btn-loop'),
         labelLoop: document.getElementById('label-loop'),
         settingsPopover: document.getElementById('settings-popover'),
+        rhythmModeBtns: document.querySelectorAll('.rhythm-mode-btn'),
         subGuitarAudio: document.getElementById('sub-guitar-audio'),
         swAudio: document.getElementById('sw-audio'),
         swMetro: document.getElementById('sw-metro'),
         swCountIn: document.getElementById('sw-countin'),
-        swStrokes: document.getElementById('sw-strokes'),
-        rowCapo3: document.getElementById('row-capo3'),
         swCapo3: document.getElementById('sw-capo3'),
+        swHeadphones: document.getElementById('sw-headphones'),
         labelSens: document.getElementById('label-sens'),
         sensBtns: document.querySelectorAll('.sens-btn'),
-        swHeadphones: document.getElementById('sw-headphones'),
         swEndless: document.getElementById('sw-endless'),
         gradeModal: document.getElementById('grade-modal'),
         modalRunMeta: document.getElementById('modal-run-meta'),
@@ -1501,7 +1602,7 @@
       };
 
       let toastTimer = null;
-      function showToast(msg, colorHex = '#89b4fa', durationMs = 3200) {
+      function showToast(msg, colorHex = '#89b4fa', durationMs = 3000) {
         if (toastTimer) clearTimeout(toastTimer);
         dom.toastDot.style.backgroundColor = colorHex;
         dom.toastText.textContent = msg;
@@ -1523,50 +1624,91 @@
         return node;
       }
 
+      // Update live Wrist-Pendulum Strip (↓ DOWN vs ↑ UP + 1 & 2 & 3 & 4 &)
+      function updatePendulumUI(noteIdx) {
+        const isDown = noteIdx % 2 === 0;
+        const beatStr = BEAT_SUBDIVISIONS[noteIdx] || '1';
+
+        if (isDown) {
+          dom.pendulumDown.className =
+            'px-1.5 py-[1px] rounded font-extrabold tracking-tight transition-all duration-75 bg-mocha-peach text-mocha-crust shadow-sm translate-y-[0.5px]';
+          dom.pendulumUp.className =
+            'px-1.5 py-[1px] rounded font-bold tracking-tight transition-all duration-75 bg-mocha-surface0/70 text-mocha-overlay0';
+          dom.pendulumBeat.className =
+            'w-5 text-center py-[1px] rounded bg-mocha-mantle border border-mocha-peach/50 font-extrabold text-mocha-peach tabular-nums';
+        } else {
+          dom.pendulumDown.className =
+            'px-1.5 py-[1px] rounded font-bold tracking-tight transition-all duration-75 bg-mocha-surface0/70 text-mocha-overlay0';
+          dom.pendulumUp.className =
+            'px-1.5 py-[1px] rounded font-extrabold tracking-tight transition-all duration-75 bg-mocha-lavender text-mocha-crust shadow-sm -translate-y-[0.5px]';
+          dom.pendulumBeat.className =
+            'w-5 text-center py-[1px] rounded bg-mocha-mantle border border-mocha-lavender/50 font-extrabold text-mocha-lavender tabular-nums';
+        }
+        dom.pendulumBeat.textContent = beatStr;
+      }
+
       // =======================================================================
-      // 6. UNIFIED 4-ROW SVG TABLATURE RENDERER & LIVE JUDGMENT STYLING
+      // 6. 4-ROW UNIFIED SVG TABLATURE + BUILT-IN PICK RHYTHM LANE RENDERER
       // =======================================================================
       function getRowMetrics() {
+        const mode = state.rhythmDisplay; // 'full' | 'arrows' | 'off'
         if (state.isDesktop) {
+          const vh = mode === 'full' ? 178 : mode === 'arrows' ? 163 : 144;
           return {
             vw: 940,
-            vh: state.showStrokes ? 172 : 152,
+            vh,
             marginX: 30,
             endX: 932,
-            topY: 35,
-            strGap: 20,
-            chordY: 20,
-            chordSize: 15,
+            topY: 33,
+            strGap: 19,
+            chordY: 19,
+            chordSize: 14.5,
             barNumSize: 11.5,
             strLabelX: 14,
-            strLabelSize: 12.5,
+            strLabelSize: 12,
             pillW: 24,
-            pillH: 18.5,
-            pillRx: 6,
-            digitSize: 14.5,
-            strokeY: 164,
-            strokeSize: 11,
+            pillH: 17.5,
+            pillRx: 5.5,
+            digitSize: 14,
+            rhythmPillY: 140,
+            rhythmPillH: mode === 'full' ? 33 : 19,
+            rhythmPillW: 24,
+            arrowTop: 143.5,
+            arrowBot: 154.5,
+            arrowWing: 3.4,
+            beatTextY: 168.5,
+            beatFontSize: 11,
+            leftIconY: mode === 'full' ? 156 : 149.5,
           };
         }
-        // Compact mobile geometry so all 8 bars + mic strip fit without clutter
+
+        // Compact mobile geometry: fits all 4 rows + Pick Rhythm Lane on a single phone viewport
+        const vh = mode === 'full' ? 209 : mode === 'arrows' ? 191 : 170;
         return {
           vw: 640,
-          vh: state.showStrokes ? 214 : 186,
+          vh,
           marginX: 28,
           endX: 634,
-          topY: 41,
-          strGap: 25,
-          chordY: 23,
-          chordSize: 20.5,
-          barNumSize: 15,
+          topY: 38,
+          strGap: 23,
+          chordY: 21,
+          chordSize: 19,
+          barNumSize: 14.5,
           strLabelX: 12,
-          strLabelSize: 16,
-          pillW: 28,
-          pillH: 23,
-          pillRx: 7.5,
-          digitSize: 20,
-          strokeY: 206,
-          strokeSize: 14,
+          strLabelSize: 15,
+          pillW: 27,
+          pillH: 21,
+          pillRx: 7,
+          digitSize: 18.5,
+          rhythmPillY: 166,
+          rhythmPillH: mode === 'full' ? 38 : 21,
+          rhythmPillW: 26,
+          arrowTop: 170,
+          arrowBot: 182,
+          arrowWing: 3.9,
+          beatTextY: 199.5,
+          beatFontSize: 13.5,
+          leftIconY: mode === 'full' ? 185 : 176,
         };
       }
 
@@ -1577,6 +1719,8 @@
         const midX = m.marginX + (m.endX - m.marginX) / 2;
         const barWidth = (m.endX - m.marginX) / 2;
         const bottomY = m.topY + 5 * m.strGap;
+        const showRhythm = state.rhythmDisplay !== 'off';
+        const showBeats = state.rhythmDisplay === 'full';
 
         dom.tabRows.innerHTML = '';
 
@@ -1587,7 +1731,7 @@
 
           const rowWrap = document.createElement('div');
           rowWrap.className = [
-            'w-full rounded-xl bg-mocha-mantle/55 border border-mocha-surface0/85 overflow-hidden transition-opacity duration-150',
+            'w-full rounded-xl bg-mocha-mantle/60 border border-mocha-surface0/85 overflow-hidden transition-opacity duration-150',
             inLoop ? 'opacity-100' : 'opacity-35 hover:opacity-75',
           ].join(' ');
 
@@ -1596,7 +1740,55 @@
             class: 'w-full h-auto block',
           });
 
-          // Left margin string names ONCE per row (e B G D A E) + weighted string lines
+          // Subtle Pick Rhythm Lane background tint + left margin '↕' symbol
+          if (showRhythm) {
+            svg.appendChild(
+              svgEl('rect', {
+                x: m.marginX,
+                y: m.rhythmPillY - 1.5,
+                width: m.endX - m.marginX,
+                height: m.rhythmPillH + 3,
+                fill: '#181825',
+                opacity: '0.65',
+              })
+            );
+
+            // Crisp custom vector '↕' icon in the left margin aligned with the Pick Rhythm Lane
+            const iy = m.leftIconY;
+            const ix = m.strLabelX;
+            svg.appendChild(
+              svgEl('path', {
+                d: `M ${ix} ${iy - 5.5} L ${ix} ${iy + 5.5} M ${ix - 2.6} ${iy - 3} L ${ix} ${iy - 5.5} L ${ix + 2.6} ${iy - 3} M ${ix - 2.6} ${iy + 3} L ${ix} ${iy + 5.5} L ${ix + 2.6} ${iy + 3}`,
+                fill: 'none',
+                stroke: '#6c7086',
+                'stroke-width': '1.5',
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+              })
+            );
+          }
+
+          // Subtle vertical quarter-note beat guide ticks (beats 2, 3, 4) inside each bar
+          [barIdxA, barIdxB].forEach((bIdx, side) => {
+            const barStartX = m.marginX + side * barWidth;
+            const colW = barWidth / 8;
+            for (let beat = 1; beat <= 3; beat++) {
+              const gx = barStartX + beat * 2 * colW;
+              svg.appendChild(
+                svgEl('line', {
+                  x1: gx,
+                  y1: m.topY,
+                  x2: gx,
+                  y2: bottomY,
+                  stroke: '#313244',
+                  'stroke-width': '1',
+                  opacity: '0.65',
+                })
+              );
+            }
+          });
+
+          // Left margin string labels (e B G D A E) + weighted string lines
           for (let s = 0; s < 6; s++) {
             const y = m.topY + s * m.strGap;
             svg.appendChild(
@@ -1690,7 +1882,7 @@
                   x2: splitX,
                   y2: bottomY + 4,
                   stroke: '#585b70',
-                  'stroke-width': '1.2',
+                  'stroke-width': '1.3',
                   'stroke-dasharray': '3 3',
                 })
               );
@@ -1712,14 +1904,14 @@
               );
             }
 
-            // Vertical Playhead Cursor
+            // Vertical Playhead Cursor spanning strings into rhythm lane
             svg.appendChild(
               svgEl('line', {
                 id: `playhead-${bIdx}`,
                 x1: barStartX + colW * 0.5,
                 y1: m.topY - 6,
                 x2: barStartX + colW * 0.5,
-                y2: bottomY + 6,
+                y2: showRhythm ? m.rhythmPillY + m.rhythmPillH : bottomY + 6,
                 stroke: '#fab387',
                 'stroke-width': '1.8',
                 opacity: '0',
@@ -1727,13 +1919,14 @@
               })
             );
 
-            // 8 Eighth Notes
+            // 8 Eighth-Note Interactive Groups (Fret Pill + Pick Rhythm Arrow & Beat Grid)
             barData.notes.forEach((note, nIdx) => {
               const cx = barStartX + colW * (nIdx + 0.5);
               const cy = m.topY + STRING_TO_TAB_ROW[note.str] * m.strGap;
+              const isDown = note.stroke === 'D';
               const judged = state.judgments[bIdx][nIdx];
 
-              const classes = ['tab-note'];
+              const classes = ['tab-note', isDown ? 'stroke-d' : 'stroke-u'];
               if (judged) classes.push(`judged-${judged}`);
 
               const g = svgEl('g', {
@@ -1742,18 +1935,18 @@
                 'data-cx': cx,
               });
 
-              // Touch target
+              // Full-column touch target (includes rhythm lane for effortless tapping)
               g.appendChild(
                 svgEl('rect', {
                   x: barStartX + nIdx * colW,
                   y: m.topY - 12,
                   width: colW,
-                  height: bottomY - m.topY + 24,
+                  height: m.vh - (m.topY - 12),
                   fill: 'transparent',
                 })
               );
 
-              // Active playhead halo
+              // Active playhead halo around fret pill
               g.appendChild(
                 svgEl('rect', {
                   class: 'note-halo',
@@ -1767,7 +1960,7 @@
                 })
               );
 
-              // Hit pop ring (triggered dynamically when Perfect/Good lands)
+              // Hit pop ring for Score Mode Perfect/Good feedback
               g.appendChild(
                 svgEl('rect', {
                   class: 'hit-pop-ring',
@@ -1783,7 +1976,7 @@
                 })
               );
 
-              // Note badge background
+              // Fret pill background
               g.appendChild(
                 svgEl('rect', {
                   class: 'note-bg',
@@ -1797,7 +1990,7 @@
                 })
               );
 
-              // Fret number
+              // Fret number text
               g.appendChild(
                 svgEl(
                   'text',
@@ -1815,24 +2008,60 @@
                 )
               );
 
-              // Optional Pick Strokes (D / U)
-              if (state.showStrokes) {
+              // Pick Rhythm Lane: Highlight Capsule + Custom SVG ↓/↑ Arrow + Beat Grid (1 & 2 & 3 & 4 &)
+              if (showRhythm) {
                 g.appendChild(
-                  svgEl(
-                    'text',
-                    {
-                      x: cx,
-                      y: m.strokeY,
-                      'text-anchor': 'middle',
-                      fill: note.stroke === 'D' ? '#89b4fa' : '#a6e3a1',
-                      'font-family': 'JetBrains Mono, monospace',
-                      'font-size': m.strokeSize,
-                      'font-weight': '600',
-                      opacity: '0.86',
-                    },
-                    note.stroke
-                  )
+                  svgEl('rect', {
+                    class: 'rhythm-pill',
+                    x: cx - m.rhythmPillW / 2,
+                    y: m.rhythmPillY,
+                    width: m.rhythmPillW,
+                    height: m.rhythmPillH,
+                    rx: 6,
+                    fill: isDown ? '#fab387' : '#89b4fa',
+                    opacity: '0',
+                  })
                 );
+
+                // Crisp Vector Down-Arrow (↓) on beats 1,2,3,4 or Up-Arrow (↑) on & off-beats
+                const aTop = m.arrowTop;
+                const aBot = m.arrowBot;
+                const w = m.arrowWing;
+                const arrowPath = isDown
+                  ? `M ${cx} ${aTop} L ${cx} ${aBot} M ${cx - w} ${aBot - w} L ${cx} ${aBot} L ${cx + w} ${aBot - w}`
+                  : `M ${cx} ${aBot} L ${cx} ${aTop} M ${cx - w} ${aTop + w} L ${cx} ${aTop} L ${cx + w} ${aTop + w}`;
+
+                g.appendChild(
+                  svgEl('path', {
+                    class: 'rhythm-arrow',
+                    d: arrowPath,
+                    fill: 'none',
+                    stroke: isDown ? '#fab387' : '#b4befe',
+                    'stroke-width': isDown ? '2.15' : '1.85',
+                    'stroke-linecap': 'round',
+                    'stroke-linejoin': 'round',
+                  })
+                );
+
+                // Beat count ('1', '&', '2', '&', '3', '&', '4', '&')
+                if (showBeats) {
+                  g.appendChild(
+                    svgEl(
+                      'text',
+                      {
+                        class: 'rhythm-beat',
+                        x: cx,
+                        y: m.beatTextY,
+                        'text-anchor': 'middle',
+                        fill: nIdx === 0 ? '#cdd6f4' : isDown ? '#a6adc8' : '#9399b2',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': m.beatFontSize,
+                        'font-weight': isDown ? '700' : '500',
+                      },
+                      note.beatLabel
+                    )
+                  );
+                }
               }
 
               g.addEventListener('click', () => jumpToNote(bIdx, nIdx, true));
@@ -1868,7 +2097,12 @@
 
         if (noteObj) {
           const midi = getMidiPitch(noteObj.str, noteObj.fret);
+          const isDown = noteObj.stroke === 'D';
           dom.chordNoteDetail.textContent = `${noteObj.str} string · Fret ${noteObj.fret} (${formatNoteName(midi)})`;
+          dom.chordStrokePill.textContent = `${isDown ? '↓' : '↑'} ${noteObj.beatLabel}`;
+          dom.chordStrokePill.className = isDown
+            ? 'px-1.5 py-0.5 rounded font-mono text-[10px] font-bold bg-mocha-peach/20 text-mocha-peach leading-none'
+            : 'px-1.5 py-0.5 rounded font-mono text-[10px] font-bold bg-mocha-lavender/20 text-mocha-lavender leading-none';
         }
 
         const svg = dom.miniChordSvg;
@@ -1910,7 +2144,7 @@
           );
         }
 
-        // Nut
+        // Top Nut
         svg.appendChild(
           svgEl('line', {
             x1: leftX - 1,
@@ -1936,7 +2170,7 @@
               x2: sx,
               y2: botY,
               stroke: isPlucked ? '#fab387' : fretVal === 'x' ? '#313244' : '#6c7086',
-              'stroke-width': isPlucked ? '2.2' : '1.3',
+              'stroke-width': isPlucked ? '2.3' : '1.3',
             })
           );
 
@@ -1999,7 +2233,7 @@
       }
 
       // =======================================================================
-      // 8. LIVE SCORING, JUDGMENT UPDATES & GRADE CARD MODAL
+      // 8. LIVE SCORING, JUDGMENT UPDATES & GRADE SUMMARY MODAL
       // =======================================================================
       function updateMicStripLevel(level, aboveGate) {
         dom.micMeterFill.style.width = `${Math.round(level * 100)}%`;
@@ -2065,7 +2299,6 @@
           state.streak = 0;
         }
 
-        // Color TAB note badge & trigger crisp halo pop
         const node = document.getElementById(`note-${item.barIdx}-${item.noteIdx}`);
         if (node) {
           node.classList.remove('judged-perfect', 'judged-good', 'judged-miss');
@@ -2076,7 +2309,6 @@
             if (popRing) {
               popRing.setAttribute('stroke', verdict === 'perfect' ? '#a6e3a1' : '#89b4fa');
               popRing.classList.remove('hit-pop-anim');
-              // Force reflow to restart animation cleanly
               void popRing.getBoundingClientRect();
               popRing.classList.add('hit-pop-anim');
             }
@@ -2104,7 +2336,6 @@
         dom.modalGood.textContent = String(state.goodCount);
         dom.modalMiss.textContent = String(state.missCount);
 
-        // Compute per-bar accuracy & populate 8-bar mini chart
         const bars = ARRANGEMENTS[state.mode].bars;
         dom.modalBarChart.innerHTML = '';
 
@@ -2137,12 +2368,12 @@
 
             const barColor =
               bPct >= 85 ? '#a6e3a1' :
-              bPct >= 70 ? '#89b4fa' :
-              bPct >= 45 ? '#fab387' : '#f38ba8';
+              bPct >= 75 ? '#89b4fa' :
+              bPct >= 50 ? '#fab387' : '#f38ba8';
 
             const hPct = Math.max(14, bPct);
             col.innerHTML = `
-              <span class="font-mono text-[9px] text-mocha-subtext">${bPct}%</span>
+              <span class="font-mono text-[9px] text-mocha-subtext0">${bPct}%</span>
               <div class="w-full flex-1 bg-mocha-surface0/60 rounded-md flex items-end overflow-hidden">
                 <div class="w-full rounded-md transition-all" style="height:${hPct}%;background:${barColor}"></div>
               </div>
@@ -2158,47 +2389,44 @@
           dom.modalBarChart.appendChild(col);
         }
 
-        // Smart Coaching Line
+        // Coaching feedback
         const totalHits = state.perfectCount + state.goodCount;
         const totalEvaluated = totalHits + state.missCount;
 
         if (totalEvaluated === 0) {
           dom.modalCoaching.textContent = 'Press Play to run a pass and grade your guitar playing live.';
         } else if (totalHits === 0) {
-          dom.modalCoaching.textContent = 'No notes detected — move closer to your mic or set Mic Sensitivity to High in ⚙️.';
+          dom.modalCoaching.textContent = 'No notes detected — move closer to your mic or set Mic Sensitivity to High in ⚙.';
         } else if (pct >= 95 && worstBarPct >= 85) {
-          dom.modalCoaching.textContent = 'Clean pass across all bars! Try nudging tempo up +5 BPM.';
+          dom.modalCoaching.textContent = 'Clean ↓↑ crosspicking across all bars! Try nudging tempo up +5 BPM.';
         } else if (worstBarIdx !== -1) {
           const bData = bars[worstBarIdx];
           const cLabel = bData.midChord
             ? `${CHORDS[bData.chord].label}/${CHORDS[bData.midChord].label}`
             : CHORDS[bData.chord].label;
-          dom.modalCoaching.textContent = `Work on Bar ${worstBarIdx + 1} · ${cLabel} (${worstBarPct}%) — tap its notes on the sheet to check pitch.`;
+          dom.modalCoaching.textContent = `Focus on Bar ${worstBarIdx + 1} (${cLabel}, ${worstBarPct}%) — keep your ↓↑ wrist motion steady and let notes ring.`;
         }
 
-        // Check if Bars 1–4 vs Bars 5–8 has a noticeably weaker half (when full 1–8 was played)
+        // Configure "Loop Weak Half (1-4 or 5-8)" button
         const firstHalf = barPcts.slice(0, 4).filter((v) => v !== null);
         const secondHalf = barPcts.slice(4, 8).filter((v) => v !== null);
-        if (firstHalf.length === 4 && secondHalf.length === 4) {
-          const avg1 = firstHalf.reduce((a, b) => a + b, 0) / 4;
-          const avg2 = secondHalf.reduce((a, b) => a + b, 0) / 4;
-          if (avg1 + 10 < avg2) {
-            dom.btnModalWeak.textContent = 'Loop Bars 1–4';
+
+        if (firstHalf.length > 0 && secondHalf.length > 0) {
+          const avg1 = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+          const avg2 = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+          if (avg1 <= avg2) {
+            dom.btnModalWeak.textContent = 'Loop Weak Half (1-4)';
             dom.btnModalWeak.dataset.targetLoop = '1';
-            dom.btnModalWeak.classList.remove('hidden');
-            dom.btnModalWeak.classList.add('inline-flex');
-          } else if (avg2 + 10 < avg1) {
-            dom.btnModalWeak.textContent = 'Loop Bars 5–8';
-            dom.btnModalWeak.dataset.targetLoop = '2';
-            dom.btnModalWeak.classList.remove('hidden');
-            dom.btnModalWeak.classList.add('inline-flex');
           } else {
-            dom.btnModalWeak.classList.add('hidden');
-            dom.btnModalWeak.classList.remove('inline-flex');
+            dom.btnModalWeak.textContent = 'Loop Weak Half (5-8)';
+            dom.btnModalWeak.dataset.targetLoop = '2';
           }
+        } else if (state.loopIdx === 1) {
+          dom.btnModalWeak.textContent = 'Switch to Bars 5-8';
+          dom.btnModalWeak.dataset.targetLoop = '2';
         } else {
-          dom.btnModalWeak.classList.add('hidden');
-          dom.btnModalWeak.classList.remove('inline-flex');
+          dom.btnModalWeak.textContent = 'Loop Bars 1-4';
+          dom.btnModalWeak.dataset.targetLoop = '1';
         }
 
         dom.gradeModal.classList.remove('hidden');
@@ -2211,7 +2439,7 @@
       }
 
       // =======================================================================
-      // 9. PRECISION LOOKAHEAD PLAYBACK & SCORING SCHEDULER
+      // 9. PRECISION LOOKAHEAD PLAYBACK, COUNT-IN & SCORING SCHEDULER
       // =======================================================================
       let prevNoteNode = null;
       let prevPlayheadNode = null;
@@ -2235,7 +2463,7 @@
             const cx = noteNode.getAttribute('data-cx');
             phNode.setAttribute('x1', cx);
             phNode.setAttribute('x2', cx);
-            phNode.setAttribute('opacity', state.isPlaying ? '0.55' : '0.3');
+            phNode.setAttribute('opacity', state.isPlaying ? '0.55' : '0.30');
             prevPlayheadNode = phNode;
           }
         }
@@ -2244,6 +2472,8 @@
           chordNode.setAttribute('fill', '#fab387');
           prevChordNode = chordNode;
         }
+
+        updatePendulumUI(noteIdx);
       }
 
       let schedTimer = null;
@@ -2274,21 +2504,40 @@
         return true;
       }
 
+      function hideCountInUI() {
+        dom.badgeCountIn.classList.add('hidden');
+        dom.countinOverlay.classList.add('hidden');
+        dom.countinOverlay.classList.remove('flex');
+      }
+
       function schedulerLoop() {
         if (!state.isPlaying || !audio.ctx || stopAfterPassScheduled) return;
 
-        while (nextTime < audio.ctx.currentTime + 0.1) {
+        while (nextTime < audio.ctx.currentTime + 0.10) {
           const beatSec = 60.0 / state.bpm;
           const eighthSec = beatSec / 2.0;
 
           if (state.isCountingIn) {
-            const num = countStep + 1;
+            // Visual 4 - 3 - 2 - 1 countdown badge + woodblock click
+            const remaining = 4 - countStep;
+            const isFirstClick = countStep === 0;
             const t = nextTime;
-            audio.click(num === 1, t);
+            audio.click(isFirstClick, t);
+
             scheduleUI(t, () => {
-              dom.badgeCountIn.textContent = String(num);
+              dom.badgeCountIn.textContent = String(remaining);
               dom.badgeCountIn.classList.remove('hidden');
               dom.labelPlay.classList.add('hidden');
+
+              dom.countinBigNum.textContent = String(remaining);
+              dom.countinOverlay.classList.remove('hidden');
+              dom.countinOverlay.classList.add('flex');
+              dom.countinBigNum.classList.remove('count-pulse');
+              void dom.countinBigNum.offsetWidth;
+              dom.countinBigNum.classList.add('count-pulse');
+
+              // Pulse pendulum downbeats during count-in so player locks in wrist tempo
+              updatePendulumUI((countStep % 4) * 2);
             });
 
             countStep++;
@@ -2298,7 +2547,7 @@
               state.isCountingIn = false;
               const endCountT = nextTime - 0.02;
               scheduleUI(endCountT, () => {
-                dom.badgeCountIn.classList.add('hidden');
+                hideCountInUI();
                 if (state.isDesktop) dom.labelPlay.classList.remove('hidden');
               });
             }
@@ -2316,9 +2565,7 @@
               audio.click(nIdx === 0, t);
             }
 
-            // Enqueue note for microphone evaluation in Score mode
             if (state.scoreMode) {
-              // Clear previous badge judgment on this note if endless looping wraps around
               if (state.endlessScoreLoop && state.judgments[bIdx][nIdx] !== null) {
                 scheduleUI(t - 0.05, () => {
                   state.judgments[bIdx][nIdx] = null;
@@ -2356,13 +2603,11 @@
             const isLastNoteOfLoop = bIdx === loopEnd && nIdx === 7;
 
             if (state.scoreMode && !state.endlessScoreLoop && isLastNoteOfLoop) {
-              // Allow the final note's evaluation window + latency to finish cleanly, then show Grade Card
               stopAfterPassScheduled = true;
               const winAfter = Math.min(eighthSec * 0.9, 0.420);
               const finishDelayMs = Math.max(80, (t + winAfter + MIC_LATENCY_SEC + 0.045 - audio.ctx.currentTime) * 1000);
               state.runFinishingTimer = setTimeout(() => {
                 state.runFinishingTimer = null;
-                // Resolve any remaining unresolved notes before opening modal
                 state.pendingEvalNotes.forEach((item) => {
                   if (!item.resolved) {
                     resolveEvaluatedNote(item, item.goodCandidateAt !== null ? 'good' : 'miss');
@@ -2398,7 +2643,6 @@
           state.activeNote = 0;
         }
 
-        // If starting a fresh graded run in Score mode, clear prior pass judgments cleanly
         if (state.scoreMode) {
           const alreadyHasJudgments = state.perfectCount + state.goodCount + state.missCount > 0;
           if (forceFromLoopStart || (alreadyHasJudgments && state.activeBar === loopStart && state.activeNote === 0)) {
@@ -2435,7 +2679,7 @@
         }
         clearVisualTimers();
         state.pendingEvalNotes = [];
-        dom.badgeCountIn.classList.add('hidden');
+        hideCountInUI();
         syncPlayButtonUI();
         applyPlayheadVisual(state.activeBar, state.activeNote);
         renderMiniChord(state.activeBar, state.activeNote, null);
@@ -2470,7 +2714,6 @@
         state.activeNote = noteIdx;
 
         const note = ARRANGEMENTS[state.mode].bars[barIdx].notes[noteIdx];
-        // Allow manual note ear-check when paused even if Score mode muted playback synth
         if (previewSound && (shouldPlaySynthDuringPlayback() || !state.isPlaying)) {
           audio.pluck(note.str, getMidiPitch(note.str, note.fret), note.stroke);
         }
@@ -2480,7 +2723,7 @@
           state.isCountingIn = false;
           stopAfterPassScheduled = false;
           state.pendingEvalNotes = [];
-          dom.badgeCountIn.classList.add('hidden');
+          hideCountInUI();
           const [ls, le] = getLoopRange();
           let nextN = noteIdx + 1;
           let nextB = barIdx;
@@ -2506,7 +2749,6 @@
             state.scoreMode = true;
             await micListener.start();
 
-            // Save user's normal playback settings & prevent speaker feedback automatically
             state.savedPrefsBeforeScore = {
               guitarAudio: state.guitarAudio,
               metronome: state.metronome,
@@ -2524,7 +2766,7 @@
             syncAllSettingsSwitches();
 
             if (!state.headphonesMode) {
-              showToast('Mic Score ON · Guitar synth muted & Metronome enabled', '#a6e3a1', 3000);
+              showToast('Mic Score ON · Synth auto-muted & Metronome active', '#a6e3a1', 2800);
             } else {
               showToast('Mic Score ON · Headphones Mode active', '#cba6f7', 2400);
             }
@@ -2545,7 +2787,6 @@
           closeGradeModal();
           resetScoreRun(true);
 
-          // Restore previous normal playback settings
           if (state.savedPrefsBeforeScore) {
             state.guitarAudio = state.savedPrefsBeforeScore.guitarAudio;
             state.metronome = state.savedPrefsBeforeScore.metronome;
@@ -2566,17 +2807,16 @@
             'h-10 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-mauve/20 text-mocha-mauve border-mocha-mauve/50 shadow-sm';
           dom.subGuitarAudio.textContent = state.headphonesMode
             ? 'Headphones ON (synth audible)'
-            : 'Auto-muted in Score mode';
-          // Adjust sticky offset of mobile chord drawer when 30px mic strip is visible
-          dom.chordPanel.classList.remove('top-12');
-          dom.chordPanel.classList.add('top-[78px]');
+            : 'Auto-muted during Score mode';
+          dom.chordPanel.classList.remove('top-[74px]');
+          dom.chordPanel.classList.add('top-[104px]');
         } else {
           dom.micStrip.classList.add('hidden');
           dom.btnScoreMode.className =
             'h-10 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0';
-          dom.subGuitarAudio.textContent = 'Synthesized steel-string plucks';
-          dom.chordPanel.classList.remove('top-[78px]');
-          dom.chordPanel.classList.add('top-12');
+          dom.subGuitarAudio.textContent = 'Let-ring steel-string plucks';
+          dom.chordPanel.classList.remove('top-[104px]');
+          dom.chordPanel.classList.add('top-[74px]');
         }
       }
 
@@ -2600,6 +2840,7 @@
       function setMode(newMode) {
         if (state.mode === newMode) return;
         state.mode = newMode;
+        writePref('gtab_mode', newMode);
         if (state.scoreMode) resetScoreRun(false);
         syncModePillsUI();
       }
@@ -2608,23 +2849,30 @@
         const isGm = state.mode === 'Gm';
         dom.pillGm.setAttribute('aria-selected', String(isGm));
         dom.pillEm.setAttribute('aria-selected', String(!isGm));
-
-        dom.pillEm.textContent = !isGm && state.capo3Pitch ? 'Em+3' : 'Em';
+        dom.pillEm.textContent = state.capo3Pitch ? 'Em+3' : 'Em';
 
         if (isGm) {
           dom.pillGm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition bg-mocha-blue text-mocha-crust';
-          dom.pillEm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text';
-          dom.rowCapo3.classList.add('hidden');
-          dom.rowCapo3.classList.remove('flex');
+          dom.pillEm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext0 hover:text-mocha-text';
         } else {
           dom.pillEm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition bg-mocha-blue text-mocha-crust';
-          dom.pillGm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text';
-          dom.rowCapo3.classList.remove('hidden');
-          dom.rowCapo3.classList.add('flex');
+          dom.pillGm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext0 hover:text-mocha-text';
         }
 
         renderTabSheet();
         renderMiniChord(state.activeBar, state.activeNote, null);
+      }
+
+      function setRhythmDisplay(mode) {
+        state.rhythmDisplay = mode;
+        writePref('gtab_rhythm', mode);
+        dom.rhythmModeBtns.forEach((btn) => {
+          const active = btn.dataset.rhythm === mode;
+          btn.className = active
+            ? 'rhythm-mode-btn py-1 rounded-lg font-mono text-[11px] font-bold bg-mocha-surface0 text-mocha-blue transition'
+            : 'rhythm-mode-btn py-1 rounded-lg font-mono text-[11px] font-semibold text-mocha-subtext0 hover:text-mocha-text transition';
+        });
+        renderTabSheet();
       }
 
       function syncChordPanelUI() {
@@ -2635,7 +2883,7 @@
           renderMiniChord(state.activeBar, state.activeNote, null);
         } else {
           dom.chordPanel.classList.add('hidden');
-          dom.btnChordToggle.className = 'h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext border-mocha-surface0 hover:text-mocha-text';
+          dom.btnChordToggle.className = 'h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext0 border-mocha-surface0 hover:text-mocha-text';
         }
       }
 
@@ -2650,7 +2898,7 @@
           const match = Number(chip.dataset.bpm) === clamped;
           chip.className = match
             ? 'bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-blue/20 text-mocha-blue border border-mocha-blue/40 transition'
-            : 'bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition';
+            : 'bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext0 border border-mocha-surface0 transition';
         });
       }
 
@@ -2671,7 +2919,7 @@
           knob.className = 'block w-4 h-4 rounded-full bg-mocha-crust translate-x-4 transition-transform';
         } else {
           btn.className = 'w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0';
-          knob.className = 'block w-4 h-4 rounded-full bg-mocha-subtext translate-x-0 transition-transform';
+          knob.className = 'block w-4 h-4 rounded-full bg-mocha-subtext0 translate-x-0 transition-transform';
         }
       }
 
@@ -2680,7 +2928,6 @@
         syncSwitchUI(dom.swAudio, effectiveAudio);
         syncSwitchUI(dom.swMetro, state.metronome);
         syncSwitchUI(dom.swCountIn, state.countIn);
-        syncSwitchUI(dom.swStrokes, state.showStrokes);
         syncSwitchUI(dom.swCapo3, state.capo3Pitch);
         syncSwitchUI(dom.swHeadphones, state.headphonesMode);
         syncSwitchUI(dom.swEndless, state.endlessScoreLoop);
@@ -2693,7 +2940,7 @@
           const active = btn.dataset.sens === level;
           btn.className = active
             ? 'sens-btn py-1 rounded-lg text-xs font-semibold bg-mocha-surface0 text-mocha-blue transition'
-            : 'sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition';
+            : 'sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext0 hover:text-mocha-text transition';
         });
       }
 
@@ -2702,6 +2949,8 @@
         dom.btnBpmPill.setAttribute('aria-expanded', 'false');
         dom.settingsPopover.classList.add('hidden');
         dom.btnSettings.setAttribute('aria-expanded', 'false');
+        dom.rhythmTooltip.classList.add('hidden');
+        dom.btnRhythmInfo.setAttribute('aria-expanded', 'false');
       }
 
       // =======================================================================
@@ -2709,6 +2958,16 @@
       // =======================================================================
       dom.pillGm.addEventListener('click', () => setMode('Gm'));
       dom.pillEm.addEventListener('click', () => setMode('Em'));
+
+      dom.btnRhythmInfo.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = dom.rhythmTooltip.classList.contains('hidden');
+        closeAllPopovers();
+        if (opening) {
+          dom.rhythmTooltip.classList.remove('hidden');
+          dom.btnRhythmInfo.setAttribute('aria-expanded', 'true');
+        }
+      });
 
       dom.btnChordToggle.addEventListener('click', () => {
         state.showChord = !state.showChord;
@@ -2769,10 +3028,13 @@
         renderMiniChord(state.activeBar, state.activeNote, null);
       });
 
-      // Settings Toggles
+      // Settings Controls
+      dom.rhythmModeBtns.forEach((btn) => {
+        btn.addEventListener('click', () => setRhythmDisplay(btn.dataset.rhythm));
+      });
+
       dom.swAudio.addEventListener('click', () => {
         if (state.scoreMode && !state.headphonesMode) {
-          // Turning Guitar Audio ON while in Score Mode automatically enables Headphones Mode
           state.headphonesMode = true;
           state.guitarAudio = true;
           syncScoreModeUI();
@@ -2793,20 +3055,11 @@
         syncAllSettingsSwitches();
       });
 
-      dom.swStrokes.addEventListener('click', () => {
-        state.showStrokes = !state.showStrokes;
-        syncAllSettingsSwitches();
-        renderTabSheet();
-      });
-
       dom.swCapo3.addEventListener('click', () => {
         state.capo3Pitch = !state.capo3Pitch;
+        if (state.scoreMode && !state.isPlaying) resetScoreRun(false);
         syncAllSettingsSwitches();
         syncModePillsUI();
-      });
-
-      dom.sensBtns.forEach((btn) => {
-        btn.addEventListener('click', () => setSensitivity(btn.dataset.sens));
       });
 
       dom.swHeadphones.addEventListener('click', () => {
@@ -2818,12 +3071,16 @@
         syncAllSettingsSwitches();
       });
 
+      dom.sensBtns.forEach((btn) => {
+        btn.addEventListener('click', () => setSensitivity(btn.dataset.sens));
+      });
+
       dom.swEndless.addEventListener('click', () => {
         state.endlessScoreLoop = !state.endlessScoreLoop;
         syncAllSettingsSwitches();
       });
 
-      // Grade Card Modal Actions
+      // Grade Summary Modal Actions
       dom.btnModalX.addEventListener('click', closeGradeModal);
       dom.btnModalClose.addEventListener('click', closeGradeModal);
       dom.gradeModal.addEventListener('click', (e) => {
@@ -2846,6 +3103,7 @@
 
       dom.bpmPopover.addEventListener('click', (e) => e.stopPropagation());
       dom.settingsPopover.addEventListener('click', (e) => e.stopPropagation());
+      dom.rhythmTooltip.addEventListener('click', (e) => e.stopPropagation());
       document.addEventListener('click', () => closeAllPopovers());
 
       desktopQuery.addEventListener('change', (e) => {
@@ -2900,6 +3158,7 @@
       // =======================================================================
       setBpm(60);
       setSensitivity('normal');
+      setRhythmDisplay(state.rhythmDisplay);
       syncChordPanelUI();
       syncAllSettingsSwitches();
       syncModePillsUI();
