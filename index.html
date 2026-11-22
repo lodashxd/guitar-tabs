@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Chance I'd Never Have — Acoustic Intro TAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configure Tailwind with Catppuccin Mocha design tokens
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          },
+          colors: {
+            mocha: {
+              crust: '#11111b',
+              mantle: '#181825',
+              base: '#1e1e2e',
+              card: '#252638',
+              surface0: '#313244',
+              surface1: '#45475a',
+              surface2: '#585b70',
+              overlay0: '#6c7086',
+              subtext0: '#a6adc8',
+              text: '#cdd6f4',
+              blue: '#89b4fa',
+              peach: '#fab387',
+              green: '#a6e3a1',
+              red: '#f38ba8',
+              lavender: '#b4befe',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Minimal custom styling for smooth SVG note pulses and range slider thumb */
+    html {
+      background-color: #1e1e2e;
+      color: #cdd6f4;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #89b4fa;
+      border: 2px solid #181825;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+      background: #fab387;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #89b4fa;
+      border: 2px solid #181825;
+      cursor: pointer;
+      box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
+      transition: transform 0.12s ease, background-color 0.12s ease;
+    }
+
+    @keyframes pluckRipple {
+      0% {
+        opacity: 0.9;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(2.1);
+      }
+    }
+    .ripple-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: pluckRipple 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .note-group {
+      cursor: pointer;
+    }
+    .note-group .note-pill {
+      transition: fill 0.1s ease, stroke 0.1s ease, transform 0.1s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .note-group:hover .note-pill {
+      stroke: #89b4fa;
+      fill: #3b3d54;
+    }
+    .note-group.is-active .note-pill {
+      fill: #fab387 !important;
+      stroke: #fde2cf !important;
+      transform: scale(1.16);
+    }
+    .note-group.is-active .note-num {
+      fill: #11111b !important;
+      font-weight: 800;
+    }
+    .note-group.is-active .pick-label {
+      opacity: 1 !important;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body class="bg-mocha-base text-mocha-text font-sans antialiased min-h-screen flex flex-col selection:bg-mocha-blue/30 selection:text-mocha-text">
+
+  <!-- ==================== HEADER & VERSION SWITCHER ==================== -->
+  <header class="bg-mocha-mantle border-b border-mocha-surface1/80">
+    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <!-- Song Title & Tuning -->
+      <div class="min-w-0">
+        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-mocha-text leading-snug">
+          A Chance I'd Never Have <span class="text-mocha-surface2 font-normal mx-1">—</span> <span class="text-mocha-blue">Acoustic Intro TAB</span>
+        </h1>
+        <p class="text-sm text-mocha-subtext0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span class="font-medium text-mocha-text/90">None</span>
+          <span class="text-mocha-surface2">·</span>
+          <span>Standard Tuning <span class="font-mono text-mocha-text/90">(E A D G B e)</span></span>
+          <span class="text-mocha-surface2 hidden sm:inline">·</span>
+          <span class="hidden sm:inline text-mocha-subtext0">Continuous Arpeggiated Crosspicking</span>
+        </p>
+      </div>
+
+      <!-- Segmented Mode Switcher -->
+      <div class="inline-flex bg-mocha-base p-1 rounded-xl border border-mocha-surface1 shrink-0 self-start md:self-auto" role="tablist" aria-label="TAB Version">
+        <button
+          id="mode-nocapo"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm"
+        >
+          No Capo — G minor <span class="hidden sm:inline opacity-80 font-medium">(Original Key)</span>
+        </button>
+        <button
+          id="mode-open"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text"
+        >
+          Open Shapes — E minor <span class="hidden sm:inline opacity-75 font-medium">(or Capo 3)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== STICKY PLAYBACK & PRACTICE CONTROLS BAR ==================== -->
+  <section class="sticky top-0 z-30 bg-mocha-mantle/95 backdrop-blur-md border-b border-mocha-surface1 shadow-lg shadow-mocha-crust/40">
+    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+
+      <!-- Transport: Play/Pause + Restart + Live Count-in Badge -->
+      <div class="flex items-center gap-2.5">
+        <button
+          id="btn-play"
+          type="button"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-mocha-blue hover:bg-mocha-lavender active:scale-[0.98] text-mocha-crust font-bold text-sm transition-all min-w-[112px] shadow-md shadow-mocha-blue/15"
+          title="Play / Pause (Spacebar)"
+        >
+          <svg id="icon-play" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+          <svg id="icon-pause" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/></svg>
+          <span id="label-play">Play</span>
+        </button>
+
+        <button
+          id="btn-restart"
+          type="button"
+          class="inline-flex items-center justify-center p-2.5 rounded-xl bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 transition-colors"
+          title="Restart from loop start (R)"
+          aria-label="Restart"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+          </svg>
+        </button>
+
+        <!-- Count-in Visual Indicator (visible while counting in) -->
+        <div id="countin-display" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mocha-peach/15 border border-mocha-peach/50 text-mocha-peach font-mono text-xs font-bold">
+          <span class="uppercase tracking-wider text-[10px] opacity-90">Count</span>
+          <span id="countin-num" class="text-base leading-none">1</span>
+        </div>
+      </div>
+
+      <!-- Tempo / BPM Slider & Presets -->
+      <div class="flex flex-wrap items-center gap-3 bg-mocha-base/90 px-3.5 py-2 rounded-xl border border-mocha-surface1/80">
+        <div class="flex items-center gap-2.5">
+          <label for="bpm-slider" class="text-xs font-semibold uppercase tracking-wider text-mocha-subtext0">BPM</label>
+          <input
+            id="bpm-slider"
+            type="range"
+            min="40"
+            max="110"
+            step="1"
+            value="60"
+            class="w-24 sm:w-32 h-1.5 bg-mocha-surface1 rounded-lg appearance-none cursor-pointer"
+          />
+          <span id="bpm-value" class="font-mono font-bold text-base text-mocha-peach w-9 text-right tabular-nums">60</span>
+        </div>
+
+        <div class="h-4 w-px bg-mocha-surface1 hidden sm:block"></div>
+
+        <div class="flex items-center gap-1">
+          <button type="button" data-bpm="50" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
+            50% (50)
+          </button>
+          <button type="button" data-bpm="75" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
+            75% (75)
+          </button>
+          <button type="button" data-bpm="100" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
+            Full (100)
+          </button>
+        </div>
+      </div>
+
+      <!-- Loop Region Selector -->
+      <div class="flex items-center gap-1 bg-mocha-base/90 p-1 rounded-xl border border-mocha-surface1/80" role="group" aria-label="Loop Selector">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-mocha-subtext0 px-2 hidden sm:inline">Loop</span>
+        <button type="button" data-loop="full" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-mocha-surface0 text-mocha-blue border border-mocha-blue/40">
+          Full (1–8)
+        </button>
+        <button type="button" data-loop="1-4" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent">
+          Bars 1–4
+        </button>
+        <button type="button" data-loop="5-8" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent">
+          Bars 5–8
+        </button>
+      </div>
+
+      <!-- Practice Toggles -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        <button id="toggle-audio" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
+          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
+          Guitar Audio
+        </button>
+        <button id="toggle-metronome" type="button" aria-pressed="false" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-surface0/60 text-mocha-subtext0 border-mocha-surface1 hover:text-mocha-text">
+          <span class="w-2 h-2 rounded-full bg-mocha-overlay0"></span>
+          Metronome Click
+        </button>
+        <button id="toggle-strokes" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
+          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
+          Pick Strokes D/U
+        </button>
+        <button id="toggle-countin" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
+          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
+          Count-in (4)
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== MAIN PRACTICE WORKSPACE ==================== -->
+  <main class="flex-1 max-w-[1640px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="flex flex-col lg:flex-row items-start gap-6 xl:gap-8">
+
+      <!-- LIVE CHORD & FINGER DIAGRAM PANEL (Top on mobile, sticky right sidebar on desktop) -->
+      <aside class="w-full lg:w-[330px] xl:w-[360px] shrink-0 order-first lg:order-last lg:sticky lg:top-[92px]">
+        <div class="bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-4 sm:p-5 shadow-xl shadow-mocha-crust/40">
+          <!-- Chord Header -->
+          <div class="flex items-start justify-between gap-3 pb-3 border-b border-mocha-surface1/70">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="chord-bar-badge" class="px-2 py-0.5 rounded-md bg-mocha-surface0 text-mocha-subtext0 font-mono text-[11px] font-semibold">Bar 1</span>
+                <span id="chord-live-dot" class="hidden w-2 h-2 rounded-full bg-mocha-peach animate-pulse"></span>
+              </div>
+              <h2 id="chord-title" class="text-2xl sm:text-3xl font-bold text-mocha-text tracking-tight mt-1 font-mono">Gm</h2>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] uppercase tracking-wider text-mocha-subtext0 font-semibold block">Active Shape</span>
+              <span id="chord-note-readout" class="font-mono text-xs text-mocha-peach font-semibold mt-0.5 block">Click any note</span>
+            </div>
+          </div>
+
+          <!-- Responsive body: side-by-side on mobile landscape / compact, stacked on desktop -->
+          <div class="flex flex-col sm:flex-row lg:flex-col items-center gap-4 pt-3">
+            <!-- SVG Fretboard Box -->
+            <div class="w-full max-w-[260px] shrink-0 flex items-center justify-center bg-mocha-card/60 rounded-xl border border-mocha-surface1/60 p-2">
+              <svg id="chord-svg" viewBox="0 0 244 242" class="w-full h-auto select-none" aria-label="Active Chord Fretboard Diagram"></svg>
+            </div>
+
+            <!-- Tip & Finger Legend -->
+            <div class="w-full flex flex-col gap-3">
+              <!-- Active Shape Tip -->
+              <div class="bg-mocha-card border border-mocha-surface1/80 rounded-xl p-3.5">
+                <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-mocha-blue mb-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+                  Hand Position Tip
+                </div>
+                <p id="chord-tip" class="text-sm text-mocha-text/95 leading-relaxed">
+                  Arch fingers cleanly so the open D string rings between them.
+                </p>
+              </div>
+
+              <!-- Finger Number Legend -->
+              <div class="grid grid-cols-2 gap-2 text-xs text-mocha-subtext0 bg-mocha-base/70 rounded-xl p-3 border border-mocha-surface1/60">
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">1</span><span>Index</span></div>
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">2</span><span>Middle</span></div>
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">3</span><span>Ring</span></div>
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">4</span><span>Pinky</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- INTERACTIVE VISUAL TAB GRID -->
+      <section class="flex-1 w-full min-w-0">
+        <!-- Subtle Utility Strip above TAB Grid -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-3.5 px-1">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-mocha-subtext0">
+            <span class="inline-flex items-center gap-1.5">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-mocha-peach"></span>
+              Active note
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="font-mono font-bold text-mocha-blue">D↓</span> Downstroke
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="font-mono font-bold text-mocha-green">U↑</span> Upstroke
+            </span>
+            <span class="hidden sm:inline text-mocha-overlay0">· Click any note to jump &amp; preview</span>
+          </div>
+
+          <!-- Wide-screen Grid Density Switcher (2 vs 4 bars per row) -->
+          <div class="hidden 2xl:inline-flex items-center gap-1 bg-mocha-mantle p-1 rounded-lg border border-mocha-surface1 text-xs">
+            <span class="px-2 text-mocha-subtext0 font-medium">Columns</span>
+            <button id="cols-2" type="button" class="px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue">2 / row</button>
+            <button id="cols-4" type="button" class="px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text">4 / row</button>
+          </div>
+        </div>
+
+        <!-- 8 Visual SVG Tablature Cards -->
+        <div id="tab-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5">
+          <!-- Populated dynamically by renderTabGrid() -->
+        </div>
+
+        <!-- Subtle Keyboard Shortcut Bar -->
+        <footer class="mt-6 pt-4 border-t border-mocha-surface1/50 flex flex-wrap items-center justify-between gap-3 text-xs text-mocha-overlay0">
+          <div class="flex flex-wrap items-center gap-4">
+            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">Space</kbd> Play / Pause</span>
+            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">R</kbd> Restart</span>
+            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">→</kbd> Step Note</span>
+          </div>
+          <span class="font-mono text-[11px] text-mocha-overlay0">Let all picked notes ring together</span>
+        </footer>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // =========================================================================
+      // 1. MUSICAL CONSTANTS & EXACT TAB DATA
+      // =========================================================================
+
+      // String index: 0=e (high E), 1=B, 2=G, 3=D, 4=A, 5=E (low E)
+      const STRING_NAMES = ['e', 'B', 'G', 'D', 'A', 'E'];
+      const OPEN_FREQS = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
+      const STRING_WEIGHTS = [1.15, 1.4, 1.7, 2.05, 2.45, 2.9];
+      const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const OPEN_MIDI = [64, 59, 55, 50, 45, 40]; // E4, B3, G3, D3, A2, E2
+
+      // Chord diagrams map string index (5=E down to 0=e) to 'X' or { fret, finger? }
+      const CHORDS = {
+        // Version 1 — No Capo (G minor)
+        Gm: {
+          name: 'Gm',
+          strings: { 5: { fret: 3, finger: 1 }, 4: 'X', 3: { fret: 0 }, 2: { fret: 3, finger: 2 }, 1: { fret: 3, finger: 3 }, 0: 'X' },
+          tip: 'Arch fingers cleanly so the open D string rings between them.'
+        },
+        Gm_b6: {
+          name: 'Gm(b6)',
+          strings: { 5: { fret: 3, finger: 1 }, 4: 'X', 3: { fret: 0 }, 2: { fret: 3, finger: 2 }, 1: { fret: 4, finger: 4 }, 0: 'X' },
+          tip: 'Drop pinky onto B string 4th fret for the brief melody lift.'
+        },
+        F: {
+          name: 'F',
+          strings: { 5: 'X', 4: 'X', 3: { fret: 3, finger: 3 }, 2: { fret: 2, finger: 2 }, 1: { fret: 1, finger: 1 }, 0: 'X' },
+          tip: 'Simple 3-finger stair-step (no barre needed).'
+        },
+        Cm: {
+          name: 'Cm',
+          strings: { 5: 'X', 4: { fret: 3, finger: 3 }, 3: { fret: 1, finger: 1 }, 2: { fret: 0 }, 1: 'X', 0: 'X' },
+          tip: 'Just 2 fingers—let the open G string ring clearly.'
+        },
+        D_turnaround: {
+          name: 'D',
+          strings: { 5: 'X', 4: 'X', 3: { fret: 0 }, 2: { fret: 2, finger: 1 }, 1: { fret: 3, finger: 3 }, 0: { fret: 2, finger: 2 } },
+          tip: 'Quick turnaround into open D to walk straight back to Gm.'
+        },
+
+        // Version 2 — Open Shapes (E minor / Capo 3)
+        Em: {
+          name: 'Em',
+          strings: { 5: { fret: 0 }, 4: { fret: 2, finger: 2 }, 3: { fret: 2, finger: 3 }, 2: { fret: 0 }, 1: { fret: 0 }, 0: { fret: 0 } },
+          tip: 'Hold standard 2-finger Em and let every string ring out.'
+        },
+        Em_b6: {
+          name: 'Em(b6)',
+          strings: { 5: { fret: 0 }, 4: { fret: 2, finger: 2 }, 3: { fret: 2, finger: 3 }, 2: { fret: 0 }, 1: { fret: 1, finger: 1 }, 0: { fret: 0 } },
+          tip: 'Add index finger to B string 1st fret for one bar, then lift.'
+        },
+        D_open: {
+          name: 'D',
+          strings: { 5: 'X', 4: 'X', 3: { fret: 0 }, 2: { fret: 2, finger: 1 }, 1: { fret: 3, finger: 3 }, 0: { fret: 2, finger: 2 } },
+          tip: 'Shift your picking hand down to the thinnest four strings.'
+        },
+        Am: {
+          name: 'Am',
+          strings: { 5: 'X', 4: { fret: 0 }, 3: { fret: 2, finger: 2 }, 2: { fret: 2, finger: 3 }, 1: { fret: 1, finger: 1 }, 0: { fret: 0 } },
+          tip: 'Keep fingers arched so the open A string rings underneath.'
+        },
+        Asus2: {
+          name: 'Asus2',
+          strings: { 5: 'X', 4: { fret: 0 }, 3: { fret: 2, finger: 2 }, 2: { fret: 2, finger: 3 }, 1: { fret: 0 }, 0: { fret: 0 } },
+          tip: 'Lift index finger off B for Asus2, then jump to B7 turnaround.'
+        },
+        B7: {
+          name: 'B7',
+          strings: { 5: 'X', 4: { fret: 2, finger: 2 }, 3: { fret: 1, finger: 1 }, 2: { fret: 2, finger: 3 }, 1: { fret: 0 }, 0: 'X' },
+          tip: 'Lift index finger off B for Asus2, then jump to B7 turnaround.'
+        }
+      };
+
+      // Helper to build note objects cleanly: [stringIndex, fret, pickDirection]
+      const makeNotes = (arr) => arr.map(([s, f, p]) => ({ s, f, p }));
+
+      // Exact 8-bar sequences for both versions
+      const VERSIONS = {
+        nocapo: {
+          id: 'nocapo',
+          label: 'No Capo — G minor (Original Key)',
+          bars: [
+            {
+              bar: 1,
+              chord: 'Gm',
+              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
+            },
+            {
+              bar: 2,
+              chord: 'Gm',
+              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
+            },
+            {
+              bar: 3,
+              chord: 'Gm_b6',
+              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,4,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
+            },
+            {
+              bar: 4,
+              chord: 'Gm',
+              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
+            },
+            {
+              bar: 5,
+              chord: 'F',
+              notes: makeNotes([[3,3,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [3,3,'D'], [2,2,'U']])
+            },
+            {
+              bar: 6,
+              chord: 'F',
+              notes: makeNotes([[3,3,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [3,3,'D'], [2,2,'U']])
+            },
+            {
+              bar: 7,
+              chord: 'Cm',
+              notes: makeNotes([[4,3,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [4,3,'D'], [3,1,'U']])
+            },
+            {
+              bar: 8,
+              chord: 'Cm',
+              splitChord: 'D_turnaround', // Changes at note index 4 (beat 3 / 5th eighth-note)
+              notes: makeNotes([[4,3,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [3,0,'D'], [2,2,'U'], [1,3,'D'], [0,2,'U']])
+            }
+          ]
+        },
+        open: {
+          id: 'open',
+          label: 'Open Shapes — E minor (or Capo 3)',
+          bars: [
+            {
+              bar: 1,
+              chord: 'Em',
+              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
+            },
+            {
+              bar: 2,
+              chord: 'Em',
+              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
+            },
+            {
+              bar: 3,
+              chord: 'Em_b6',
+              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,1,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
+            },
+            {
+              bar: 4,
+              chord: 'Em',
+              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
+            },
+            {
+              bar: 5,
+              chord: 'D_open',
+              notes: makeNotes([[3,0,'D'], [2,2,'U'], [1,3,'D'], [2,2,'U'], [0,2,'D'], [1,3,'U'], [2,2,'D'], [1,3,'U']])
+            },
+            {
+              bar: 6,
+              chord: 'D_open',
+              notes: makeNotes([[3,0,'D'], [2,2,'U'], [1,3,'D'], [2,2,'U'], [0,2,'D'], [1,3,'U'], [2,2,'D'], [1,3,'U']])
+            },
+            {
+              bar: 7,
+              chord: 'Am',
+              notes: makeNotes([[4,0,'D'], [3,2,'U'], [2,2,'D'], [3,2,'U'], [1,1,'D'], [2,2,'U'], [3,2,'D'], [2,2,'U']])
+            },
+            {
+              bar: 8,
+              chord: 'Asus2',
+              splitChord: 'B7', // Changes at note index 4 (beat 3 / 5th eighth-note)
+              notes: makeNotes([[4,0,'D'], [3,2,'U'], [2,2,'D'], [1,0,'U'], [4,2,'D'], [3,1,'U'], [2,2,'D'], [1,0,'U']])
+            }
+          ]
+        }
+      };
+
+      // =========================================================================
+      // 2. APPLICATION STATE
+      // =========================================================================
+      const state = {
+        version: 'nocapo',      // 'nocapo' | 'open'
+        bpm: 60,                // 40..110
+        loopMode: 'full',       // 'full' | '1-4' | '5-8'
+        guitarAudio: true,
+        metronome: false,
+        showStrokes: true,
+        countIn: true,
+        gridCols: 2,            // 2 or 4 on ultra-wide screens
+
+        isPlaying: false,
+        isCountingIn: false,
+        currentBar: 0,          // 0..7
+        currentNote: 0,         // 0..7
+        selectedBar: 0,         // Highlighted/inspected bar for chord diagram
+        selectedNote: 0,        // Highlighted/inspected note index
+      };
+
+      // Helper to resolve the loop bar boundaries [startBar, endBar] inclusive
+      function getLoopBounds() {
+        if (state.loopMode === '1-4') return [0, 3];
+        if (state.loopMode === '5-8') return [4, 7];
+        return [0, 7];
+      }
+
+      // Helper to get chord key for a given bar & note index
+      function getChordKeyAt(barIdx, noteIdx) {
+        const barObj = VERSIONS[state.version].bars[barIdx];
+        if (barObj.splitChord && noteIdx >= 4) return barObj.splitChord;
+        return barObj.chord;
+      }
+
+      // Helper to compute exact musical pitch name (e.g., "G2", "D3")
+      function getPitchLabel(stringIdx, fret) {
+        const midi = OPEN_MIDI[stringIdx] + fret;
+        const note = NOTE_NAMES[midi % 12];
+        const octave = Math.floor(midi / 12) - 1;
+        return `${note}${octave}`;
+      }
+
+      // =========================================================================
+      // 3. WEB AUDIO ACOUSTIC GUITAR & METRONOME SYNTHESIZER
+      // =========================================================================
+      class AcousticEngine {
+        constructor() {
+          this.ctx = null;
+          this.masterGain = null;
+          this.compressor = null;
+          this.reverbSend = null;
+          this.noiseBuffer = null;
+          // Track active voice per string so re-plucking the same string chokes smoothly
+          // while other strings continue ringing naturally ("let ring")
+          this.stringVoices = new Array(6).fill(null);
+        }
+
+        ensureContext() {
+          try {
+            if (!this.ctx) {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              this.ctx = new AudioCtx();
+
+              // Warm acoustic body EQ + dynamics compressor for clean polyphony
+              this.compressor = this.ctx.createDynamicsCompressor();
+              this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+              this.compressor.knee.setValueAtTime(18, this.ctx.currentTime);
+              this.compressor.ratio.setValueAtTime(3.5, this.ctx.currentTime);
+              this.compressor.attack.setValueAtTime(0.004, this.ctx.currentTime);
+              this.compressor.release.setValueAtTime(0.18, this.ctx.currentTime);
+
+              const bodyWarmth = this.ctx.createBiquadFilter();
+              bodyWarmth.type = 'peaking';
+              bodyWarmth.frequency.setValueAtTime(210, this.ctx.currentTime);
+              bodyWarmth.Q.setValueAtTime(1.1, this.ctx.currentTime);
+              bodyWarmth.gain.setValueAtTime(3.2, this.ctx.currentTime);
+
+              this.masterGain = this.ctx.createGain();
+              this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+              bodyWarmth.connect(this.compressor);
+              this.compressor.connect(this.masterGain);
+              this.masterGain.connect(this.ctx.destination);
+              this.busInput = bodyWarmth;
+
+              // Subtle algorithmic room reverb for atmospheric "let ring" depth
+              const convolver = this.ctx.createConvolver();
+              convolver.buffer = this._createReverbImpulse(1.15, 3.2);
+              const reverbFilter = this.ctx.createBiquadFilter();
+              reverbFilter.type = 'lowpass';
+              reverbFilter.frequency.setValueAtTime(2400, this.ctx.currentTime);
+              const reverbWet = this.ctx.createGain();
+              reverbWet.gain.setValueAtTime(0.16, this.ctx.currentTime);
+
+              bodyWarmth.connect(convolver);
+              convolver.connect(reverbFilter);
+              reverbFilter.connect(reverbWet);
+              reverbWet.connect(this.masterGain);
+
+              // Short white-noise buffer for crisp pick-on-steel transient
+              this.noiseBuffer = this._createNoiseBuffer(0.04);
+            }
+
+            if (this.ctx.state === 'suspended') {
+              this.ctx.resume();
+            }
+            return true;
+          } catch (err) {
+            console.error('Web Audio initialization failed:', err);
+            return false;
+          }
+        }
+
+        _createNoiseBuffer(durationSec) {
+          const length = Math.floor(this.ctx.sampleRate * durationSec);
+          const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < length; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (length * 0.25));
+          }
+          return buffer;
+        }
+
+        _createReverbImpulse(durationSec, decay) {
+          const length = Math.floor(this.ctx.sampleRate * durationSec);
+          const impulse = this.ctx.createBuffer(2, length, this.ctx.sampleRate);
+          for (let ch = 0; ch < 2; ch++) {
+            const data = impulse.getChannelData(ch);
+            for (let i = 0; i < length; i++) {
+              data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+            }
+          }
+          return impulse;
+        }
+
+        /**
+         * Plucks a warm steel-string acoustic note at exact AudioContext timestamp.
+         * Uses multi-harmonic oscillators + pick transient + bright-to-warm LPF sweep + 1.85s decay.
+         */
+        pluck(stringIdx, fret, pickDir = 'D', when = null) {
+          if (!this.ensureContext()) return;
+          const t = when !== null ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime;
+
+          // Gently choke previous voice on this exact same string (realistic guitar physics)
+          const prev = this.stringVoices[stringIdx];
+          if (prev && prev.voiceGain) {
+            try {
+              prev.voiceGain.gain.cancelScheduledValues(t);
+              prev.voiceGain.gain.setValueAtTime(Math.max(prev.voiceGain.gain.value, 0.001), t);
+              prev.voiceGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.028);
+            } catch (_) {}
+          }
+
+          const freq = OPEN_FREQS[stringIdx] * Math.pow(2, fret / 12);
+          const velocity = pickDir === 'D' ? 0.34 : 0.28; // Slight human dynamic contrast
+          const decayTime = 1.85;
+
+          // Master voice envelope
+          const voiceGain = this.ctx.createGain();
+          voiceGain.gain.setValueAtTime(0.0001, t);
+          voiceGain.gain.linearRampToValueAtTime(velocity, t + 0.004);
+          voiceGain.gain.exponentialRampToValueAtTime(velocity * 0.42, t + 0.28);
+          voiceGain.gain.exponentialRampToValueAtTime(0.0001, t + decayTime);
+
+          // Pluck low-pass filter sweep: bright ~2800Hz down to warm ~500Hz
+          const lpf = this.ctx.createBiquadFilter();
+          lpf.type = 'lowpass';
+          lpf.Q.setValueAtTime(1.6, t);
+          const brightStart = Math.min(3400, Math.max(2500, freq * 9));
+          const warmEnd = Math.min(720, Math.max(460, freq * 2.1));
+          lpf.frequency.setValueAtTime(brightStart, t);
+          lpf.frequency.exponentialRampToValueAtTime(warmEnd, t + 0.42);
+          lpf.frequency.exponentialRampToValueAtTime(380, t + decayTime);
+
+          // Fundamental (warm triangle)
+          const osc1 = this.ctx.createOscillator();
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(freq, t);
+
+          // 2nd harmonic (steel body richness)
+          const osc2 = this.ctx.createOscillator();
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(freq * 2, t);
+          const g2 = this.ctx.createGain();
+          g2.gain.setValueAtTime(0.32, t);
+          g2.gain.exponentialRampToValueAtTime(0.04, t + 0.9);
+
+          // 3rd harmonic + subtle detuned shimmer (bright steel-string overtone)
+          const osc3 = this.ctx.createOscillator();
+          osc3.type = 'sawtooth';
+          osc3.frequency.setValueAtTime(freq * 3.002, t);
+          const g3 = this.ctx.createGain();
+          g3.gain.setValueAtTime(0.09, t);
+          g3.gain.exponentialRampToValueAtTime(0.002, t + 0.45);
+
+          // Crisp pick-against-string attack transient
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = this.noiseBuffer;
+          const noiseFilter = this.ctx.createBiquadFilter();
+          noiseFilter.type = 'bandpass';
+          noiseFilter.frequency.setValueAtTime(2400 + (5 - stringIdx) * 180, t);
+          noiseFilter.Q.setValueAtTime(1.8, t);
+          const noiseGain = this.ctx.createGain();
+          noiseGain.gain.setValueAtTime(velocity * 0.48, t);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
+
+          // Route graph
+          osc1.connect(lpf);
+          osc2.connect(g2);
+          g2.connect(lpf);
+          osc3.connect(g3);
+          g3.connect(lpf);
+          noise.connect(noiseFilter);
+          noiseFilter.connect(noiseGain);
+          noiseGain.connect(voiceGain);
+
+          lpf.connect(voiceGain);
+          voiceGain.connect(this.busInput);
+
+          // Start & schedule clean stop
+          const stopAt = t + decayTime + 0.06;
+          osc1.start(t);
+          osc2.start(t);
+          osc3.start(t);
+          noise.start(t);
+
+          osc1.stop(stopAt);
+          osc2.stop(stopAt);
+          osc3.stop(stopAt);
+          noise.stop(t + 0.04);
+
+          this.stringVoices[stringIdx] = { voiceGain, stopAt };
+        }
+
+        /**
+         * Clean woodblock/rim click for metronome & count-in.
+         */
+        click(accent = false, when = null) {
+          if (!this.ensureContext()) return;
+          const t = when !== null ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime;
+
+          const osc = this.ctx.createOscillator();
+          osc.type = 'triangle';
+          const baseFreq = accent ? 1280 : 860;
+          osc.frequency.setValueAtTime(baseFreq, t);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.62, t + 0.032);
+
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.linearRampToValueAtTime(accent ? 0.34 : 0.21, t + 0.002);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+
+          const hp = this.ctx.createBiquadFilter();
+          hp.type = 'highpass';
+          hp.frequency.setValueAtTime(420, t);
+
+          osc.connect(hp);
+          hp.connect(gain);
+          gain.connect(this.masterGain);
+
+          osc.start(t);
+          osc.stop(t + 0.055);
+        }
+      }
+
+      const audio = new AcousticEngine();
+
+      // =========================================================================
+      // 4. DOM REFERENCES
+      // =========================================================================
+      const dom = {
+        modeNoCapo: document.getElementById('mode-nocapo'),
+        modeOpen: document.getElementById('mode-open'),
+        btnPlay: document.getElementById('btn-play'),
+        iconPlay: document.getElementById('icon-play'),
+        iconPause: document.getElementById('icon-pause'),
+        labelPlay: document.getElementById('label-play'),
+        btnRestart: document.getElementById('btn-restart'),
+        countInDisplay: document.getElementById('countin-display'),
+        countInNum: document.getElementById('countin-num'),
+        bpmSlider: document.getElementById('bpm-slider'),
+        bpmValue: document.getElementById('bpm-value'),
+        bpmPresets: document.querySelectorAll('.bpm-preset'),
+        loopBtns: document.querySelectorAll('.loop-btn'),
+        toggleAudio: document.getElementById('toggle-audio'),
+        toggleMetronome: document.getElementById('toggle-metronome'),
+        toggleStrokes: document.getElementById('toggle-strokes'),
+        toggleCountIn: document.getElementById('toggle-countin'),
+        cols2: document.getElementById('cols-2'),
+        cols4: document.getElementById('cols-4'),
+        tabGrid: document.getElementById('tab-grid'),
+        chordSvg: document.getElementById('chord-svg'),
+        chordTitle: document.getElementById('chord-title'),
+        chordBarBadge: document.getElementById('chord-bar-badge'),
+        chordLiveDot: document.getElementById('chord-live-dot'),
+        chordNoteReadout: document.getElementById('chord-note-readout'),
+        chordTip: document.getElementById('chord-tip'),
+      };
+
+      // =========================================================================
+      // 5. SVG TABLATURE GRID RENDERER
+      // =========================================================================
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+
+      function el(tag, attrs = {}, text = null) {
+        const node = document.createElementNS(SVG_NS, tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          node.setAttribute(k, String(v));
+        }
+        if (text !== null) node.textContent = text;
+        return node;
+      }
+
+      // Compute note column X coordinate inside 460-wide SVG viewBox
+      const TAB_LEFT = 42;
+      const TAB_RIGHT = 446;
+      const TAB_COL_W = (TAB_RIGHT - TAB_LEFT) / 8; // 50.5
+      const colX = (noteIdx) => TAB_LEFT + TAB_COL_W * (noteIdx + 0.5);
+      const stringY = (stringIdx) => 24 + stringIdx * 26; // 24, 50, 76, 102, 128, 154
+
+      function renderTabGrid() {
+        const versionData = VERSIONS[state.version];
+        const [loopStart, loopEnd] = getLoopBounds();
+
+        // Update responsive column classes
+        dom.tabGrid.className = state.gridCols === 4
+          ? 'grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4'
+          : 'grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5';
+
+        dom.tabGrid.innerHTML = '';
+
+        versionData.bars.forEach((barObj, barIdx) => {
+          const inLoop = barIdx >= loopStart && barIdx <= loopEnd;
+          const isSelected = barIdx === state.selectedBar;
+
+          // Bar Card Wrapper
+          const card = document.createElement('div');
+          card.id = `bar-card-${barIdx}`;
+          card.dataset.bar = String(barIdx);
+          card.className = [
+            'rounded-2xl border transition-all duration-150 overflow-hidden select-none',
+            inLoop ? 'opacity-100' : 'opacity-40 hover:opacity-75',
+            isSelected
+              ? 'bg-mocha-card border-mocha-blue/70 shadow-lg shadow-mocha-crust/50'
+              : 'bg-mocha-card/85 border-mocha-surface1 hover:border-mocha-surface2'
+          ].join(' ');
+
+          // ---- Card Header (Chord Names & Bar Number) ----
+          const header = document.createElement('div');
+          header.className = 'flex items-center justify-between px-4 pt-3 pb-1.5 cursor-pointer';
+          header.addEventListener('click', () => selectBar(barIdx, 0, false));
+
+          const primaryChord = CHORDS[barObj.chord];
+          if (barObj.splitChord) {
+            const secondChord = CHORDS[barObj.splitChord];
+            header.innerHTML = `
+              <div class="grid grid-cols-2 w-full items-baseline gap-2">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-mono text-[11px] font-semibold text-mocha-overlay0">0${barObj.bar}</span>
+                  <span class="font-mono text-lg sm:text-xl font-bold text-mocha-text tracking-tight">${primaryChord.name}</span>
+                  <span class="text-[10px] font-mono text-mocha-overlay0 uppercase">1–4</span>
+                </div>
+                <div class="flex items-baseline gap-2 pl-2 border-l border-dashed border-mocha-surface2">
+                  <span class="font-mono text-lg sm:text-xl font-bold text-mocha-peach tracking-tight">${secondChord.name}</span>
+                  <span class="text-[10px] font-mono text-mocha-peach/80 uppercase">Beat 3 (5–8)</span>
+                </div>
+              </div>
+            `;
+          } else {
+            header.innerHTML = `
+              <div class="flex items-baseline gap-2.5">
+                <span class="font-mono text-[11px] font-semibold text-mocha-overlay0">0${barObj.bar}</span>
+                <span class="font-mono text-lg sm:text-xl font-bold text-mocha-text tracking-tight">${primaryChord.name}</span>
+              </div>
+              <span class="text-[11px] font-mono text-mocha-overlay0">4/4</span>
+            `;
+          }
+          card.appendChild(header);
+
+          // ---- Custom SVG Tablature Staff ----
+          const viewH = state.showStrokes ? 196 : 172;
+          const svg = el('svg', {
+            viewBox: `0 0 460 ${viewH}`,
+            class: 'w-full h-auto block px-1.5 pb-2',
+            role: 'img',
+            'aria-label': `Bar ${barObj.bar} tablature`
+          });
+
+          // Subtle vertical beat guide lines (beats 1, 2, 3, 4)
+          for (let b = 0; b < 4; b++) {
+            const x = TAB_LEFT + b * (TAB_COL_W * 2);
+            if (b === 0) continue;
+            const isMidSplit = b === 2 && Boolean(barObj.splitChord);
+            svg.appendChild(el('line', {
+              x1: x,
+              y1: stringY(0) - 8,
+              x2: x,
+              y2: stringY(5) + 8,
+              stroke: isMidSplit ? '#fab387' : '#313244',
+              'stroke-width': isMidSplit ? '1.6' : '1',
+              'stroke-dasharray': isMidSplit ? '4 3' : '2 3',
+              opacity: isMidSplit ? '0.65' : '0.9'
+            }));
+          }
+
+          // Vertical Playhead Indicator (hidden until active)
+          const playhead = el('line', {
+            id: `playhead-${barIdx}`,
+            x1: colX(0),
+            y1: stringY(0) - 12,
+            x2: colX(0),
+            y2: stringY(5) + 12,
+            stroke: '#fab387',
+            'stroke-width': '2',
+            opacity: '0',
+            'stroke-linecap': 'round'
+          });
+          svg.appendChild(playhead);
+
+          // 6 Horizontal String Lines + Left String Labels
+          for (let s = 0; s < 6; s++) {
+            const y = stringY(s);
+            // String label (e, B, G, D, A, E)
+            svg.appendChild(el('text', {
+              x: 20,
+              y: y + 4.5,
+              'text-anchor': 'middle',
+              fill: s === 5 ? '#cdd6f4' : '#a6adc8',
+              'font-family': 'JetBrains Mono, monospace',
+              'font-size': '13',
+              'font-weight': s >= 3 ? '700' : '600'
+            }, STRING_NAMES[s]));
+
+            // String line (thicker for lower strings)
+            svg.appendChild(el('line', {
+              x1: TAB_LEFT,
+              y1: y,
+              x2: TAB_RIGHT,
+              y2: y,
+              stroke: '#585b70',
+              'stroke-width': STRING_WEIGHTS[s],
+              'stroke-linecap': 'round'
+            }));
+          }
+
+          // Left & Right Barlines
+          svg.appendChild(el('line', {
+            x1: TAB_LEFT, y1: stringY(0), x2: TAB_LEFT, y2: stringY(5),
+            stroke: '#6c7086', 'stroke-width': '2'
+          }));
+          svg.appendChild(el('line', {
+            x1: TAB_RIGHT, y1: stringY(0), x2: TAB_RIGHT, y2: stringY(5),
+            stroke: barIdx === 7 ? '#89b4fa' : '#6c7086',
+            'stroke-width': barIdx === 7 ? '3' : '2'
+          }));
+
+          // 8 Eighth-Note Interactive Badges + Pick Stroke Indicators
+          barObj.notes.forEach((note, noteIdx) => {
+            const cx = colX(noteIdx);
+            const cy = stringY(note.s);
+            const isDown = note.p === 'D';
+
+            const group = el('g', {
+              id: `note-${barIdx}-${noteIdx}`,
+              class: 'note-group',
+              tabindex: '0',
+              role: 'button',
+              'aria-label': `Bar ${barObj.bar}, beat ${noteIdx + 1}, string ${STRING_NAMES[note.s]}, fret ${note.f}, ${isDown ? 'downstroke' : 'upstroke'}`
+            });
+
+            // Generous invisible touch/click column target
+            group.appendChild(el('rect', {
+              x: cx - TAB_COL_W / 2,
+              y: 6,
+              width: TAB_COL_W,
+              height: viewH - 10,
+              fill: 'transparent'
+            }));
+
+            // Outer Glow Ring (only visible when active)
+            group.appendChild(el('rect', {
+              class: 'active-glow',
+              x: cx - 19,
+              y: cy - 16,
+              width: 38,
+              height: 32,
+              rx: 13,
+              fill: 'none',
+              stroke: '#fab387',
+              'stroke-width': '2.5',
+              opacity: '0'
+            }));
+
+            // Main Fret Pill Badge
+            group.appendChild(el('rect', {
+              class: 'note-pill',
+              x: cx - 15,
+              y: cy - 12.5,
+              width: 30,
+              height: 25,
+              rx: 10,
+              fill: '#313244',
+              stroke: '#6c7086',
+              'stroke-width': '1.6'
+            }));
+
+            // Fret Number Text
+            group.appendChild(el('text', {
+              class: 'note-num',
+              x: cx,
+              y: cy + 5.2,
+              'text-anchor': 'middle',
+              fill: '#cdd6f4',
+              'font-family': 'JetBrains Mono, monospace',
+              'font-size': '15.5',
+              'font-weight': '700'
+            }, String(note.f)));
+
+            // Optional Pick Stroke Label below string E
+            if (state.showStrokes) {
+              group.appendChild(el('text', {
+                class: 'pick-label',
+                x: cx,
+                y: 184,
+                'text-anchor': 'middle',
+                fill: isDown ? '#89b4fa' : '#a6e3a1',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': '12',
+                'font-weight': '600',
+                opacity: '0.88'
+              }, isDown ? 'D↓' : 'U↑'));
+            }
+
+            // Click / Enter handler: Jump playhead & preview pluck
+            const onActivate = (e) => {
+              e.stopPropagation();
+              jumpAndPreview(barIdx, noteIdx);
+            };
+            group.addEventListener('click', onActivate);
+            group.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter') onActivate(e);
+            });
+
+            // Hover preview of chord diagram when not playing
+            group.addEventListener('mouseenter', () => {
+              if (!state.isPlaying) {
+                renderChordDiagram(barIdx, noteIdx, null);
+              }
+            });
+
+            svg.appendChild(group);
+          });
+
+          card.appendChild(svg);
+          dom.tabGrid.appendChild(card);
+        });
+
+        // Re-apply active visual highlight if needed
+        highlightNoteVisual(state.currentBar, state.currentNote, state.isPlaying);
+      }
+
+      // =========================================================================
+      // 6. LIVE CHORD & FINGER DIAGRAM RENDERER (WITH REAL-TIME PLUCK PULSE)
+      // =========================================================================
+      // Chord box string order left-to-right: E(5), A(4), D(3), G(2), B(1), e(0)
+      const CHORD_STRING_ORDER = [5, 4, 3, 2, 1, 0];
+
+      function renderChordDiagram(barIdx, noteIdx, pluckedStringIdx = null) {
+        const chordKey = getChordKeyAt(barIdx, noteIdx);
+        const chord = CHORDS[chordKey];
+        const barObj = VERSIONS[state.version].bars[barIdx];
+
+        // Update textual header & tip
+        dom.chordTitle.textContent = chord.name;
+        dom.chordTip.textContent = chord.tip;
+        if (barObj.splitChord) {
+          dom.chordBarBadge.textContent = noteIdx < 4 ? `Bar ${barObj.bar} · Beats 1–2` : `Bar ${barObj.bar} · Beats 3–4`;
+        } else {
+          dom.chordBarBadge.textContent = `Bar ${barObj.bar}`;
+        }
+
+        const noteObj = barObj.notes[noteIdx];
+        if (noteObj) {
+          const pitch = getPitchLabel(noteObj.s, noteObj.f);
+          dom.chordNoteReadout.textContent = `${STRING_NAMES[noteObj.s]} string · Fret ${noteObj.f} (${pitch})`;
+        }
+
+        // Build clean SVG Fretboard Box
+        const svg = dom.chordSvg;
+        svg.innerHTML = '';
+
+        const leftX = 44;
+        const stringSpacing = 32;
+        const topY = 48;
+        const fretSpacing = 38;
+        const numFrets = 4;
+        const bottomY = topY + numFrets * fretSpacing; // 200
+        const rightX = leftX + 5 * stringSpacing;      // 204
+
+        // Fretboard subtle dark background
+        svg.appendChild(el('rect', {
+          x: leftX,
+          y: topY,
+          width: rightX - leftX,
+          height: bottomY - topY,
+          fill: '#1e1e2e',
+          rx: 4
+        }));
+
+        // Horizontal Fret Wires + Left Fret Numbers (1–4)
+        for (let f = 1; f <= numFrets; f++) {
+          const fy = topY + f * fretSpacing;
+          svg.appendChild(el('line', {
+            x1: leftX,
+            y1: fy,
+            x2: rightX,
+            y2: fy,
+            stroke: '#45475a',
+            'stroke-width': '1.6'
+          }));
+          svg.appendChild(el('text', {
+            x: 20,
+            y: topY + (f - 0.5) * fretSpacing + 5,
+            'text-anchor': 'middle',
+            fill: '#6c7086',
+            'font-family': 'JetBrains Mono, monospace',
+            'font-size': '13',
+            'font-weight': '600'
+          }, String(f)));
+        }
+
+        // Thick Nut Line at Top
+        svg.appendChild(el('line', {
+          x1: leftX - 1.5,
+          y1: topY,
+          x2: rightX + 1.5,
+          y2: topY,
+          stroke: '#cdd6f4',
+          'stroke-width': '5.5',
+          'stroke-linecap': 'round'
+        }));
+
+        // 6 Vertical String Lines + Open/Mute Markers + Finger Dots + Bottom Labels
+        CHORD_STRING_ORDER.forEach((stringIdx, col) => {
+          const sx = leftX + col * stringSpacing;
+          const spec = chord.strings[stringIdx];
+          const isPlucked = pluckedStringIdx === stringIdx;
+
+          // Vertical String Line
+          svg.appendChild(el('line', {
+            x1: sx,
+            y1: topY,
+            x2: sx,
+            y2: bottomY,
+            stroke: isPlucked ? '#fab387' : (spec === 'X' ? '#313244' : '#6c7086'),
+            'stroke-width': isPlucked ? STRING_WEIGHTS[stringIdx] + 1.4 : STRING_WEIGHTS[stringIdx],
+            'stroke-linecap': 'round'
+          }));
+
+          // Bottom String Label (E A D G B e)
+          svg.appendChild(el('text', {
+            x: sx,
+            y: bottomY + 24,
+            'text-anchor': 'middle',
+            fill: isPlucked ? '#fab387' : (spec === 'X' ? '#585b70' : '#a6adc8'),
+            'font-family': 'JetBrains Mono, monospace',
+            'font-size': '13.5',
+            'font-weight': isPlucked ? '800' : '600'
+          }, STRING_NAMES[stringIdx]));
+
+          // Top Mute (X) or Open (O) or Fretted Finger Dot
+          if (spec === 'X') {
+            svg.appendChild(el('text', {
+              x: sx,
+              y: topY - 16,
+              'text-anchor': 'middle',
+              fill: '#585b70',
+              'font-family': 'Inter, sans-serif',
+              'font-size': '15',
+              'font-weight': '700'
+            }, '×'));
+          } else if (spec.fret === 0) {
+            if (isPlucked) {
+              svg.appendChild(el('circle', {
+                cx: sx,
+                cy: topY - 21,
+                r: 9.5,
+                fill: 'none',
+                stroke: '#fab387',
+                'stroke-width': '2.5',
+                class: 'ripple-ring'
+              }));
+            }
+            svg.appendChild(el('circle', {
+              cx: sx,
+              cy: topY - 21,
+              r: 7.5,
+              fill: isPlucked ? '#fab387' : 'none',
+              stroke: isPlucked ? '#fab387' : '#a6e3a1',
+              'stroke-width': '2.4'
+            }));
+          } else {
+            const dotY = topY + (spec.fret - 0.5) * fretSpacing;
+
+            // Real-time pluck ripple glow
+            if (isPlucked) {
+              svg.appendChild(el('circle', {
+                cx: sx,
+                cy: dotY,
+                r: 14,
+                fill: 'none',
+                stroke: '#fab387',
+                'stroke-width': '2.8',
+                class: 'ripple-ring'
+              }));
+            }
+
+            // Finger Circle
+            svg.appendChild(el('circle', {
+              cx: sx,
+              cy: dotY,
+              r: isPlucked ? 14 : 12.5,
+              fill: isPlucked ? '#fab387' : '#89b4fa',
+              stroke: isPlucked ? '#fde2cf' : '#181825',
+              'stroke-width': '2'
+            }));
+
+            // Finger Number
+            if (spec.finger) {
+              svg.appendChild(el('text', {
+                x: sx,
+                y: dotY + 4.8,
+                'text-anchor': 'middle',
+                fill: '#11111b',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': '13.5',
+                'font-weight': '800'
+              }, String(spec.finger)));
+            }
+          }
+        });
+      }
+
+      // =========================================================================
+      // 7. PLAYHEAD & VISUAL HIGHLIGHTING
+      // =========================================================================
+      let lastHighlightedNoteEl = null;
+      let lastHighlightedBarEl = null;
+
+      function highlightNoteVisual(barIdx, noteIdx, isPluckActive) {
+        // Clear previous note highlight
+        if (lastHighlightedNoteEl) {
+          lastHighlightedNoteEl.classList.remove('is-active');
+          const oldGlow = lastHighlightedNoteEl.querySelector('.active-glow');
+          if (oldGlow) oldGlow.setAttribute('opacity', '0');
+        }
+
+        // Clear previous bar active styling & playhead
+        if (lastHighlightedBarEl) {
+          lastHighlightedBarEl.classList.remove('ring-2', 'ring-mocha-peach/80', 'border-mocha-peach/60', 'bg-mocha-surface0/40');
+          const prevBarIdx = Number(lastHighlightedBarEl.dataset.bar);
+          const oldPh = document.getElementById(`playhead-${prevBarIdx}`);
+          if (oldPh) oldPh.setAttribute('opacity', '0');
+        }
+
+        const barCard = document.getElementById(`bar-card-${barIdx}`);
+        const noteEl = document.getElementById(`note-${barIdx}-${noteIdx}`);
+        const playhead = document.getElementById(`playhead-${barIdx}`);
+
+        if (barCard) {
+          barCard.classList.add('ring-2', 'ring-mocha-peach/80', 'border-mocha-peach/60');
+          lastHighlightedBarEl = barCard;
+        }
+
+        if (noteEl) {
+          noteEl.classList.add('is-active');
+          const glow = noteEl.querySelector('.active-glow');
+          if (glow) glow.setAttribute('opacity', isPluckActive ? '0.95' : '0.45');
+          lastHighlightedNoteEl = noteEl;
+        }
+
+        if (playhead) {
+          const x = colX(noteIdx);
+          playhead.setAttribute('x1', String(x));
+          playhead.setAttribute('x2', String(x));
+          playhead.setAttribute('opacity', isPluckActive ? '0.55' : '0.28');
+        }
+      }
+
+      // =========================================================================
+      // 8. PRECISION LOOKAHEAD PLAYBACK SCHEDULER
+      // =========================================================================
+      let schedulerTimer = null;
+      let nextStepTime = 0;
+      let schedBar = 0;
+      let schedNote = 0;
+      let countInStep = 0;
+      const pendingVisualTimeouts = new Set();
+
+      const LOOKAHEAD_MS = 25;
+      const SCHEDULE_AHEAD_SEC = 0.11;
+
+      function clearPendingVisuals() {
+        pendingVisualTimeouts.forEach((id) => clearTimeout(id));
+        pendingVisualTimeouts.clear();
+      }
+
+      function scheduleVisual(when, callback) {
+        const delayMs = Math.max(0, (when - audio.ctx.currentTime) * 1000);
+        const id = setTimeout(() => {
+          pendingVisualTimeouts.delete(id);
+          if (state.isPlaying) callback();
+        }, delayMs);
+        pendingVisualTimeouts.add(id);
+      }
+
+      function schedulerTick() {
+        if (!state.isPlaying || !audio.ctx) return;
+
+        while (nextStepTime < audio.ctx.currentTime + SCHEDULE_AHEAD_SEC) {
+          const quarterSec = 60.0 / state.bpm;
+          const eighthSec = quarterSec / 2.0;
+
+          if (state.isCountingIn) {
+            const beatNumber = countInStep + 1;
+            const clickTime = nextStepTime;
+
+            // Count-in always plays 4 clear clicks (beat 1 accented)
+            audio.click(beatNumber === 1, clickTime);
+            scheduleVisual(clickTime, () => {
+              dom.countInDisplay.classList.remove('hidden');
+              dom.countInDisplay.classList.add('inline-flex');
+              dom.countInNum.textContent = String(beatNumber);
+            });
+
+            countInStep++;
+            nextStepTime += quarterSec;
+
+            if (countInStep >= 4) {
+              state.isCountingIn = false;
+              const hideTime = nextStepTime - 0.02;
+              scheduleVisual(hideTime, () => {
+                dom.countInDisplay.classList.add('hidden');
+                dom.countInDisplay.classList.remove('inline-flex');
+              });
+            }
+          } else {
+            const barIdx = schedBar;
+            const noteIdx = schedNote;
+            const stepTime = nextStepTime;
+            const noteObj = VERSIONS[state.version].bars[barIdx].notes[noteIdx];
+
+            // Schedule Guitar Audio
+            if (state.guitarAudio) {
+              audio.pluck(noteObj.s, noteObj.f, noteObj.p, stepTime);
+            }
+
+            // Schedule Metronome Click on quarter-note beats (indices 0, 2, 4, 6)
+            if (state.metronome && noteIdx % 2 === 0) {
+              audio.click(noteIdx === 0, stepTime);
+            }
+
+            // Schedule Synchronized Visual Update
+            scheduleVisual(stepTime, () => {
+              state.currentBar = barIdx;
+              state.currentNote = noteIdx;
+              state.selectedBar = barIdx;
+              state.selectedNote = noteIdx;
+              highlightNoteVisual(barIdx, noteIdx, true);
+              renderChordDiagram(barIdx, noteIdx, noteObj.s);
+            });
+
+            // Advance pointer within active loop boundaries
+            const [loopStart, loopEnd] = getLoopBounds();
+            schedNote++;
+            if (schedNote >= 8) {
+              schedNote = 0;
+              schedBar++;
+              if (schedBar > loopEnd) {
+                schedBar = loopStart;
+              }
+            }
+
+            nextStepTime += eighthSec;
+          }
+        }
+      }
+
+      function startPlayback() {
+        if (!audio.ensureContext()) return;
+        clearPendingVisuals();
+
+        const [loopStart, loopEnd] = getLoopBounds();
+        if (state.currentBar < loopStart || state.currentBar > loopEnd) {
+          state.currentBar = loopStart;
+          state.currentNote = 0;
+        }
+
+        state.isPlaying = true;
+        schedBar = state.currentBar;
+        schedNote = state.currentNote;
+
+        // Only run 4-beat count-in if enabled AND starting at beat 1 of a bar
+        state.isCountingIn = state.countIn && schedNote === 0;
+        countInStep = 0;
+        nextStepTime = audio.ctx.currentTime + 0.05;
+
+        updateTransportUI();
+        schedulerTick();
+        schedulerTimer = setInterval(schedulerTick, LOOKAHEAD_MS);
+      }
+
+      function stopPlayback() {
+        state.isPlaying = false;
+        state.isCountingIn = false;
+        if (schedulerTimer) {
+          clearInterval(schedulerTimer);
+          schedulerTimer = null;
+        }
+        clearPendingVisuals();
+        dom.countInDisplay.classList.add('hidden');
+        dom.countInDisplay.classList.remove('inline-flex');
+        updateTransportUI();
+        highlightNoteVisual(state.currentBar, state.currentNote, false);
+        renderChordDiagram(state.currentBar, state.currentNote, null);
+      }
+
+      function togglePlayback() {
+        if (state.isPlaying) {
+          stopPlayback();
+        } else {
+          startPlayback();
+        }
+      }
+
+      function restartPlayback() {
+        const wasPlaying = state.isPlaying;
+        stopPlayback();
+        const [loopStart] = getLoopBounds();
+        state.currentBar = loopStart;
+        state.currentNote = 0;
+        state.selectedBar = loopStart;
+        state.selectedNote = 0;
+        highlightNoteVisual(loopStart, 0, false);
+        renderChordDiagram(loopStart, 0, null);
+        if (wasPlaying) {
+          startPlayback();
+        }
+      }
+
+      function jumpAndPreview(barIdx, noteIdx) {
+        // If user clicks outside current sub-loop, switch seamlessly to Full (1-8)
+        const [loopStart, loopEnd] = getLoopBounds();
+        if (barIdx < loopStart || barIdx > loopEnd) {
+          setLoopMode('full');
+        }
+
+        state.currentBar = barIdx;
+        state.currentNote = noteIdx;
+        state.selectedBar = barIdx;
+        state.selectedNote = noteIdx;
+
+        const noteObj = VERSIONS[state.version].bars[barIdx].notes[noteIdx];
+        if (state.guitarAudio) {
+          audio.pluck(noteObj.s, noteObj.f, noteObj.p);
+        }
+
+        if (state.isPlaying) {
+          // Resync live scheduler immediately to clicked position
+          clearPendingVisuals();
+          state.isCountingIn = false;
+          dom.countInDisplay.classList.add('hidden');
+          dom.countInDisplay.classList.remove('inline-flex');
+
+          const eighthSec = (60.0 / state.bpm) / 2.0;
+          const [ls, le] = getLoopBounds();
+          let nextN = noteIdx + 1;
+          let nextB = barIdx;
+          if (nextN >= 8) {
+            nextN = 0;
+            nextB = nextB + 1 > le ? ls : nextB + 1;
+          }
+          schedBar = nextB;
+          schedNote = nextN;
+          nextStepTime = audio.ctx.currentTime + eighthSec;
+        }
+
+        highlightNoteVisual(barIdx, noteIdx, true);
+        renderChordDiagram(barIdx, noteIdx, noteObj.s);
+      }
+
+      function selectBar(barIdx, noteIdx = 0, playPreview = false) {
+        if (playPreview) {
+          jumpAndPreview(barIdx, noteIdx);
+        } else {
+          const [loopStart, loopEnd] = getLoopBounds();
+          if (barIdx < loopStart || barIdx > loopEnd) {
+            setLoopMode('full');
+          }
+          state.currentBar = barIdx;
+          state.currentNote = noteIdx;
+          state.selectedBar = barIdx;
+          state.selectedNote = noteIdx;
+          highlightNoteVisual(barIdx, noteIdx, false);
+          renderChordDiagram(barIdx, noteIdx, null);
+        }
+      }
+
+      // =========================================================================
+      // 9. UI CONTROLS & EVENT BINDINGS
+      // =========================================================================
+      function updateTransportUI() {
+        if (state.isPlaying) {
+          dom.iconPlay.classList.add('hidden');
+          dom.iconPause.classList.remove('hidden');
+          dom.labelPlay.textContent = 'Pause';
+          dom.btnPlay.classList.remove('bg-mocha-blue', 'hover:bg-mocha-lavender');
+          dom.btnPlay.classList.add('bg-mocha-peach', 'hover:bg-mocha-peach/90');
+          dom.chordLiveDot.classList.remove('hidden');
+        } else {
+          dom.iconPlay.classList.remove('hidden');
+          dom.iconPause.classList.add('hidden');
+          dom.labelPlay.textContent = 'Play';
+          dom.btnPlay.classList.add('bg-mocha-blue', 'hover:bg-mocha-lavender');
+          dom.btnPlay.classList.remove('bg-mocha-peach', 'hover:bg-mocha-peach/90');
+          dom.chordLiveDot.classList.add('hidden');
+        }
+      }
+
+      function setVersion(versionKey) {
+        if (state.version === versionKey) return;
+        state.version = versionKey;
+
+        const isNoCapo = versionKey === 'nocapo';
+        dom.modeNoCapo.setAttribute('aria-selected', String(isNoCapo));
+        dom.modeOpen.setAttribute('aria-selected', String(!isNoCapo));
+
+        if (isNoCapo) {
+          dom.modeNoCapo.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm';
+          dom.modeOpen.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text';
+        } else {
+          dom.modeOpen.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm';
+          dom.modeNoCapo.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text';
+        }
+
+        renderTabGrid();
+        renderChordDiagram(state.currentBar, state.currentNote, null);
+      }
+
+      function setBpm(val) {
+        const clamped = Math.max(40, Math.min(110, Number(val)));
+        state.bpm = clamped;
+        dom.bpmSlider.value = String(clamped);
+        dom.bpmValue.textContent = String(clamped);
+
+        dom.bpmPresets.forEach((btn) => {
+          const preset = Number(btn.dataset.bpm);
+          if (preset === clamped) {
+            btn.className = 'bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-blue/20 text-mocha-blue border border-mocha-blue/40 transition-colors';
+          } else {
+            btn.className = 'bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text border border-transparent transition-colors';
+          }
+        });
+      }
+
+      function setLoopMode(mode) {
+        state.loopMode = mode;
+        dom.loopBtns.forEach((btn) => {
+          const active = btn.dataset.loop === mode;
+          btn.className = active
+            ? 'loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-mocha-surface0 text-mocha-blue border border-mocha-blue/40'
+            : 'loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent';
+        });
+
+        const [loopStart, loopEnd] = getLoopBounds();
+        if (state.currentBar < loopStart || state.currentBar > loopEnd) {
+          state.currentBar = loopStart;
+          state.currentNote = 0;
+          state.selectedBar = loopStart;
+          state.selectedNote = 0;
+          if (state.isPlaying) {
+            schedBar = loopStart;
+            schedNote = 0;
+          }
+        }
+        renderTabGrid();
+        renderChordDiagram(state.currentBar, state.currentNote, null);
+      }
+
+      function styleToggleButton(btn, isOn) {
+        btn.setAttribute('aria-pressed', String(isOn));
+        const dot = btn.querySelector('span');
+        if (isOn) {
+          btn.className = 'toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40';
+          if (dot) dot.className = 'w-2 h-2 rounded-full bg-mocha-blue';
+        } else {
+          btn.className = 'toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-surface0/60 text-mocha-subtext0 border-mocha-surface1 hover:text-mocha-text';
+          if (dot) dot.className = 'w-2 h-2 rounded-full bg-mocha-overlay0';
+        }
+      }
+
+      // Bindings
+      dom.modeNoCapo.addEventListener('click', () => setVersion('nocapo'));
+      dom.modeOpen.addEventListener('click', () => setVersion('open'));
+      dom.btnPlay.addEventListener('click', togglePlayback);
+      dom.btnRestart.addEventListener('click', restartPlayback);
+
+      dom.bpmSlider.addEventListener('input', (e) => setBpm(e.target.value));
+      dom.bpmPresets.forEach((btn) => {
+        btn.addEventListener('click', () => setBpm(btn.dataset.bpm));
+      });
+
+      dom.loopBtns.forEach((btn) => {
+        btn.addEventListener('click', () => setLoopMode(btn.dataset.loop));
+      });
+
+      dom.toggleAudio.addEventListener('click', () => {
+        state.guitarAudio = !state.guitarAudio;
+        styleToggleButton(dom.toggleAudio, state.guitarAudio);
+      });
+
+      dom.toggleMetronome.addEventListener('click', () => {
+        state.metronome = !state.metronome;
+        styleToggleButton(dom.toggleMetronome, state.metronome);
+      });
+
+      dom.toggleStrokes.addEventListener('click', () => {
+        state.showStrokes = !state.showStrokes;
+        styleToggleButton(dom.toggleStrokes, state.showStrokes);
+        renderTabGrid();
+      });
+
+      dom.toggleCountIn.addEventListener('click', () => {
+        state.countIn = !state.countIn;
+        styleToggleButton(dom.toggleCountIn, state.countIn);
+      });
+
+      // Wide-monitor column switcher (2 vs 4 bars per row)
+      if (dom.cols2 && dom.cols4) {
+        dom.cols2.addEventListener('click', () => {
+          state.gridCols = 2;
+          dom.cols2.className = 'px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue';
+          dom.cols4.className = 'px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text';
+          renderTabGrid();
+        });
+        dom.cols4.addEventListener('click', () => {
+          state.gridCols = 4;
+          dom.cols4.className = 'px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue';
+          dom.cols2.className = 'px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text';
+          renderTabGrid();
+        });
+      }
+
+      // Keyboard Shortcuts: Spacebar (Play/Pause), R (Restart), Left/Right (Step note)
+      window.addEventListener('keydown', (e) => {
+        const tag = document.activeElement?.tagName;
+        const type = document.activeElement?.getAttribute?.('type');
+        const isTextInput = tag === 'TEXTAREA' || (tag === 'INPUT' && type !== 'range');
+        if (isTextInput) return;
+
+        if (e.code === 'Space') {
+          e.preventDefault();
+          togglePlayback();
+        } else if (e.key === 'r' || e.key === 'R') {
+          e.preventDefault();
+          restartPlayback();
+        } else if (e.key === 'ArrowRight' && tag !== 'INPUT') {
+          e.preventDefault();
+          const [ls, le] = getLoopBounds();
+          let n = state.currentNote + 1;
+          let b = state.currentBar;
+          if (n >= 8) {
+            n = 0;
+            b = b + 1 > le ? ls : b + 1;
+          }
+          jumpAndPreview(b, n);
+        } else if (e.key === 'ArrowLeft' && tag !== 'INPUT') {
+          e.preventDefault();
+          const [ls, le] = getLoopBounds();
+          let n = state.currentNote - 1;
+          let b = state.currentBar;
+          if (n < 0) {
+            n = 7;
+            b = b - 1 < ls ? le : b - 1;
+          }
+          jumpAndPreview(b, n);
+        }
+      });
+
+      // =========================================================================
+      // 10. INITIAL RENDER
+      // =========================================================================
+      setBpm(60);
+      renderTabGrid();
+      renderChordDiagram(0, 0, null);
+    })();
+  </script>
+</body>
+</html>
