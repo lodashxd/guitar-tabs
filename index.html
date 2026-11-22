@@ -2,14 +2,31 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A Chance I'd Never Have — Acoustic Intro TAB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#181825" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>A Chance I'd Never Have — TAB &amp; Score</title>
+
+  <!-- Inline SVG Guitar Pick Favicon -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23181825'/%3E%3Cpath d='M32 10c12 0 19 8 19 19 0 13-13 25-19 25S13 42 13 29c0-11 7-19 19-19z' fill='%2389b4fa'/%3E%3Ccircle cx='32' cy='28' r='5' fill='%23181825'/%3E%3C/svg%3E"
+  />
+
+  <!-- Fonts: Inter for UI, JetBrains Mono for Tablature & Readouts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // Configure Tailwind with Catppuccin Mocha design tokens
     tailwind.config = {
       darkMode: 'class',
       theme: {
@@ -23,32 +40,42 @@
               crust: '#11111b',
               mantle: '#181825',
               base: '#1e1e2e',
-              card: '#252638',
               surface0: '#313244',
               surface1: '#45475a',
               surface2: '#585b70',
               overlay0: '#6c7086',
-              subtext0: '#a6adc8',
+              subtext: '#a6adc8',
               text: '#cdd6f4',
               blue: '#89b4fa',
-              peach: '#fab387',
+              mauve: '#cba6f7',
               green: '#a6e3a1',
+              gold: '#f9e2af',
+              peach: '#fab387',
+              maroon: '#eba0ac',
               red: '#f38ba8',
-              lavender: '#b4befe',
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
     };
   </script>
+
   <style>
-    /* Minimal custom styling for smooth SVG note pulses and range slider thumb */
-    html {
+    html, body {
       background-color: #1e1e2e;
       color: #cdd6f4;
       -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
     }
 
+    /* Custom Range Slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #313244;
+      height: 6px;
+      border-radius: 9999px;
+    }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
@@ -58,12 +85,7 @@
       background: #89b4fa;
       border: 2px solid #181825;
       cursor: pointer;
-      box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
-      transition: transform 0.12s ease, background-color 0.12s ease;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.12);
-      background: #fab387;
+      box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.22);
     }
     input[type="range"]::-moz-range-thumb {
       width: 18px;
@@ -72,580 +94,806 @@
       background: #89b4fa;
       border: 2px solid #181825;
       cursor: pointer;
-      box-shadow: 0 0 0 2px rgba(137, 180, 250, 0.25);
-      transition: transform 0.12s ease, background-color 0.12s ease;
     }
 
-    @keyframes pluckRipple {
-      0% {
-        opacity: 0.9;
-        transform: scale(1);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(2.1);
-      }
-    }
-    .ripple-ring {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: pluckRipple 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .note-group {
+    /* Interactive SVG TAB Note & Live Judgment States */
+    .tab-note {
       cursor: pointer;
     }
-    .note-group .note-pill {
-      transition: fill 0.1s ease, stroke 0.1s ease, transform 0.1s ease;
-      transform-box: fill-box;
-      transform-origin: center;
+    .tab-note .note-bg {
+      transition: fill 0.09s ease, stroke 0.09s ease;
     }
-    .note-group:hover .note-pill {
+    .tab-note:hover .note-bg {
+      fill: #313244;
       stroke: #89b4fa;
-      fill: #3b3d54;
+      stroke-width: 1.4;
     }
-    .note-group.is-active .note-pill {
+
+    /* Active Playhead Cursor State (when unjudged or in normal mode) */
+    .tab-note.is-active:not(.judged-perfect):not(.judged-good):not(.judged-miss) .note-bg {
       fill: #fab387 !important;
       stroke: #fde2cf !important;
-      transform: scale(1.16);
+      stroke-width: 1.5 !important;
     }
-    .note-group.is-active .note-num {
+    .tab-note.is-active:not(.judged-perfect):not(.judged-good):not(.judged-miss) .note-digit {
       fill: #11111b !important;
       font-weight: 800;
     }
-    .note-group.is-active .pick-label {
-      opacity: 1 !important;
-      font-weight: 700;
+    .tab-note.is-active .note-halo {
+      opacity: 0.30 !important;
+    }
+
+    /* Score Mode Judgments: Perfect (Green), Good (Blue), Miss (Red) */
+    .tab-note.judged-perfect .note-bg {
+      fill: #a6e3a1 !important;
+      stroke: #d4f7d0 !important;
+      stroke-width: 1.5 !important;
+    }
+    .tab-note.judged-perfect .note-digit {
+      fill: #11111b !important;
+      font-weight: 800;
+    }
+
+    .tab-note.judged-good .note-bg {
+      fill: #89b4fa !important;
+      stroke: #cfe2ff !important;
+      stroke-width: 1.5 !important;
+    }
+    .tab-note.judged-good .note-digit {
+      fill: #11111b !important;
+      font-weight: 800;
+    }
+
+    .tab-note.judged-miss .note-bg {
+      fill: rgba(243, 139, 168, 0.22) !important;
+      stroke: #f38ba8 !important;
+      stroke-width: 1.6 !important;
+    }
+    .tab-note.judged-miss .note-digit {
+      fill: #f38ba8 !important;
+      font-weight: 800;
+    }
+
+    /* Subtle Halo Pop Animation on Hit */
+    @keyframes hitPop {
+      0% {
+        opacity: 0.85;
+        transform: scale(0.92);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.75);
+      }
+    }
+    .hit-pop-anim {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: hitPop 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
   </style>
 </head>
-<body class="bg-mocha-base text-mocha-text font-sans antialiased min-h-screen flex flex-col selection:bg-mocha-blue/30 selection:text-mocha-text">
 
-  <!-- ==================== HEADER & VERSION SWITCHER ==================== -->
-  <header class="bg-mocha-mantle border-b border-mocha-surface1/80">
-    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <!-- Song Title & Tuning -->
-      <div class="min-w-0">
-        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-mocha-text leading-snug">
-          A Chance I'd Never Have <span class="text-mocha-surface2 font-normal mx-1">—</span> <span class="text-mocha-blue">Acoustic Intro TAB</span>
+<body class="bg-mocha-base text-mocha-text font-sans antialiased min-h-[100dvh] flex flex-col select-none">
+
+  <!-- ==================== 1. SLIM 48px TOP HEADER ==================== -->
+  <header class="sticky top-0 z-30 h-12 bg-mocha-mantle border-b border-mocha-surface0">
+    <div class="max-w-5xl mx-auto h-full px-3 sm:px-5 flex items-center justify-between gap-2">
+      <!-- Left: Compact Song Title + 2-Way Key/Mode Pill (Gm / Em) -->
+      <div class="flex items-center gap-2 min-w-0">
+        <h1 class="text-[13px] sm:text-base font-semibold tracking-tight text-mocha-text truncate">
+          A Chance I'd Never Have
         </h1>
-        <p class="text-sm text-mocha-subtext0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span class="font-medium text-mocha-text/90">None</span>
-          <span class="text-mocha-surface2">·</span>
-          <span>Standard Tuning <span class="font-mono text-mocha-text/90">(E A D G B e)</span></span>
-          <span class="text-mocha-surface2 hidden sm:inline">·</span>
-          <span class="hidden sm:inline text-mocha-subtext0">Continuous Arpeggiated Crosspicking</span>
-        </p>
+
+        <div
+          class="shrink-0 inline-flex items-center bg-mocha-base p-0.5 rounded-full border border-mocha-surface0"
+          role="tablist"
+          aria-label="Key and Arrangement Mode"
+        >
+          <button
+            id="pill-gm"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            title="No Capo — G minor (Original Key)"
+            class="px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition bg-mocha-blue text-mocha-crust"
+          >
+            Gm
+          </button>
+          <button
+            id="pill-em"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            title="Open Shapes — E minor (or Capo 3)"
+            class="px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text"
+          >
+            Em
+          </button>
+        </div>
       </div>
 
-      <!-- Segmented Mode Switcher -->
-      <div class="inline-flex bg-mocha-base p-1 rounded-xl border border-mocha-surface1 shrink-0 self-start md:self-auto" role="tablist" aria-label="TAB Version">
+      <!-- Right: Chord Drawer Toggle + Settings Gear -->
+      <div class="flex items-center gap-1.5 shrink-0">
         <button
-          id="mode-nocapo"
+          id="btn-chord-toggle"
           type="button"
-          role="tab"
-          aria-selected="true"
-          class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm"
+          aria-pressed="false"
+          class="h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext border-mocha-surface0 hover:text-mocha-text"
         >
-          No Capo — G minor <span class="hidden sm:inline opacity-80 font-medium">(Original Key)</span>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="4" y="3" width="16" height="18" rx="2" />
+            <line x1="4" y1="8" x2="20" y2="8" />
+            <line x1="9.3" y1="3" x2="9.3" y2="21" />
+            <line x1="14.7" y1="3" x2="14.7" y2="21" />
+          </svg>
+          <span>Chord</span>
         </button>
+
         <button
-          id="mode-open"
+          id="btn-settings"
           type="button"
-          role="tab"
-          aria-selected="false"
-          class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text"
+          aria-label="Settings"
+          aria-expanded="false"
+          class="w-8 h-8 rounded-lg inline-flex items-center justify-center border border-mocha-surface0 bg-mocha-base text-mocha-subtext hover:text-mocha-text hover:bg-mocha-surface0 transition active:scale-95"
         >
-          Open Shapes — E minor <span class="hidden sm:inline opacity-75 font-medium">(or Capo 3)</span>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ==================== STICKY PLAYBACK & PRACTICE CONTROLS BAR ==================== -->
-  <section class="sticky top-0 z-30 bg-mocha-mantle/95 backdrop-blur-md border-b border-mocha-surface1 shadow-lg shadow-mocha-crust/40">
-    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+  <!-- ==================== 2. ULTRA-SLIM 30px LIVE MIC STRIP ==================== -->
+  <!-- Completely hidden unless Score mode is ON -->
+  <div
+    id="mic-strip"
+    class="hidden sticky top-12 z-20 h-[30px] bg-mocha-crust/95 backdrop-blur border-b border-mocha-surface0"
+  >
+    <div class="max-w-5xl mx-auto h-full px-3 sm:px-5 flex items-center justify-between gap-2 text-[11px] font-mono">
+      <!-- Left: Live Mic Level Dot & Bar -->
+      <div class="flex items-center gap-2 min-w-0">
+        <span id="mic-dot" class="w-2 h-2 rounded-full bg-mocha-surface2 transition-colors shrink-0"></span>
+        <div class="w-11 sm:w-14 h-1.5 rounded-full bg-mocha-surface0 overflow-hidden shrink-0">
+          <div id="mic-meter-fill" class="h-full w-0 bg-mocha-green rounded-full transition-[width] duration-75"></div>
+        </div>
+        <span id="mic-pitch-readout" class="text-mocha-subtext truncate">Listening…</span>
+      </div>
 
-      <!-- Transport: Play/Pause + Restart + Live Count-in Badge -->
-      <div class="flex items-center gap-2.5">
+      <!-- Right: Tappable Running Grade, Accuracy & Streak Pill -->
+      <button
+        id="btn-live-grade"
+        type="button"
+        title="Tap to view detailed Score Card"
+        class="shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-mocha-mantle hover:bg-mocha-surface0 border border-mocha-surface1 transition active:scale-95"
+      >
+        <span id="live-grade-letter" class="font-extrabold text-mocha-subtext">—</span>
+        <span class="text-mocha-surface2">·</span>
+        <span id="live-grade-pct" class="text-mocha-text">--%</span>
+        <span class="text-mocha-surface2">·</span>
+        <span id="live-grade-streak" class="text-mocha-peach">0x</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Non-blocking Inline Toast Banner (for mic permission or status feedback) -->
+  <div
+    id="toast-banner"
+    role="status"
+    aria-live="polite"
+    class="hidden fixed top-[58px] left-1/2 -translate-x-1/2 z-50 max-w-[92vw] sm:max-w-md px-3.5 py-2 rounded-xl bg-mocha-mantle/95 backdrop-blur border border-mocha-surface1 shadow-xl text-xs text-mocha-text items-center gap-2"
+  >
+    <span id="toast-dot" class="w-2 h-2 rounded-full bg-mocha-blue shrink-0"></span>
+    <span id="toast-text" class="leading-snug"></span>
+  </div>
+
+  <!-- ==================== 3. COMPACT 92px CHORD DRAWER / OVERLAY ==================== -->
+  <!-- Hidden by default on mobile (<768px) so all 8 bars fit cleanly -->
+  <aside
+    id="chord-panel"
+    class="hidden sticky top-12 z-20 h-[92px] bg-mocha-mantle/95 backdrop-blur-md border-b border-mocha-surface0 md:fixed md:top-auto md:bottom-[68px] md:right-4 md:w-[308px] md:h-[96px] md:rounded-2xl md:border md:border-mocha-surface1 md:shadow-2xl"
+    aria-label="Active Chord Diagram"
+  >
+    <div class="max-w-5xl mx-auto h-full px-3 flex items-center justify-between gap-3 relative w-full">
+      <!-- Mini Fretboard SVG -->
+      <div class="shrink-0 bg-mocha-base/90 border border-mocha-surface0 rounded-xl px-1.5 py-1 flex items-center justify-center">
+        <svg id="mini-chord-svg" width="126" height="74" viewBox="0 0 134 80" aria-label="Mini Chord Fretboard"></svg>
+      </div>
+
+      <!-- Chord Name, Active Pitch & Finger Legend -->
+      <div class="flex-1 min-w-0 flex flex-col justify-center pr-5">
+        <div class="flex items-baseline gap-2">
+          <span id="chord-name" class="font-mono text-lg font-bold text-mocha-text leading-none">Gm</span>
+          <span id="chord-bar-label" class="font-mono text-[11px] text-mocha-overlay0">Bar 1</span>
+        </div>
+        <div id="chord-note-detail" class="font-mono text-xs text-mocha-peach font-semibold mt-1 truncate">
+          E string · Fret 3 (G2)
+        </div>
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-mono text-mocha-subtext mt-1.5">
+          <span><b class="text-mocha-blue">1</b> Idx</span>
+          <span><b class="text-mocha-blue">2</b> Mid</span>
+          <span><b class="text-mocha-blue">3</b> Rng</span>
+          <span><b class="text-mocha-blue">4</b> Pnk</span>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        id="btn-chord-close"
+        type="button"
+        aria-label="Hide Chord Diagram"
+        class="absolute top-1.5 right-2 w-6 h-6 rounded-md inline-flex items-center justify-center text-mocha-overlay0 hover:text-mocha-text hover:bg-mocha-surface0 transition"
+      >
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==================== 4. UNIFIED 4-ROW SVG TABLATURE SHEET ==================== -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-2 sm:px-5 py-1.5 sm:py-3 flex flex-col justify-center">
+    <div id="tab-rows" class="flex flex-col gap-1.5 sm:gap-2.5 w-full">
+      <!-- 4 crisp 2-bars-per-row SVG systems injected by renderTabSheet() -->
+    </div>
+  </main>
+
+  <!-- ==================== 5. DOCKED 56px BOTTOM TRANSPORT BAR ==================== -->
+  <footer class="sticky bottom-0 z-30 h-14 bg-mocha-mantle border-t border-mocha-surface0">
+    <div class="max-w-5xl mx-auto h-full px-2.5 sm:px-5 flex items-center justify-between gap-1.5 sm:gap-3 relative">
+
+      <!-- Left Group: Play/Pause + Mic Score Toggle + Restart -->
+      <div class="flex items-center gap-1.5">
         <button
           id="btn-play"
           type="button"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-mocha-blue hover:bg-mocha-lavender active:scale-[0.98] text-mocha-crust font-bold text-sm transition-all min-w-[112px] shadow-md shadow-mocha-blue/15"
           title="Play / Pause (Spacebar)"
+          aria-label="Play or Pause"
+          class="h-10 min-w-[44px] px-3 sm:px-4 rounded-xl bg-mocha-blue hover:bg-mocha-blue/90 active:scale-95 text-mocha-crust font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-1.5 transition shadow-sm"
         >
-          <svg id="icon-play" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
-          <svg id="icon-pause" class="w-4 h-4 fill-current hidden" viewBox="0 0 24 24"><path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/></svg>
-          <span id="label-play">Play</span>
+          <svg id="icon-play" class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+            <path d="M8 5.14v14l11-7-11-7z" />
+          </svg>
+          <svg id="icon-pause" class="w-4 h-4 fill-current hidden shrink-0" viewBox="0 0 24 24">
+            <path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z" />
+          </svg>
+          <span id="label-play" class="hidden sm:inline">Play</span>
+          <span id="badge-countin" class="hidden font-mono text-xs font-extrabold">1</span>
         </button>
 
+        <!-- Mic Score Mode Toggle Button -->
+        <button
+          id="btn-score-mode"
+          type="button"
+          aria-pressed="false"
+          title="Toggle real-time microphone listening & F–S grading"
+          class="h-10 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0"
+        >
+          <svg class="w-3.5 h-3.5 text-mocha-mauve shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+          <span>Score</span>
+        </button>
+
+        <!-- Restart Button -->
         <button
           id="btn-restart"
           type="button"
-          class="inline-flex items-center justify-center p-2.5 rounded-xl bg-mocha-surface0 hover:bg-mocha-surface1 text-mocha-text border border-mocha-surface1 transition-colors"
-          title="Restart from loop start (R)"
-          aria-label="Restart"
+          title="Restart Loop (R)"
+          aria-label="Restart Loop"
+          class="w-9 sm:w-10 h-10 rounded-xl bg-mocha-base hover:bg-mocha-surface0 active:scale-95 text-mocha-text border border-mocha-surface0 inline-flex items-center justify-center transition shrink-0"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
             <path d="M3 3v5h5" />
           </svg>
         </button>
-
-        <!-- Count-in Visual Indicator (visible while counting in) -->
-        <div id="countin-display" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-mocha-peach/15 border border-mocha-peach/50 text-mocha-peach font-mono text-xs font-bold">
-          <span class="uppercase tracking-wider text-[10px] opacity-90">Count</span>
-          <span id="countin-num" class="text-base leading-none">1</span>
-        </div>
       </div>
 
-      <!-- Tempo / BPM Slider & Presets -->
-      <div class="flex flex-wrap items-center gap-3 bg-mocha-base/90 px-3.5 py-2 rounded-xl border border-mocha-surface1/80">
-        <div class="flex items-center gap-2.5">
-          <label for="bpm-slider" class="text-xs font-semibold uppercase tracking-wider text-mocha-subtext0">BPM</label>
-          <input
-            id="bpm-slider"
-            type="range"
-            min="40"
-            max="110"
-            step="1"
-            value="60"
-            class="w-24 sm:w-32 h-1.5 bg-mocha-surface1 rounded-lg appearance-none cursor-pointer"
-          />
-          <span id="bpm-value" class="font-mono font-bold text-base text-mocha-peach w-9 text-right tabular-nums">60</span>
+      <!-- Right Group: Compact BPM Pill + Loop Selector Pill -->
+      <div class="flex items-center gap-1.5">
+        <!-- BPM Pill & Floating Popover -->
+        <div class="relative">
+          <button
+            id="btn-bpm-pill"
+            type="button"
+            aria-expanded="false"
+            title="Adjust Tempo (40–110 BPM)"
+            class="h-10 px-2.5 sm:px-3.5 rounded-xl bg-mocha-base hover:bg-mocha-surface0 active:scale-95 border border-mocha-surface0 font-mono text-xs font-semibold text-mocha-text inline-flex items-center gap-1 transition tabular-nums"
+          >
+            <span id="bpm-text" class="text-mocha-peach font-bold">60</span>
+            <span class="text-mocha-subtext text-[11px]">BPM</span>
+          </button>
+
+          <!-- Sleek BPM Popover -->
+          <div
+            id="bpm-popover"
+            class="hidden absolute bottom-[52px] right-0 sm:left-1/2 sm:-translate-x-1/2 z-40 w-64 bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-3.5 shadow-2xl"
+          >
+            <div class="flex items-center justify-between text-xs mb-2.5">
+              <span class="text-mocha-subtext font-medium">Tempo</span>
+              <div class="flex items-center gap-1.5">
+                <button id="btn-bpm-minus" type="button" class="w-6 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono font-bold text-mocha-text inline-flex items-center justify-center">−</button>
+                <span id="bpm-popover-val" class="font-mono font-bold text-mocha-peach w-14 text-center tabular-nums">60 BPM</span>
+                <button id="btn-bpm-plus" type="button" class="w-6 h-6 rounded-md bg-mocha-base hover:bg-mocha-surface0 border border-mocha-surface0 font-mono font-bold text-mocha-text inline-flex items-center justify-center">+</button>
+              </div>
+            </div>
+            <input
+              id="bpm-slider"
+              type="range"
+              min="40"
+              max="110"
+              step="1"
+              value="60"
+              class="w-full cursor-pointer mb-3"
+            />
+            <div class="grid grid-cols-3 gap-1.5">
+              <button type="button" data-bpm="50" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
+                50% (50)
+              </button>
+              <button type="button" data-bpm="75" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
+                75% (75)
+              </button>
+              <button type="button" data-bpm="100" class="bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition">
+                100% (100)
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="h-4 w-px bg-mocha-surface1 hidden sm:block"></div>
-
-        <div class="flex items-center gap-1">
-          <button type="button" data-bpm="50" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
-            50% (50)
-          </button>
-          <button type="button" data-bpm="75" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
-            75% (75)
-          </button>
-          <button type="button" data-bpm="100" class="bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text transition-colors">
-            Full (100)
-          </button>
-        </div>
-      </div>
-
-      <!-- Loop Region Selector -->
-      <div class="flex items-center gap-1 bg-mocha-base/90 p-1 rounded-xl border border-mocha-surface1/80" role="group" aria-label="Loop Selector">
-        <span class="text-[11px] font-semibold uppercase tracking-wider text-mocha-subtext0 px-2 hidden sm:inline">Loop</span>
-        <button type="button" data-loop="full" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-mocha-surface0 text-mocha-blue border border-mocha-blue/40">
-          Full (1–8)
-        </button>
-        <button type="button" data-loop="1-4" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent">
-          Bars 1–4
-        </button>
-        <button type="button" data-loop="5-8" class="loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent">
-          Bars 5–8
-        </button>
-      </div>
-
-      <!-- Practice Toggles -->
-      <div class="flex flex-wrap items-center gap-1.5">
-        <button id="toggle-audio" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
-          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
-          Guitar Audio
-        </button>
-        <button id="toggle-metronome" type="button" aria-pressed="false" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-surface0/60 text-mocha-subtext0 border-mocha-surface1 hover:text-mocha-text">
-          <span class="w-2 h-2 rounded-full bg-mocha-overlay0"></span>
-          Metronome Click
-        </button>
-        <button id="toggle-strokes" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
-          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
-          Pick Strokes D/U
-        </button>
-        <button id="toggle-countin" type="button" aria-pressed="true" class="toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40">
-          <span class="w-2 h-2 rounded-full bg-mocha-blue"></span>
-          Count-in (4)
+        <!-- Loop Selector Pill (1–8 -> 1–4 -> 5–8) -->
+        <button
+          id="btn-loop"
+          type="button"
+          title="Cycle Loop Bars (1–8, 1–4, 5–8)"
+          class="h-10 px-2.5 sm:px-3 rounded-xl border text-xs font-mono font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0"
+        >
+          <svg class="w-3.5 h-3.5 text-mocha-blue shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9" />
+            <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+            <polyline points="7 23 3 19 7 15" />
+            <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+          </svg>
+          <span id="label-loop">1–8</span>
         </button>
       </div>
 
     </div>
-  </section>
+  </footer>
 
-  <!-- ==================== MAIN PRACTICE WORKSPACE ==================== -->
-  <main class="flex-1 max-w-[1640px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="flex flex-col lg:flex-row items-start gap-6 xl:gap-8">
-
-      <!-- LIVE CHORD & FINGER DIAGRAM PANEL (Top on mobile, sticky right sidebar on desktop) -->
-      <aside class="w-full lg:w-[330px] xl:w-[360px] shrink-0 order-first lg:order-last lg:sticky lg:top-[92px]">
-        <div class="bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-4 sm:p-5 shadow-xl shadow-mocha-crust/40">
-          <!-- Chord Header -->
-          <div class="flex items-start justify-between gap-3 pb-3 border-b border-mocha-surface1/70">
-            <div>
-              <div class="flex items-center gap-2">
-                <span id="chord-bar-badge" class="px-2 py-0.5 rounded-md bg-mocha-surface0 text-mocha-subtext0 font-mono text-[11px] font-semibold">Bar 1</span>
-                <span id="chord-live-dot" class="hidden w-2 h-2 rounded-full bg-mocha-peach animate-pulse"></span>
-              </div>
-              <h2 id="chord-title" class="text-2xl sm:text-3xl font-bold text-mocha-text tracking-tight mt-1 font-mono">Gm</h2>
-            </div>
-            <div class="text-right">
-              <span class="text-[11px] uppercase tracking-wider text-mocha-subtext0 font-semibold block">Active Shape</span>
-              <span id="chord-note-readout" class="font-mono text-xs text-mocha-peach font-semibold mt-0.5 block">Click any note</span>
-            </div>
-          </div>
-
-          <!-- Responsive body: side-by-side on mobile landscape / compact, stacked on desktop -->
-          <div class="flex flex-col sm:flex-row lg:flex-col items-center gap-4 pt-3">
-            <!-- SVG Fretboard Box -->
-            <div class="w-full max-w-[260px] shrink-0 flex items-center justify-center bg-mocha-card/60 rounded-xl border border-mocha-surface1/60 p-2">
-              <svg id="chord-svg" viewBox="0 0 244 242" class="w-full h-auto select-none" aria-label="Active Chord Fretboard Diagram"></svg>
-            </div>
-
-            <!-- Tip & Finger Legend -->
-            <div class="w-full flex flex-col gap-3">
-              <!-- Active Shape Tip -->
-              <div class="bg-mocha-card border border-mocha-surface1/80 rounded-xl p-3.5">
-                <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-mocha-blue mb-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
-                  Hand Position Tip
-                </div>
-                <p id="chord-tip" class="text-sm text-mocha-text/95 leading-relaxed">
-                  Arch fingers cleanly so the open D string rings between them.
-                </p>
-              </div>
-
-              <!-- Finger Number Legend -->
-              <div class="grid grid-cols-2 gap-2 text-xs text-mocha-subtext0 bg-mocha-base/70 rounded-xl p-3 border border-mocha-surface1/60">
-                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">1</span><span>Index</span></div>
-                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">2</span><span>Middle</span></div>
-                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">3</span><span>Ring</span></div>
-                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded-full bg-mocha-blue text-mocha-crust font-mono font-bold text-[11px] inline-flex items-center justify-center">4</span><span>Pinky</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- INTERACTIVE VISUAL TAB GRID -->
-      <section class="flex-1 w-full min-w-0">
-        <!-- Subtle Utility Strip above TAB Grid -->
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-3.5 px-1">
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-mocha-subtext0">
-            <span class="inline-flex items-center gap-1.5">
-              <span class="inline-block w-2.5 h-2.5 rounded-full bg-mocha-peach"></span>
-              Active note
-            </span>
-            <span class="inline-flex items-center gap-1.5">
-              <span class="font-mono font-bold text-mocha-blue">D↓</span> Downstroke
-            </span>
-            <span class="inline-flex items-center gap-1.5">
-              <span class="font-mono font-bold text-mocha-green">U↑</span> Upstroke
-            </span>
-            <span class="hidden sm:inline text-mocha-overlay0">· Click any note to jump &amp; preview</span>
-          </div>
-
-          <!-- Wide-screen Grid Density Switcher (2 vs 4 bars per row) -->
-          <div class="hidden 2xl:inline-flex items-center gap-1 bg-mocha-mantle p-1 rounded-lg border border-mocha-surface1 text-xs">
-            <span class="px-2 text-mocha-subtext0 font-medium">Columns</span>
-            <button id="cols-2" type="button" class="px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue">2 / row</button>
-            <button id="cols-4" type="button" class="px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text">4 / row</button>
-          </div>
-        </div>
-
-        <!-- 8 Visual SVG Tablature Cards -->
-        <div id="tab-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5">
-          <!-- Populated dynamically by renderTabGrid() -->
-        </div>
-
-        <!-- Subtle Keyboard Shortcut Bar -->
-        <footer class="mt-6 pt-4 border-t border-mocha-surface1/50 flex flex-wrap items-center justify-between gap-3 text-xs text-mocha-overlay0">
-          <div class="flex flex-wrap items-center gap-4">
-            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">Space</kbd> Play / Pause</span>
-            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">R</kbd> Restart</span>
-            <span><kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">←</kbd> <kbd class="px-1.5 py-0.5 rounded bg-mocha-mantle border border-mocha-surface1 text-mocha-subtext0 font-mono text-[11px]">→</kbd> Step Note</span>
-          </div>
-          <span class="font-mono text-[11px] text-mocha-overlay0">Let all picked notes ring together</span>
-        </footer>
-      </section>
-
+  <!-- ==================== 6. SETTINGS POPOVER (⚙️) ==================== -->
+  <div
+    id="settings-popover"
+    role="dialog"
+    aria-label="Player and Microphone Settings"
+    class="hidden fixed top-[54px] right-2.5 sm:right-5 z-40 w-[calc(100vw-20px)] max-w-[320px] bg-mocha-mantle border border-mocha-surface1 rounded-2xl p-4 shadow-2xl max-h-[82dvh] overflow-y-auto"
+  >
+    <div class="text-[11px] font-semibold uppercase tracking-wider text-mocha-overlay0 mb-2.5">
+      Playback &amp; Display
     </div>
-  </main>
+
+    <div class="flex flex-col gap-2.5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Guitar Audio</div>
+          <div id="sub-guitar-audio" class="text-[10px] text-mocha-subtext">Synthesized steel-string plucks</div>
+        </div>
+        <button id="sw-audio" type="button" role="switch" aria-checked="true" class="w-9 h-5 rounded-full bg-mocha-blue p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-crust translate-x-4 transition-transform"></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-mocha-text">Metronome Click</span>
+        <button id="sw-metro" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-mocha-text">4-Beat Count-in</span>
+        <button id="sw-countin" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-mocha-text">Pick Strokes (D/U)</span>
+        <button id="sw-strokes" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+
+      <!-- Capo 3 Pitch Toggle (active in Em Open Shapes mode) -->
+      <div id="row-capo3" class="hidden pt-1 items-center justify-between">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Capo 3 Pitch (+3 st)</div>
+          <div class="text-[10px] text-mocha-subtext">Match original Gm pitch in Em mode</div>
+        </div>
+        <button id="sw-capo3" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="h-px bg-mocha-surface0 my-3.5"></div>
+
+    <div class="text-[11px] font-semibold uppercase tracking-wider text-mocha-overlay0 mb-2.5">
+      Microphone Scoring
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <!-- Mic Sensitivity Segmented Selector -->
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-medium text-mocha-text">Mic Sensitivity</span>
+          <span id="label-sens" class="font-mono text-[10px] text-mocha-subtext">Normal</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1 bg-mocha-base p-1 rounded-xl border border-mocha-surface0">
+          <button type="button" data-sens="low" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition">
+            Low
+          </button>
+          <button type="button" data-sens="normal" class="sens-btn py-1 rounded-lg text-xs font-semibold bg-mocha-surface0 text-mocha-blue transition">
+            Normal
+          </button>
+          <button type="button" data-sens="high" class="sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition">
+            High
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Headphones Mode</div>
+          <div class="text-[10px] text-mocha-subtext">Keep synth audio ON in Score mode</div>
+        </div>
+        <button id="sw-headphones" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <div class="text-xs font-medium text-mocha-text">Endless Loop in Score</div>
+          <div class="text-[10px] text-mocha-subtext">Keep looping without end modal</div>
+        </div>
+        <button id="sw-endless" type="button" role="switch" aria-checked="false" class="w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0">
+          <span class="block w-4 h-4 rounded-full bg-mocha-subtext transition-transform"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 7. END-OF-RUN F–S GRADE CARD MODAL ==================== -->
+  <div
+    id="grade-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="grade-modal-title"
+    class="hidden fixed inset-0 z-50 bg-mocha-crust/80 backdrop-blur-sm p-4 items-center justify-center"
+  >
+    <div class="w-full max-w-sm bg-mocha-mantle border border-mocha-surface1 rounded-3xl p-5 shadow-2xl relative">
+      <!-- Top Row: Context Tag + Close -->
+      <div class="flex items-center justify-between mb-3">
+        <span id="modal-run-meta" class="font-mono text-[11px] text-mocha-subtext bg-mocha-base px-2.5 py-1 rounded-full border border-mocha-surface0">
+          Gm · 60 BPM · Bars 1–8
+        </span>
+        <button
+          id="btn-modal-x"
+          type="button"
+          aria-label="Close Grade Card"
+          class="w-7 h-7 rounded-full bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext hover:text-mocha-text inline-flex items-center justify-center transition"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Center: Glowing Letter Grade Badge & Accuracy -->
+      <div class="flex items-center gap-4 py-2">
+        <div
+          id="modal-grade-crest"
+          class="w-20 h-20 rounded-2xl bg-mocha-base border-2 border-mocha-gold flex items-center justify-center shrink-0 shadow-lg"
+        >
+          <span id="modal-grade-letter" class="font-mono text-5xl font-extrabold leading-none text-mocha-gold">S</span>
+        </div>
+        <div class="min-w-0">
+          <h2 id="grade-modal-title" class="text-xl font-bold text-mocha-text tracking-tight leading-tight">
+            Flawless
+          </h2>
+          <div class="flex items-baseline gap-2 mt-0.5">
+            <span id="modal-accuracy" class="font-mono text-2xl font-extrabold text-mocha-text">98%</span>
+            <span class="text-xs text-mocha-subtext">accuracy</span>
+          </div>
+          <div class="font-mono text-xs text-mocha-peach mt-0.5">
+            Best Streak: <span id="modal-streak" class="font-bold">16x</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hit Breakdown Pills: Perfect / Good / Miss -->
+      <div class="grid grid-cols-3 gap-2 my-3.5">
+        <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
+          <div id="modal-perfect" class="font-mono text-base font-bold text-mocha-green">0</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Perfect</div>
+        </div>
+        <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
+          <div id="modal-good" class="font-mono text-base font-bold text-mocha-blue">0</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Good</div>
+        </div>
+        <div class="bg-mocha-base rounded-xl p-2 text-center border border-mocha-surface0">
+          <div id="modal-miss" class="font-mono text-base font-bold text-mocha-red">0</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-mocha-subtext">Miss</div>
+        </div>
+      </div>
+
+      <!-- Compact 8-Bar Mini Accuracy Chart -->
+      <div class="bg-mocha-base/80 border border-mocha-surface0 rounded-2xl p-3 mb-3">
+        <div class="flex items-center justify-between text-[10px] font-mono text-mocha-overlay0 uppercase mb-2">
+          <span>Bar Breakdown</span>
+          <span>1 – 8</span>
+        </div>
+        <div id="modal-bar-chart" class="grid grid-cols-8 gap-1.5 items-end h-16">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Smart Coaching Line -->
+      <p id="modal-coaching" class="text-xs text-mocha-subtext bg-mocha-base/60 border border-mocha-surface0/70 rounded-xl px-3 py-2 mb-4 leading-relaxed">
+        Clean pass across all bars!
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2">
+          <button
+            id="btn-modal-retry"
+            type="button"
+            class="flex-1 h-10 rounded-xl bg-mocha-blue hover:bg-mocha-blue/90 active:scale-95 text-mocha-crust font-bold text-xs inline-flex items-center justify-center gap-1.5 transition"
+          >
+            <span>↻ Retry Run</span>
+          </button>
+          <button
+            id="btn-modal-weak"
+            type="button"
+            class="hidden flex-1 h-10 rounded-xl bg-mocha-mauve/20 hover:bg-mocha-mauve/30 active:scale-95 text-mocha-mauve border border-mocha-mauve/40 font-semibold text-xs items-center justify-center transition"
+          >
+            Loop Bars 1–4
+          </button>
+        </div>
+        <button
+          id="btn-modal-close"
+          type="button"
+          class="w-full h-9 rounded-xl bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext hover:text-mocha-text border border-mocha-surface0 font-semibold text-xs transition"
+        >
+          Close &amp; Review Sheet
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
     (() => {
       'use strict';
 
-      // =========================================================================
-      // 1. MUSICAL CONSTANTS & EXACT TAB DATA
-      // =========================================================================
+      // =======================================================================
+      // 1. MUSICAL TUNING, TAB DATA & F–S GRADING CONSTANTS
+      // =======================================================================
 
-      // String index: 0=e (high E), 1=B, 2=G, 3=D, 4=A, 5=E (low E)
-      const STRING_NAMES = ['e', 'B', 'G', 'D', 'A', 'E'];
-      const OPEN_FREQS = [329.63, 246.94, 196.00, 146.83, 110.00, 82.41];
-      const STRING_WEIGHTS = [1.15, 1.4, 1.7, 2.05, 2.45, 2.9];
-      const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-      const OPEN_MIDI = [64, 59, 55, 50, 45, 40]; // E4, B3, G3, D3, A2, E2
+      // Top-to-bottom TAB string order (0=e4 .. 5=E2) vs Low-to-High Chord box order
+      const TAB_STRINGS = ['e', 'B', 'G', 'D', 'A', 'E'];
+      const CHORD_STRINGS = ['E', 'A', 'D', 'G', 'B', 'e'];
+      const STRING_TO_TAB_ROW = { e: 0, B: 1, G: 2, D: 3, A: 4, E: 5 };
 
-      // Chord diagrams map string index (5=E down to 0=e) to 'X' or { fret, finger? }
+      // Scientific Pitch Standard Tuning MIDI: e4=64, B3=59, G3=55, D3=50, A2=45, E2=40
+      const BASE_MIDI = { e: 64, B: 59, G: 55, D: 50, A: 45, E: 40 };
+      const PITCH_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const TAB_LINE_WEIGHTS = [1.05, 1.2, 1.4, 1.65, 1.9, 2.2];
+
+      const midiToFreq = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+      const formatNoteName = (midi) => `${PITCH_NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
+
+      // Fretboard Chord Box Library (ordered Low-to-High: [E, A, D, G, B, e])
       const CHORDS = {
-        // Version 1 — No Capo (G minor)
+        Gm:    { label: 'Gm',     shape: [3, 'x', 0, 3, 3, 'x'], fingers: [1, 0, 0, 2, 3, 0] },
+        Gm_b6: { label: 'Gm(b6)', shape: [3, 'x', 0, 3, 4, 'x'], fingers: [1, 0, 0, 2, 4, 0] },
+        F:     { label: 'F',      shape: ['x', 'x', 3, 2, 1, 'x'], fingers: [0, 0, 3, 2, 1, 0] },
+        Cm:    { label: 'Cm',     shape: ['x', 3, 1, 0, 'x', 'x'], fingers: [0, 3, 1, 0, 0, 0] },
+        D:     { label: 'D',      shape: ['x', 'x', 0, 2, 3, 2],   fingers: [0, 0, 0, 1, 3, 2] },
+        Em:    { label: 'Em',     shape: [0, 2, 2, 0, 0, 0],       fingers: [0, 2, 3, 0, 0, 0] },
+        Em_b6: { label: 'Em(b6)', shape: [0, 2, 2, 0, 1, 0],       fingers: [0, 2, 3, 0, 1, 0] },
+        Am:    { label: 'Am',     shape: ['x', 0, 2, 2, 1, 0],     fingers: [0, 0, 2, 3, 1, 0] },
+        Asus2: { label: 'Asus2',  shape: ['x', 0, 2, 2, 0, 0],     fingers: [0, 0, 2, 3, 0, 0] },
+        B7:    { label: 'B7',     shape: ['x', 2, 1, 2, 0, 'x'],   fingers: [0, 2, 1, 3, 0, 0] },
+      };
+
+      // Helper to create 8th-note arrays with strict D/U alternate picking
+      const notesFrom = (pairs) =>
+        pairs.map(([str, fret], idx) => ({
+          str,
+          fret,
+          stroke: idx % 2 === 0 ? 'D' : 'U',
+        }));
+
+      const GM_BAR = [['E',3],['D',0],['G',3],['D',0],['B',3],['G',3],['D',0],['G',3]];
+      const F_BAR  = [['D',3],['G',2],['B',1],['G',2],['B',1],['G',2],['D',3],['G',2]];
+      const EM_BAR = [['E',0],['D',2],['G',0],['D',2],['B',0],['G',0],['D',2],['G',0]];
+      const D_OPEN = [['D',0],['G',2],['B',3],['G',2],['e',2],['B',3],['G',2],['B',3]];
+
+      const ARRANGEMENTS = {
         Gm: {
-          name: 'Gm',
-          strings: { 5: { fret: 3, finger: 1 }, 4: 'X', 3: { fret: 0 }, 2: { fret: 3, finger: 2 }, 1: { fret: 3, finger: 3 }, 0: 'X' },
-          tip: 'Arch fingers cleanly so the open D string rings between them.'
+          bars: [
+            { num: 1, chord: 'Gm', notes: notesFrom(GM_BAR) },
+            { num: 2, chord: 'Gm', notes: notesFrom(GM_BAR) },
+            { num: 3, chord: 'Gm_b6', notes: notesFrom([['E',3],['D',0],['G',3],['D',0],['B',4],['G',3],['D',0],['G',3]]) },
+            { num: 4, chord: 'Gm', notes: notesFrom(GM_BAR) },
+            { num: 5, chord: 'F', notes: notesFrom(F_BAR) },
+            { num: 6, chord: 'F', notes: notesFrom(F_BAR) },
+            { num: 7, chord: 'Cm', notes: notesFrom([['A',3],['D',1],['G',0],['D',1],['G',0],['D',1],['A',3],['D',1]]) },
+            { num: 8, chord: 'Cm', midChord: 'D', notes: notesFrom([['A',3],['D',1],['G',0],['D',1],['D',0],['G',2],['B',3],['e',2]]) },
+          ],
         },
-        Gm_b6: {
-          name: 'Gm(b6)',
-          strings: { 5: { fret: 3, finger: 1 }, 4: 'X', 3: { fret: 0 }, 2: { fret: 3, finger: 2 }, 1: { fret: 4, finger: 4 }, 0: 'X' },
-          tip: 'Drop pinky onto B string 4th fret for the brief melody lift.'
-        },
-        F: {
-          name: 'F',
-          strings: { 5: 'X', 4: 'X', 3: { fret: 3, finger: 3 }, 2: { fret: 2, finger: 2 }, 1: { fret: 1, finger: 1 }, 0: 'X' },
-          tip: 'Simple 3-finger stair-step (no barre needed).'
-        },
-        Cm: {
-          name: 'Cm',
-          strings: { 5: 'X', 4: { fret: 3, finger: 3 }, 3: { fret: 1, finger: 1 }, 2: { fret: 0 }, 1: 'X', 0: 'X' },
-          tip: 'Just 2 fingers—let the open G string ring clearly.'
-        },
-        D_turnaround: {
-          name: 'D',
-          strings: { 5: 'X', 4: 'X', 3: { fret: 0 }, 2: { fret: 2, finger: 1 }, 1: { fret: 3, finger: 3 }, 0: { fret: 2, finger: 2 } },
-          tip: 'Quick turnaround into open D to walk straight back to Gm.'
-        },
-
-        // Version 2 — Open Shapes (E minor / Capo 3)
         Em: {
-          name: 'Em',
-          strings: { 5: { fret: 0 }, 4: { fret: 2, finger: 2 }, 3: { fret: 2, finger: 3 }, 2: { fret: 0 }, 1: { fret: 0 }, 0: { fret: 0 } },
-          tip: 'Hold standard 2-finger Em and let every string ring out.'
+          bars: [
+            { num: 1, chord: 'Em', notes: notesFrom(EM_BAR) },
+            { num: 2, chord: 'Em', notes: notesFrom(EM_BAR) },
+            { num: 3, chord: 'Em_b6', notes: notesFrom([['E',0],['D',2],['G',0],['D',2],['B',1],['G',0],['D',2],['G',0]]) },
+            { num: 4, chord: 'Em', notes: notesFrom(EM_BAR) },
+            { num: 5, chord: 'D', notes: notesFrom(D_OPEN) },
+            { num: 6, chord: 'D', notes: notesFrom(D_OPEN) },
+            { num: 7, chord: 'Am', notes: notesFrom([['A',0],['D',2],['G',2],['D',2],['B',1],['G',2],['D',2],['G',2]]) },
+            { num: 8, chord: 'Asus2', midChord: 'B7', notes: notesFrom([['A',0],['D',2],['G',2],['B',0],['A',2],['D',1],['G',2],['B',0]]) },
+          ],
         },
-        Em_b6: {
-          name: 'Em(b6)',
-          strings: { 5: { fret: 0 }, 4: { fret: 2, finger: 2 }, 3: { fret: 2, finger: 3 }, 2: { fret: 0 }, 1: { fret: 1, finger: 1 }, 0: { fret: 0 } },
-          tip: 'Add index finger to B string 1st fret for one bar, then lift.'
-        },
-        D_open: {
-          name: 'D',
-          strings: { 5: 'X', 4: 'X', 3: { fret: 0 }, 2: { fret: 2, finger: 1 }, 1: { fret: 3, finger: 3 }, 0: { fret: 2, finger: 2 } },
-          tip: 'Shift your picking hand down to the thinnest four strings.'
-        },
-        Am: {
-          name: 'Am',
-          strings: { 5: 'X', 4: { fret: 0 }, 3: { fret: 2, finger: 2 }, 2: { fret: 2, finger: 3 }, 1: { fret: 1, finger: 1 }, 0: { fret: 0 } },
-          tip: 'Keep fingers arched so the open A string rings underneath.'
-        },
-        Asus2: {
-          name: 'Asus2',
-          strings: { 5: 'X', 4: { fret: 0 }, 3: { fret: 2, finger: 2 }, 2: { fret: 2, finger: 3 }, 1: { fret: 0 }, 0: { fret: 0 } },
-          tip: 'Lift index finger off B for Asus2, then jump to B7 turnaround.'
-        },
-        B7: {
-          name: 'B7',
-          strings: { 5: 'X', 4: { fret: 2, finger: 2 }, 3: { fret: 1, finger: 1 }, 2: { fret: 2, finger: 3 }, 1: { fret: 0 }, 0: 'X' },
-          tip: 'Lift index finger off B for Asus2, then jump to B7 turnaround.'
-        }
       };
 
-      // Helper to build note objects cleanly: [stringIndex, fret, pickDirection]
-      const makeNotes = (arr) => arr.map(([s, f, p]) => ({ s, f, p }));
+      const LOOP_MODES = [
+        { id: '1-8', label: '1–8', start: 0, end: 7 },
+        { id: '1-4', label: '1–4', start: 0, end: 3 },
+        { id: '5-8', label: '5–8', start: 4, end: 7 },
+      ];
 
-      // Exact 8-bar sequences for both versions
-      const VERSIONS = {
-        nocapo: {
-          id: 'nocapo',
-          label: 'No Capo — G minor (Original Key)',
-          bars: [
-            {
-              bar: 1,
-              chord: 'Gm',
-              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
-            },
-            {
-              bar: 2,
-              chord: 'Gm',
-              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
-            },
-            {
-              bar: 3,
-              chord: 'Gm_b6',
-              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,4,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
-            },
-            {
-              bar: 4,
-              chord: 'Gm',
-              notes: makeNotes([[5,3,'D'], [3,0,'U'], [2,3,'D'], [3,0,'U'], [1,3,'D'], [2,3,'U'], [3,0,'D'], [2,3,'U']])
-            },
-            {
-              bar: 5,
-              chord: 'F',
-              notes: makeNotes([[3,3,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [3,3,'D'], [2,2,'U']])
-            },
-            {
-              bar: 6,
-              chord: 'F',
-              notes: makeNotes([[3,3,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [1,1,'D'], [2,2,'U'], [3,3,'D'], [2,2,'U']])
-            },
-            {
-              bar: 7,
-              chord: 'Cm',
-              notes: makeNotes([[4,3,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [4,3,'D'], [3,1,'U']])
-            },
-            {
-              bar: 8,
-              chord: 'Cm',
-              splitChord: 'D_turnaround', // Changes at note index 4 (beat 3 / 5th eighth-note)
-              notes: makeNotes([[4,3,'D'], [3,1,'U'], [2,0,'D'], [3,1,'U'], [3,0,'D'], [2,2,'U'], [1,3,'D'], [0,2,'U']])
-            }
-          ]
-        },
-        open: {
-          id: 'open',
-          label: 'Open Shapes — E minor (or Capo 3)',
-          bars: [
-            {
-              bar: 1,
-              chord: 'Em',
-              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
-            },
-            {
-              bar: 2,
-              chord: 'Em',
-              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
-            },
-            {
-              bar: 3,
-              chord: 'Em_b6',
-              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,1,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
-            },
-            {
-              bar: 4,
-              chord: 'Em',
-              notes: makeNotes([[5,0,'D'], [3,2,'U'], [2,0,'D'], [3,2,'U'], [1,0,'D'], [2,0,'U'], [3,2,'D'], [2,0,'U']])
-            },
-            {
-              bar: 5,
-              chord: 'D_open',
-              notes: makeNotes([[3,0,'D'], [2,2,'U'], [1,3,'D'], [2,2,'U'], [0,2,'D'], [1,3,'U'], [2,2,'D'], [1,3,'U']])
-            },
-            {
-              bar: 6,
-              chord: 'D_open',
-              notes: makeNotes([[3,0,'D'], [2,2,'U'], [1,3,'D'], [2,2,'U'], [0,2,'D'], [1,3,'U'], [2,2,'D'], [1,3,'U']])
-            },
-            {
-              bar: 7,
-              chord: 'Am',
-              notes: makeNotes([[4,0,'D'], [3,2,'U'], [2,2,'D'], [3,2,'U'], [1,1,'D'], [2,2,'U'], [3,2,'D'], [2,2,'U']])
-            },
-            {
-              bar: 8,
-              chord: 'Asus2',
-              splitChord: 'B7', // Changes at note index 4 (beat 3 / 5th eighth-note)
-              notes: makeNotes([[4,0,'D'], [3,2,'U'], [2,2,'D'], [1,0,'U'], [4,2,'D'], [3,1,'U'], [2,2,'D'], [1,0,'U']])
-            }
-          ]
+      // F-to-S Grading Scale Thresholds
+      const GRADE_TIERS = [
+        { min: 95, letter: 'S', title: 'Flawless',        color: '#f9e2af' },
+        { min: 85, letter: 'A', title: 'Dialed In',       color: '#a6e3a1' },
+        { min: 72, letter: 'B', title: 'Solid Flow',      color: '#89b4fa' },
+        { min: 58, letter: 'C', title: 'Getting There',   color: '#fab387' },
+        { min: 40, letter: 'D', title: 'Rough Pass',      color: '#eba0ac' },
+        { min: 0,  letter: 'F', title: 'Keep Practicing', color: '#f38ba8' },
+      ];
+
+      function computeGradeTier(pct) {
+        for (const tier of GRADE_TIERS) {
+          if (pct >= tier.min) return tier;
         }
+        return GRADE_TIERS[GRADE_TIERS.length - 1];
+      }
+
+      // Mic Sensitivity Presets (RMS Gate & Spectral SNR Multiplier)
+      const SENSITIVITY_CONFIG = {
+        low:    { label: 'Low',    rmsGate: 0.015, snrMult: 5.2, onsetRatio: 1.42 },
+        normal: { label: 'Normal', rmsGate: 0.007, snrMult: 3.6, onsetRatio: 1.26 },
+        high:   { label: 'High',   rmsGate: 0.003, snrMult: 2.5, onsetRatio: 1.15 },
       };
 
-      // =========================================================================
-      // 2. APPLICATION STATE
-      // =========================================================================
+      const MIC_LATENCY_SEC = 0.035;
+
+      // =======================================================================
+      // 2. APPLICATION & SCORING STATE
+      // =======================================================================
+      const desktopQuery = window.matchMedia('(min-width: 768px)');
+
       const state = {
-        version: 'nocapo',      // 'nocapo' | 'open'
-        bpm: 60,                // 40..110
-        loopMode: 'full',       // 'full' | '1-4' | '5-8'
+        mode: 'Gm',                        // 'Gm' | 'Em'
+        capo3Pitch: false,                 // +3 semitones when 'Em' is selected
+        bpm: 60,                           // 40..110
+        loopIdx: 0,                        // 0: 1-8, 1: 1-4, 2: 5-8
+        showChord: desktopQuery.matches,   // Hidden by default on mobile (<768px)
         guitarAudio: true,
         metronome: false,
-        showStrokes: true,
-        countIn: true,
-        gridCols: 2,            // 2 or 4 on ultra-wide screens
+        countIn: false,
+        showStrokes: false,
+        sensitivity: 'normal',             // 'low' | 'normal' | 'high'
+        headphonesMode: false,             // Keep synth ON in Score mode
+        endlessScoreLoop: false,           // Keep looping in Score mode without modal
+        isDesktop: desktopQuery.matches,
+
+        scoreMode: false,                  // Microphone listening & F-S grading mode
+        savedPrefsBeforeScore: null,       // Restores Audio/Metronome/Count-in when exiting Score mode
 
         isPlaying: false,
         isCountingIn: false,
-        currentBar: 0,          // 0..7
-        currentNote: 0,         // 0..7
-        selectedBar: 0,         // Highlighted/inspected bar for chord diagram
-        selectedNote: 0,        // Highlighted/inspected note index
+        activeBar: 0,
+        activeNote: 0,
+
+        // Current Score Run Tracking
+        judgments: Array.from({ length: 8 }, () => new Array(8).fill(null)), // 'perfect' | 'good' | 'miss' | null
+        perfectCount: 0,
+        goodCount: 0,
+        missCount: 0,
+        streak: 0,
+        bestStreak: 0,
+        pendingEvalNotes: [],              // Scheduled notes awaiting mic evaluation
+        runFinishingTimer: null,
       };
 
-      // Helper to resolve the loop bar boundaries [startBar, endBar] inclusive
-      function getLoopBounds() {
-        if (state.loopMode === '1-4') return [0, 3];
-        if (state.loopMode === '5-8') return [4, 7];
-        return [0, 7];
+      function getLoopRange() {
+        const m = LOOP_MODES[state.loopIdx];
+        return [m.start, m.end];
       }
 
-      // Helper to get chord key for a given bar & note index
-      function getChordKeyAt(barIdx, noteIdx) {
-        const barObj = VERSIONS[state.version].bars[barIdx];
-        if (barObj.splitChord && noteIdx >= 4) return barObj.splitChord;
-        return barObj.chord;
+      function getChordKeyFor(barIdx, noteIdx) {
+        const bar = ARRANGEMENTS[state.mode].bars[barIdx];
+        if (bar.midChord && noteIdx >= 4) return bar.midChord;
+        return bar.chord;
       }
 
-      // Helper to compute exact musical pitch name (e.g., "G2", "D3")
-      function getPitchLabel(stringIdx, fret) {
-        const midi = OPEN_MIDI[stringIdx] + fret;
-        const note = NOTE_NAMES[midi % 12];
-        const octave = Math.floor(midi / 12) - 1;
-        return `${note}${octave}`;
+      function getMidiPitch(str, fret) {
+        const transpose = state.mode === 'Em' && state.capo3Pitch ? 3 : 0;
+        return BASE_MIDI[str] + fret + transpose;
       }
 
-      // =========================================================================
-      // 3. WEB AUDIO ACOUSTIC GUITAR & METRONOME SYNTHESIZER
-      // =========================================================================
-      class AcousticEngine {
+      function getRunAccuracyPct() {
+        const total = state.perfectCount + state.goodCount + state.missCount;
+        if (total === 0) return null;
+        const weighted = state.perfectCount * 100 + state.goodCount * 75;
+        return Math.round((weighted / (total * 100)) * 100);
+      }
+
+      // =======================================================================
+      // 3. KARPLUS-STRONG ACOUSTIC GUITAR SYNTHESIZER & HIGH-PITCH METRONOME
+      // =======================================================================
+      class AcousticGuitarSynth {
         constructor() {
           this.ctx = null;
-          this.masterGain = null;
-          this.compressor = null;
-          this.reverbSend = null;
-          this.noiseBuffer = null;
-          // Track active voice per string so re-plucking the same string chokes smoothly
-          // while other strings continue ringing naturally ("let ring")
-          this.stringVoices = new Array(6).fill(null);
+          this.bodyBus = null;
+          this.master = null;
+          this.bufferCache = new Map();
+          this.activeVoices = {};
         }
 
-        ensureContext() {
+        init() {
           try {
             if (!this.ctx) {
               const AudioCtx = window.AudioContext || window.webkitAudioContext;
               this.ctx = new AudioCtx();
 
-              // Warm acoustic body EQ + dynamics compressor for clean polyphony
-              this.compressor = this.ctx.createDynamicsCompressor();
-              this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
-              this.compressor.knee.setValueAtTime(18, this.ctx.currentTime);
-              this.compressor.ratio.setValueAtTime(3.5, this.ctx.currentTime);
-              this.compressor.attack.setValueAtTime(0.004, this.ctx.currentTime);
-              this.compressor.release.setValueAtTime(0.18, this.ctx.currentTime);
+              // Warm acoustic guitar body air & top-plate resonance filters
+              const airResonance = this.ctx.createBiquadFilter();
+              airResonance.type = 'peaking';
+              airResonance.frequency.setValueAtTime(202, this.ctx.currentTime);
+              airResonance.Q.setValueAtTime(1.2, this.ctx.currentTime);
+              airResonance.gain.setValueAtTime(3.2, this.ctx.currentTime);
 
-              const bodyWarmth = this.ctx.createBiquadFilter();
-              bodyWarmth.type = 'peaking';
-              bodyWarmth.frequency.setValueAtTime(210, this.ctx.currentTime);
-              bodyWarmth.Q.setValueAtTime(1.1, this.ctx.currentTime);
-              bodyWarmth.gain.setValueAtTime(3.2, this.ctx.currentTime);
+              const woodWarmth = this.ctx.createBiquadFilter();
+              woodWarmth.type = 'peaking';
+              woodWarmth.frequency.setValueAtTime(415, this.ctx.currentTime);
+              woodWarmth.Q.setValueAtTime(1.1, this.ctx.currentTime);
+              woodWarmth.gain.setValueAtTime(1.8, this.ctx.currentTime);
 
-              this.masterGain = this.ctx.createGain();
-              this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+              const comp = this.ctx.createDynamicsCompressor();
+              comp.threshold.setValueAtTime(-14, this.ctx.currentTime);
+              comp.knee.setValueAtTime(16, this.ctx.currentTime);
+              comp.ratio.setValueAtTime(3.2, this.ctx.currentTime);
+              comp.attack.setValueAtTime(0.003, this.ctx.currentTime);
+              comp.release.setValueAtTime(0.16, this.ctx.currentTime);
 
-              bodyWarmth.connect(this.compressor);
-              this.compressor.connect(this.masterGain);
-              this.masterGain.connect(this.ctx.destination);
-              this.busInput = bodyWarmth;
+              this.master = this.ctx.createGain();
+              this.master.gain.setValueAtTime(0.88, this.ctx.currentTime);
 
-              // Subtle algorithmic room reverb for atmospheric "let ring" depth
-              const convolver = this.ctx.createConvolver();
-              convolver.buffer = this._createReverbImpulse(1.15, 3.2);
-              const reverbFilter = this.ctx.createBiquadFilter();
-              reverbFilter.type = 'lowpass';
-              reverbFilter.frequency.setValueAtTime(2400, this.ctx.currentTime);
-              const reverbWet = this.ctx.createGain();
-              reverbWet.gain.setValueAtTime(0.16, this.ctx.currentTime);
-
-              bodyWarmth.connect(convolver);
-              convolver.connect(reverbFilter);
-              reverbFilter.connect(reverbWet);
-              reverbWet.connect(this.masterGain);
-
-              // Short white-noise buffer for crisp pick-on-steel transient
-              this.noiseBuffer = this._createNoiseBuffer(0.04);
+              airResonance.connect(woodWarmth);
+              woodWarmth.connect(comp);
+              comp.connect(this.master);
+              this.master.connect(this.ctx.destination);
+              this.bodyBus = airResonance;
             }
 
             if (this.ctx.state === 'suspended') {
@@ -653,203 +901,620 @@
             }
             return true;
           } catch (err) {
-            console.error('Web Audio initialization failed:', err);
+            console.error('Web Audio init failed:', err);
             return false;
           }
         }
 
-        _createNoiseBuffer(durationSec) {
-          const length = Math.floor(this.ctx.sampleRate * durationSec);
-          const buffer = this.ctx.createBuffer(1, length, this.ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < length; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (length * 0.25));
-          }
-          return buffer;
-        }
-
-        _createReverbImpulse(durationSec, decay) {
-          const length = Math.floor(this.ctx.sampleRate * durationSec);
-          const impulse = this.ctx.createBuffer(2, length, this.ctx.sampleRate);
-          for (let ch = 0; ch < 2; ch++) {
-            const data = impulse.getChannelData(ch);
-            for (let i = 0; i < length; i++) {
-              data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
-            }
-          }
-          return impulse;
-        }
-
         /**
-         * Plucks a warm steel-string acoustic note at exact AudioContext timestamp.
-         * Uses multi-harmonic oscillators + pick transient + bright-to-warm LPF sweep + 1.85s decay.
+         * Synthesizes & caches a fractional-delay Karplus-Strong steel-string pluck AudioBuffer
+         * for exact pitch accuracy and realistic harmonic decay.
          */
-        pluck(stringIdx, fret, pickDir = 'D', when = null) {
-          if (!this.ensureContext()) return;
+        _getPluckBuffer(midi, stroke) {
+          const key = `${midi}-${stroke}`;
+          if (this.bufferCache.has(key)) return this.bufferCache.get(key);
+
+          const sr = this.ctx.sampleRate;
+          const duration = 2.15;
+          const length = Math.floor(sr * duration);
+          const buf = this.ctx.createBuffer(1, length, sr);
+          const out = buf.getChannelData(0);
+
+          const freq = midiToFreq(midi);
+          // Account for ~0.5 sample phase delay of 2-point averaging filter
+          const exactPeriod = Math.max(4, sr / freq - 0.5);
+          const N = Math.floor(exactPeriod);
+          const frac = exactPeriod - N;
+
+          // Seed excitation burst with pick-position comb filtering
+          const pickRatio = stroke === 'D' ? 0.14 : 0.10;
+          const pickOffset = Math.max(1, Math.floor(N * pickRatio));
+          const rawSeed = new Float32Array(N + 2);
+          let lpPrev = 0;
+          const smoothAlpha = stroke === 'D' ? 0.52 : 0.64;
+
+          for (let i = 0; i <= N + 1; i++) {
+            const white = Math.random() * 2 - 1;
+            lpPrev = lpPrev + smoothAlpha * (white - lpPrev);
+            rawSeed[i] = lpPrev;
+          }
+
+          for (let i = 0; i <= N; i++) {
+            const combIdx = (i + pickOffset) % (N + 1);
+            out[i] = (rawSeed[i] - 0.65 * rawSeed[combIdx]) * 0.55;
+          }
+
+          // Damping & brightness tailored across low wound strings vs plain treble strings
+          const stretchBrightness = midi < 50 ? 0.44 : 0.36;
+          const loopDecay = Math.pow(0.0018, 1 / (freq * duration));
+
+          for (let i = N + 1; i < length; i++) {
+            const s0 = out[i - N];
+            const s1 = out[i - N - 1];
+            const s2 = i - N - 2 >= 0 ? out[i - N - 2] : s1;
+            const interpA = s0 * (1 - frac) + s1 * frac;
+            const interpB = s1 * (1 - frac) + s2 * frac;
+            const filtered = (1 - stretchBrightness) * interpA + stretchBrightness * interpB;
+            out[i] = filtered * loopDecay;
+          }
+
+          this.bufferCache.set(key, buf);
+          return buf;
+        }
+
+        pluck(str, midi, stroke = 'D', when = null) {
+          if (!this.init()) return;
           const t = when !== null ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime;
 
-          // Gently choke previous voice on this exact same string (realistic guitar physics)
-          const prev = this.stringVoices[stringIdx];
-          if (prev && prev.voiceGain) {
+          // Choke prior note on the SAME string while allowing other strings to keep ringing
+          const prev = this.activeVoices[str];
+          if (prev) {
             try {
-              prev.voiceGain.gain.cancelScheduledValues(t);
-              prev.voiceGain.gain.setValueAtTime(Math.max(prev.voiceGain.gain.value, 0.001), t);
-              prev.voiceGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.028);
+              prev.gain.cancelScheduledValues(t);
+              prev.gain.setValueAtTime(Math.max(prev.gain.value, 0.0005), t);
+              prev.gain.exponentialRampToValueAtTime(0.0001, t + 0.024);
             } catch (_) {}
           }
 
-          const freq = OPEN_FREQS[stringIdx] * Math.pow(2, fret / 12);
-          const velocity = pickDir === 'D' ? 0.34 : 0.28; // Slight human dynamic contrast
-          const decayTime = 1.85;
+          const src = this.ctx.createBufferSource();
+          src.buffer = this._getPluckBuffer(midi, stroke);
 
-          // Master voice envelope
-          const voiceGain = this.ctx.createGain();
-          voiceGain.gain.setValueAtTime(0.0001, t);
-          voiceGain.gain.linearRampToValueAtTime(velocity, t + 0.004);
-          voiceGain.gain.exponentialRampToValueAtTime(velocity * 0.42, t + 0.28);
-          voiceGain.gain.exponentialRampToValueAtTime(0.0001, t + decayTime);
+          const gain = this.ctx.createGain();
+          const vel = stroke === 'D' ? 0.72 : 0.60;
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.linearRampToValueAtTime(vel, t + 0.003);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
 
-          // Pluck low-pass filter sweep: bright ~2800Hz down to warm ~500Hz
-          const lpf = this.ctx.createBiquadFilter();
-          lpf.type = 'lowpass';
-          lpf.Q.setValueAtTime(1.6, t);
-          const brightStart = Math.min(3400, Math.max(2500, freq * 9));
-          const warmEnd = Math.min(720, Math.max(460, freq * 2.1));
-          lpf.frequency.setValueAtTime(brightStart, t);
-          lpf.frequency.exponentialRampToValueAtTime(warmEnd, t + 0.42);
-          lpf.frequency.exponentialRampToValueAtTime(380, t + decayTime);
+          src.connect(gain);
+          gain.connect(this.bodyBus);
 
-          // Fundamental (warm triangle)
-          const osc1 = this.ctx.createOscillator();
-          osc1.type = 'triangle';
-          osc1.frequency.setValueAtTime(freq, t);
-
-          // 2nd harmonic (steel body richness)
-          const osc2 = this.ctx.createOscillator();
-          osc2.type = 'sine';
-          osc2.frequency.setValueAtTime(freq * 2, t);
-          const g2 = this.ctx.createGain();
-          g2.gain.setValueAtTime(0.32, t);
-          g2.gain.exponentialRampToValueAtTime(0.04, t + 0.9);
-
-          // 3rd harmonic + subtle detuned shimmer (bright steel-string overtone)
-          const osc3 = this.ctx.createOscillator();
-          osc3.type = 'sawtooth';
-          osc3.frequency.setValueAtTime(freq * 3.002, t);
-          const g3 = this.ctx.createGain();
-          g3.gain.setValueAtTime(0.09, t);
-          g3.gain.exponentialRampToValueAtTime(0.002, t + 0.45);
-
-          // Crisp pick-against-string attack transient
-          const noise = this.ctx.createBufferSource();
-          noise.buffer = this.noiseBuffer;
-          const noiseFilter = this.ctx.createBiquadFilter();
-          noiseFilter.type = 'bandpass';
-          noiseFilter.frequency.setValueAtTime(2400 + (5 - stringIdx) * 180, t);
-          noiseFilter.Q.setValueAtTime(1.8, t);
-          const noiseGain = this.ctx.createGain();
-          noiseGain.gain.setValueAtTime(velocity * 0.48, t);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
-
-          // Route graph
-          osc1.connect(lpf);
-          osc2.connect(g2);
-          g2.connect(lpf);
-          osc3.connect(g3);
-          g3.connect(lpf);
-          noise.connect(noiseFilter);
-          noiseFilter.connect(noiseGain);
-          noiseGain.connect(voiceGain);
-
-          lpf.connect(voiceGain);
-          voiceGain.connect(this.busInput);
-
-          // Start & schedule clean stop
-          const stopAt = t + decayTime + 0.06;
-          osc1.start(t);
-          osc2.start(t);
-          osc3.start(t);
-          noise.start(t);
-
-          osc1.stop(stopAt);
-          osc2.stop(stopAt);
-          osc3.stop(stopAt);
-          noise.stop(t + 0.04);
-
-          this.stringVoices[stringIdx] = { voiceGain, stopAt };
+          src.start(t);
+          src.stop(t + 2.12);
+          this.activeVoices[str] = gain;
         }
 
         /**
-         * Clean woodblock/rim click for metronome & count-in.
+         * High-frequency crisp metronome click (>1650 Hz, 18ms) so phone microphones
+         * never confuse metronome clicks with guitar string fundamentals (82–370 Hz).
          */
         click(accent = false, when = null) {
-          if (!this.ensureContext()) return;
+          if (!this.init()) return;
           const t = when !== null ? Math.max(when, this.ctx.currentTime) : this.ctx.currentTime;
 
           const osc = this.ctx.createOscillator();
           osc.type = 'triangle';
-          const baseFreq = accent ? 1280 : 860;
-          osc.frequency.setValueAtTime(baseFreq, t);
-          osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.62, t + 0.032);
-
-          const gain = this.ctx.createGain();
-          gain.gain.setValueAtTime(0.0001, t);
-          gain.gain.linearRampToValueAtTime(accent ? 0.34 : 0.21, t + 0.002);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+          const startFreq = accent ? 2250 : 1780;
+          osc.frequency.setValueAtTime(startFreq, t);
+          osc.frequency.exponentialRampToValueAtTime(startFreq * 0.72, t + 0.018);
 
           const hp = this.ctx.createBiquadFilter();
           hp.type = 'highpass';
-          hp.frequency.setValueAtTime(420, t);
+          hp.frequency.setValueAtTime(1450, t);
+
+          const g = this.ctx.createGain();
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(accent ? 0.28 : 0.17, t + 0.0015);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 0.022);
 
           osc.connect(hp);
-          hp.connect(gain);
-          gain.connect(this.masterGain);
+          hp.connect(g);
+          g.connect(this.master);
 
           osc.start(t);
-          osc.stop(t + 0.055);
+          osc.stop(t + 0.026);
         }
       }
 
-      const audio = new AcousticEngine();
+      const audio = new AcousticGuitarSynth();
 
-      // =========================================================================
-      // 4. DOM REFERENCES
-      // =========================================================================
+      // =======================================================================
+      // 4. REAL-TIME HYBRID ACOUSTIC GUITAR LISTENING & ARPEGGIO DETECTOR
+      // =======================================================================
+      class GuitarMicListener {
+        constructor() {
+          this.stream = null;
+          this.source = null;
+          this.hpFilter = null;
+          this.analyser = null;
+          this.timeBuf = new Float32Array(2048);
+          this.freqDbBuf = new Float32Array(2048); // half of 4096 FFT
+          this.linMagBuf = new Float32Array(2048);
+          this.yinBuf = new Float32Array(1024);
+          this.rafId = null;
+          this.prevRms = 0;
+          this.smoothedLevel = 0;
+          this.lastHitTime = -1;
+        }
+
+        async start() {
+          if (!audio.init()) {
+            throw new Error('Web Audio unavailable');
+          }
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Microphone API unavailable in this browser');
+          }
+
+          if (!this.stream) {
+            try {
+              this.stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                  echoCancellation: false,
+                  noiseSuppression: false,
+                  autoGainControl: false,
+                },
+              });
+            } catch (firstErr) {
+              // Fallback to basic constraints if raw audio flags are rejected by device
+              if (firstErr && (firstErr.name === 'NotAllowedError' || firstErr.name === 'PermissionDeniedError')) {
+                throw firstErr;
+              }
+              this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            }
+
+            this.source = audio.ctx.createMediaStreamSource(this.stream);
+
+            // Gentle 62 Hz sub-rumble filter keeps E2 (82.4 Hz) clean while rejecting handling thumps
+            this.hpFilter = audio.ctx.createBiquadFilter();
+            this.hpFilter.type = 'highpass';
+            this.hpFilter.frequency.setValueAtTime(62, audio.ctx.currentTime);
+            this.hpFilter.Q.setValueAtTime(0.7, audio.ctx.currentTime);
+
+            this.analyser = audio.ctx.createAnalyser();
+            this.analyser.fftSize = 4096;
+            this.analyser.smoothingTimeConstant = 0.0;
+
+            this.freqDbBuf = new Float32Array(this.analyser.frequencyBinCount);
+            this.linMagBuf = new Float32Array(this.analyser.frequencyBinCount);
+
+            this.source.connect(this.hpFilter);
+            this.hpFilter.connect(this.analyser);
+          }
+
+          if (!this.rafId) {
+            const loop = () => {
+              if (!state.scoreMode) {
+                this.rafId = null;
+                return;
+              }
+              this.processFrame();
+              this.rafId = requestAnimationFrame(loop);
+            };
+            this.rafId = requestAnimationFrame(loop);
+          }
+        }
+
+        stop() {
+          if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+          }
+          if (this.source) {
+            try { this.source.disconnect(); } catch (_) {}
+            this.source = null;
+          }
+          if (this.hpFilter) {
+            try { this.hpFilter.disconnect(); } catch (_) {}
+            this.hpFilter = null;
+          }
+          if (this.stream) {
+            this.stream.getTracks().forEach((t) => t.stop());
+            this.stream = null;
+          }
+          this.analyser = null;
+          this.smoothedLevel = 0;
+          this.prevRms = 0;
+        }
+
+        /**
+         * YIN Time-Domain Fundamental Pitch Detector on latest 2048 samples.
+         * Returns { freq, midi, cents, clarity } or null if unpitched.
+         */
+        _detectYinPitch(sampleRate) {
+          const buf = this.timeBuf;
+          const W = 1024;
+          const minTau = Math.max(4, Math.floor(sampleRate / 900)); // ~900 Hz upper bound
+          const maxTau = Math.min(W - 2, Math.ceil(sampleRate / 68)); // ~68 Hz lower bound
+
+          const yin = this.yinBuf;
+          yin[0] = 1;
+          let runningSum = 0;
+
+          for (let tau = 1; tau <= maxTau; tau++) {
+            let diff = 0;
+            for (let i = 0; i < W; i++) {
+              const delta = buf[i] - buf[i + tau];
+              diff += delta * delta;
+            }
+            runningSum += diff;
+            yin[tau] = runningSum > 0 ? (diff * tau) / runningSum : 1;
+          }
+
+          const threshold = 0.19;
+          let bestTau = -1;
+
+          for (let tau = minTau; tau <= maxTau - 1; tau++) {
+            if (yin[tau] < threshold) {
+              while (tau + 1 <= maxTau - 1 && yin[tau + 1] < yin[tau]) {
+                tau++;
+              }
+              bestTau = tau;
+              break;
+            }
+          }
+
+          // Fallback to global minimum if reasonably clear
+          if (bestTau === -1) {
+            let minVal = 0.30;
+            for (let tau = minTau; tau <= maxTau - 1; tau++) {
+              if (yin[tau] < minVal) {
+                minVal = yin[tau];
+                bestTau = tau;
+              }
+            }
+          }
+
+          if (bestTau === -1) return null;
+
+          // Parabolic lag refinement
+          const y0 = yin[bestTau - 1];
+          const y1 = yin[bestTau];
+          const y2 = yin[bestTau + 1];
+          const denom = 2 * (2 * y1 - y2 - y0);
+          const shift = Math.abs(denom) > 1e-9 ? (y2 - y0) / denom : 0;
+          const refinedTau = bestTau + Math.max(-0.5, Math.min(0.5, shift));
+
+          const freq = sampleRate / refinedTau;
+          if (freq < 68 || freq > 900) return null;
+
+          const exactMidi = 69 + 12 * Math.log2(freq / 440);
+          const nearestMidi = Math.round(exactMidi);
+          const cents = Math.round((exactMidi - nearestMidi) * 100);
+          const clarity = Math.max(0, Math.min(1, 1 - y1));
+
+          return { freq, exactMidi, midi: nearestMidi, cents, clarity };
+        }
+
+        /**
+         * Parabolic FFT Bin Peak Measurement around expected frequency.
+         * Returns { mag, peakFreq, centsOff }.
+         */
+        _measureSpectralPeak(centerFreq, centsWindow = 75) {
+          const sr = audio.ctx.sampleRate;
+          const binHz = sr / 4096;
+          const ratio = Math.pow(2, centsWindow / 1200);
+          const minBin = Math.max(2, Math.floor((centerFreq / ratio) / binHz));
+          const maxBin = Math.min(this.linMagBuf.length - 3, Math.ceil((centerFreq * ratio) / binHz));
+
+          let peakBin = minBin;
+          let peakMag = 0;
+          for (let b = minBin; b <= maxBin; b++) {
+            if (this.linMagBuf[b] > peakMag) {
+              peakMag = this.linMagBuf[b];
+              peakBin = b;
+            }
+          }
+
+          if (peakMag <= 1e-8) {
+            return { mag: 0, peakFreq: centerFreq, centsOff: 999 };
+          }
+
+          // Parabolic log-magnitude bin interpolation
+          const m0 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin - 1]));
+          const m1 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin]));
+          const m2 = Math.log(Math.max(1e-9, this.linMagBuf[peakBin + 1]));
+          const denom = m0 - 2 * m1 + m2;
+          const delta = Math.abs(denom) > 1e-8 ? (0.5 * (m0 - m2)) / denom : 0;
+          const clampedDelta = Math.max(-0.5, Math.min(0.5, delta));
+
+          const peakFreq = (peakBin + clampedDelta) * binHz;
+          const centsOff = 1200 * Math.log2(peakFreq / centerFreq);
+          return { mag: peakMag, peakFreq, centsOff };
+        }
+
+        /**
+         * Combined harmonic energy for a candidate guitar pitch (f0 + 2*f0 + low-string 3*f0).
+         */
+        _harmonicScore(freq, midi) {
+          const p1 = this._measureSpectralPeak(freq, 70);
+          const p2 = this._measureSpectralPeak(freq * 2, 70);
+          const p3 = midi <= 47 ? this._measureSpectralPeak(freq * 3, 70) : { mag: 0, centsOff: 0 };
+
+          const energy = p1.mag + 0.58 * p2.mag + (midi <= 47 ? 0.38 * p3.mag : 0);
+          // For low strings on tiny phone mics, 2*f0 often gives cleaner cent precision than f0
+          const bestCents = (midi <= 47 && p2.mag > p1.mag * 1.15) ? p2.centsOff : p1.centsOff;
+          return { energy, centsOff: bestCents, f0Mag: p1.mag, f2Mag: p2.mag, f3Mag: p3.mag };
+        }
+
+        processFrame() {
+          if (!this.analyser || !audio.ctx) return;
+
+          // Read latest 2048 time-domain samples from 4096 analyser via temp slice
+          const fullTime = this._fullTime || (this._fullTime = new Float32Array(this.analyser.fftSize));
+          this.analyser.getFloatTimeDomainData(fullTime);
+          // Copy the freshest 2048 samples at the tail of the 4096 buffer
+          this.timeBuf.set(fullTime.subarray(fullTime.length - 2048));
+
+          // Compute RMS energy
+          let sumSq = 0;
+          for (let i = 0; i < 2048; i++) {
+            sumSq += this.timeBuf[i] * this.timeBuf[i];
+          }
+          const rms = Math.sqrt(sumSq / 2048);
+
+          // Update live UI level meter
+          const sens = SENSITIVITY_CONFIG[state.sensitivity];
+          const normLevel = Math.min(1, Math.pow(rms / 0.085, 0.55));
+          this.smoothedLevel = normLevel > this.smoothedLevel
+            ? normLevel
+            : this.smoothedLevel * 0.84 + normLevel * 0.16;
+
+          updateMicStripLevel(this.smoothedLevel, rms >= sens.rmsGate);
+
+          // Read 4096-pt FFT spectrum & convert guitar band (60–1500 Hz) to linear magnitude
+          this.analyser.getFloatFrequencyData(this.freqDbBuf);
+          const sr = audio.ctx.sampleRate;
+          const binHz = sr / 4096;
+          const maxGuitarBin = Math.min(this.freqDbBuf.length - 1, Math.ceil(1600 / binHz));
+          const minFloorBin = Math.max(2, Math.floor(75 / binHz));
+
+          let floorSum = 0;
+          let floorCount = 0;
+          for (let b = 0; b <= maxGuitarBin; b++) {
+            const db = this.freqDbBuf[b];
+            const lin = db > -115 ? Math.pow(10, db / 20) : 0;
+            this.linMagBuf[b] = lin;
+            if (b >= minFloorBin) {
+              floorSum += lin;
+              floorCount++;
+            }
+          }
+          const avgFloor = floorCount > 0 ? floorSum / floorCount : 1e-6;
+
+          // Run YIN pitch detection when signal exceeds gate
+          let yinRes = null;
+          if (rms >= sens.rmsGate * 0.85) {
+            yinRes = this._detectYinPitch(sr);
+          }
+
+          if (yinRes && yinRes.clarity >= 0.72) {
+            const sign = yinRes.cents >= 0 ? '+' : '';
+            dom.micPitchReadout.textContent = `Mic: ${formatNoteName(yinRes.midi)} (${sign}${yinRes.cents}¢)`;
+            dom.micPitchReadout.className = 'text-mocha-text font-semibold truncate';
+          } else if (rms < sens.rmsGate * 0.6) {
+            dom.micPitchReadout.textContent = 'Listening…';
+            dom.micPitchReadout.className = 'text-mocha-subtext truncate';
+          }
+
+          // Evaluate active scheduled TAB notes if playing in Score mode
+          if (state.isPlaying && !state.isCountingIn && state.pendingEvalNotes.length > 0) {
+            this._evaluateScheduledNotes(rms, avgFloor, yinRes, sens);
+          }
+
+          this.prevRms = rms;
+        }
+
+        _evaluateScheduledNotes(rms, avgFloor, yinRes, sens) {
+          const effectiveNow = audio.ctx.currentTime - MIC_LATENCY_SEC;
+
+          for (let i = 0; i < state.pendingEvalNotes.length; i++) {
+            const item = state.pendingEvalNotes[i];
+            if (item.resolved) continue;
+
+            // 1) Snapshot pre-window energy right before note window opens so we detect fresh plucks
+            if (!item.preSampled && effectiveNow >= item.windowStart - 0.045) {
+              const preSpec = this._harmonicScore(item.targetFreq, item.midi);
+              item.preEnergy = preSpec.energy;
+              item.preRms = rms;
+              item.preSampled = true;
+            }
+
+            // 2) Close expired window: either lock in pending Good or grade as Miss
+            if (effectiveNow > item.windowEnd) {
+              if (item.goodCandidateAt !== null) {
+                resolveEvaluatedNote(item, 'good');
+              } else {
+                resolveEvaluatedNote(item, 'miss');
+              }
+              continue;
+            }
+
+            // 3) If a Good candidate was registered and 45ms elapsed without upgrading to Perfect, commit Good
+            if (item.goodCandidateAt !== null && audio.ctx.currentTime - item.goodCandidateAt >= 0.045) {
+              resolveEvaluatedNote(item, 'good');
+              continue;
+            }
+
+            // Wait until inside active window & signal above gate
+            if (effectiveNow < item.windowStart || rms < sens.rmsGate) {
+              continue;
+            }
+
+            // Brief 42ms cooldown after a previous hit so a single pluck doesn't double-score identical notes
+            if (effectiveNow - this.lastHitTime < 0.042) {
+              continue;
+            }
+
+            // Measure target harmonic energy & adjacent +/- 1 semitone wrong-fret competitors
+            const targetSpec = this._harmonicScore(item.targetFreq, item.midi);
+            const downFreq = item.targetFreq * Math.pow(2, -1 / 12);
+            const upFreq = item.targetFreq * Math.pow(2, 1 / 12);
+            const adjDown = this._harmonicScore(downFreq, item.midi - 1).energy;
+            const adjUp = this._harmonicScore(upFreq, item.midi + 1).energy;
+            const maxAdjacent = Math.max(adjDown, adjUp);
+
+            // Check Path A: Direct YIN Monophonic Lock (including phone-mic low-string harmonic compensation)
+            let yinMatched = false;
+            let yinAbsCents = 999;
+
+            if (yinRes && yinRes.clarity >= 0.76) {
+              const directCentsDiff = Math.abs(yinRes.exactMidi - item.midi) * 100;
+              if (directCentsDiff <= 65) {
+                yinMatched = true;
+                yinAbsCents = directCentsDiff;
+              } else if (item.midi <= 47) {
+                // Phone mic low-string compensation (E2..B2): phone mics often emphasize 2*f0 (+12 st)
+                // Verify 3*f0 odd harmonic exists so an actual octave-higher string pluck isn't accepted
+                const octCentsDiff = Math.abs(yinRes.exactMidi - (item.midi + 12)) * 100;
+                if (octCentsDiff <= 60 && targetSpec.f3Mag > avgFloor * 1.8 && targetSpec.energy > maxAdjacent * 1.25) {
+                  yinMatched = true;
+                  yinAbsCents = octCentsDiff;
+                }
+              }
+            }
+
+            // Freshness check so passively decaying strings don't self-trigger without being plucked
+            const hasOnsetOrPresence =
+              targetSpec.energy > item.preEnergy * sens.onsetRatio ||
+              rms > Math.max(0.002, item.preRms) * 1.18 ||
+              (yinMatched && targetSpec.energy > avgFloor * (sens.snrMult * 1.4));
+
+            // Check Path B: High-res 4096-FFT Polyphonic "Let Ring" Spectral Target Matcher
+            const snrPassed = targetSpec.energy > avgFloor * sens.snrMult;
+            const beatsAdjacentFrets = targetSpec.energy > maxAdjacent * 1.32;
+            const specAbsCents = Math.abs(targetSpec.centsOff);
+            const spectralMatched = snrPassed && beatsAdjacentFrets && specAbsCents <= 68 && hasOnsetOrPresence;
+
+            if (yinMatched && beatsAdjacentFrets && hasOnsetOrPresence) {
+              const timingErr = Math.abs(effectiveNow - item.scheduledTime);
+              const tightLimit = Math.max(0.085, Math.min(item.stepDur * 0.44, 0.150));
+
+              if (yinAbsCents <= 42 && timingErr <= tightLimit) {
+                this.lastHitTime = effectiveNow;
+                resolveEvaluatedNote(item, 'perfect');
+                break;
+              } else if (item.goodCandidateAt === null) {
+                item.goodCandidateAt = audio.ctx.currentTime;
+                this.lastHitTime = effectiveNow;
+              }
+              break;
+            } else if (spectralMatched) {
+              const timingErr = Math.abs(effectiveNow - item.scheduledTime);
+              const tightLimit = Math.max(0.085, Math.min(item.stepDur * 0.44, 0.150));
+
+              if (specAbsCents <= 45 && timingErr <= tightLimit && targetSpec.energy > maxAdjacent * 1.45) {
+                this.lastHitTime = effectiveNow;
+                resolveEvaluatedNote(item, 'perfect');
+                break;
+              } else if (item.goodCandidateAt === null) {
+                item.goodCandidateAt = audio.ctx.currentTime;
+                this.lastHitTime = effectiveNow;
+              }
+              break;
+            }
+          }
+        }
+      }
+
+      const micListener = new GuitarMicListener();
+
+      // =======================================================================
+      // 5. DOM REFERENCES & TOAST HELPER
+      // =======================================================================
       const dom = {
-        modeNoCapo: document.getElementById('mode-nocapo'),
-        modeOpen: document.getElementById('mode-open'),
+        pillGm: document.getElementById('pill-gm'),
+        pillEm: document.getElementById('pill-em'),
+        btnChordToggle: document.getElementById('btn-chord-toggle'),
+        btnSettings: document.getElementById('btn-settings'),
+        micStrip: document.getElementById('mic-strip'),
+        micDot: document.getElementById('mic-dot'),
+        micMeterFill: document.getElementById('mic-meter-fill'),
+        micPitchReadout: document.getElementById('mic-pitch-readout'),
+        btnLiveGrade: document.getElementById('btn-live-grade'),
+        liveGradeLetter: document.getElementById('live-grade-letter'),
+        liveGradePct: document.getElementById('live-grade-pct'),
+        liveGradeStreak: document.getElementById('live-grade-streak'),
+        toastBanner: document.getElementById('toast-banner'),
+        toastDot: document.getElementById('toast-dot'),
+        toastText: document.getElementById('toast-text'),
+        chordPanel: document.getElementById('chord-panel'),
+        miniChordSvg: document.getElementById('mini-chord-svg'),
+        chordName: document.getElementById('chord-name'),
+        chordBarLabel: document.getElementById('chord-bar-label'),
+        chordNoteDetail: document.getElementById('chord-note-detail'),
+        btnChordClose: document.getElementById('btn-chord-close'),
+        tabRows: document.getElementById('tab-rows'),
         btnPlay: document.getElementById('btn-play'),
         iconPlay: document.getElementById('icon-play'),
         iconPause: document.getElementById('icon-pause'),
         labelPlay: document.getElementById('label-play'),
+        badgeCountIn: document.getElementById('badge-countin'),
+        btnScoreMode: document.getElementById('btn-score-mode'),
         btnRestart: document.getElementById('btn-restart'),
-        countInDisplay: document.getElementById('countin-display'),
-        countInNum: document.getElementById('countin-num'),
+        btnBpmPill: document.getElementById('btn-bpm-pill'),
+        bpmText: document.getElementById('bpm-text'),
+        bpmPopover: document.getElementById('bpm-popover'),
+        btnBpmMinus: document.getElementById('btn-bpm-minus'),
+        btnBpmPlus: document.getElementById('btn-bpm-plus'),
+        bpmPopoverVal: document.getElementById('bpm-popover-val'),
         bpmSlider: document.getElementById('bpm-slider'),
-        bpmValue: document.getElementById('bpm-value'),
-        bpmPresets: document.querySelectorAll('.bpm-preset'),
-        loopBtns: document.querySelectorAll('.loop-btn'),
-        toggleAudio: document.getElementById('toggle-audio'),
-        toggleMetronome: document.getElementById('toggle-metronome'),
-        toggleStrokes: document.getElementById('toggle-strokes'),
-        toggleCountIn: document.getElementById('toggle-countin'),
-        cols2: document.getElementById('cols-2'),
-        cols4: document.getElementById('cols-4'),
-        tabGrid: document.getElementById('tab-grid'),
-        chordSvg: document.getElementById('chord-svg'),
-        chordTitle: document.getElementById('chord-title'),
-        chordBarBadge: document.getElementById('chord-bar-badge'),
-        chordLiveDot: document.getElementById('chord-live-dot'),
-        chordNoteReadout: document.getElementById('chord-note-readout'),
-        chordTip: document.getElementById('chord-tip'),
+        bpmChips: document.querySelectorAll('.bpm-chip'),
+        btnLoop: document.getElementById('btn-loop'),
+        labelLoop: document.getElementById('label-loop'),
+        settingsPopover: document.getElementById('settings-popover'),
+        subGuitarAudio: document.getElementById('sub-guitar-audio'),
+        swAudio: document.getElementById('sw-audio'),
+        swMetro: document.getElementById('sw-metro'),
+        swCountIn: document.getElementById('sw-countin'),
+        swStrokes: document.getElementById('sw-strokes'),
+        rowCapo3: document.getElementById('row-capo3'),
+        swCapo3: document.getElementById('sw-capo3'),
+        labelSens: document.getElementById('label-sens'),
+        sensBtns: document.querySelectorAll('.sens-btn'),
+        swHeadphones: document.getElementById('sw-headphones'),
+        swEndless: document.getElementById('sw-endless'),
+        gradeModal: document.getElementById('grade-modal'),
+        modalRunMeta: document.getElementById('modal-run-meta'),
+        btnModalX: document.getElementById('btn-modal-x'),
+        modalGradeCrest: document.getElementById('modal-grade-crest'),
+        modalGradeLetter: document.getElementById('modal-grade-letter'),
+        modalTitle: document.getElementById('grade-modal-title'),
+        modalAccuracy: document.getElementById('modal-accuracy'),
+        modalStreak: document.getElementById('modal-streak'),
+        modalPerfect: document.getElementById('modal-perfect'),
+        modalGood: document.getElementById('modal-good'),
+        modalMiss: document.getElementById('modal-miss'),
+        modalBarChart: document.getElementById('modal-bar-chart'),
+        modalCoaching: document.getElementById('modal-coaching'),
+        btnModalRetry: document.getElementById('btn-modal-retry'),
+        btnModalWeak: document.getElementById('btn-modal-weak'),
+        btnModalClose: document.getElementById('btn-modal-close'),
       };
 
-      // =========================================================================
-      // 5. SVG TABLATURE GRID RENDERER
-      // =========================================================================
-      const SVG_NS = 'http://www.w3.org/2000/svg';
+      let toastTimer = null;
+      function showToast(msg, colorHex = '#89b4fa', durationMs = 3200) {
+        if (toastTimer) clearTimeout(toastTimer);
+        dom.toastDot.style.backgroundColor = colorHex;
+        dom.toastText.textContent = msg;
+        dom.toastBanner.classList.remove('hidden');
+        dom.toastBanner.classList.add('inline-flex');
+        toastTimer = setTimeout(() => {
+          dom.toastBanner.classList.add('hidden');
+          dom.toastBanner.classList.remove('inline-flex');
+        }, durationMs);
+      }
 
-      function el(tag, attrs = {}, text = null) {
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      function svgEl(tag, attrs = {}, text = null) {
         const node = document.createElementNS(SVG_NS, tag);
         for (const [k, v] of Object.entries(attrs)) {
           node.setAttribute(k, String(v));
@@ -858,888 +1523,1386 @@
         return node;
       }
 
-      // Compute note column X coordinate inside 460-wide SVG viewBox
-      const TAB_LEFT = 42;
-      const TAB_RIGHT = 446;
-      const TAB_COL_W = (TAB_RIGHT - TAB_LEFT) / 8; // 50.5
-      const colX = (noteIdx) => TAB_LEFT + TAB_COL_W * (noteIdx + 0.5);
-      const stringY = (stringIdx) => 24 + stringIdx * 26; // 24, 50, 76, 102, 128, 154
+      // =======================================================================
+      // 6. UNIFIED 4-ROW SVG TABLATURE RENDERER & LIVE JUDGMENT STYLING
+      // =======================================================================
+      function getRowMetrics() {
+        if (state.isDesktop) {
+          return {
+            vw: 940,
+            vh: state.showStrokes ? 172 : 152,
+            marginX: 30,
+            endX: 932,
+            topY: 35,
+            strGap: 20,
+            chordY: 20,
+            chordSize: 15,
+            barNumSize: 11.5,
+            strLabelX: 14,
+            strLabelSize: 12.5,
+            pillW: 24,
+            pillH: 18.5,
+            pillRx: 6,
+            digitSize: 14.5,
+            strokeY: 164,
+            strokeSize: 11,
+          };
+        }
+        // Compact mobile geometry so all 8 bars + mic strip fit without clutter
+        return {
+          vw: 640,
+          vh: state.showStrokes ? 214 : 186,
+          marginX: 28,
+          endX: 634,
+          topY: 41,
+          strGap: 25,
+          chordY: 23,
+          chordSize: 20.5,
+          barNumSize: 15,
+          strLabelX: 12,
+          strLabelSize: 16,
+          pillW: 28,
+          pillH: 23,
+          pillRx: 7.5,
+          digitSize: 20,
+          strokeY: 206,
+          strokeSize: 14,
+        };
+      }
 
-      function renderTabGrid() {
-        const versionData = VERSIONS[state.version];
-        const [loopStart, loopEnd] = getLoopBounds();
+      function renderTabSheet() {
+        const bars = ARRANGEMENTS[state.mode].bars;
+        const [loopStart, loopEnd] = getLoopRange();
+        const m = getRowMetrics();
+        const midX = m.marginX + (m.endX - m.marginX) / 2;
+        const barWidth = (m.endX - m.marginX) / 2;
+        const bottomY = m.topY + 5 * m.strGap;
 
-        // Update responsive column classes
-        dom.tabGrid.className = state.gridCols === 4
-          ? 'grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4'
-          : 'grid grid-cols-1 md:grid-cols-2 gap-4 xl:gap-5';
+        dom.tabRows.innerHTML = '';
 
-        dom.tabGrid.innerHTML = '';
+        for (let row = 0; row < 4; row++) {
+          const barIdxA = row * 2;
+          const barIdxB = row * 2 + 1;
+          const inLoop = barIdxA >= loopStart && barIdxB <= loopEnd;
 
-        versionData.bars.forEach((barObj, barIdx) => {
-          const inLoop = barIdx >= loopStart && barIdx <= loopEnd;
-          const isSelected = barIdx === state.selectedBar;
-
-          // Bar Card Wrapper
-          const card = document.createElement('div');
-          card.id = `bar-card-${barIdx}`;
-          card.dataset.bar = String(barIdx);
-          card.className = [
-            'rounded-2xl border transition-all duration-150 overflow-hidden select-none',
-            inLoop ? 'opacity-100' : 'opacity-40 hover:opacity-75',
-            isSelected
-              ? 'bg-mocha-card border-mocha-blue/70 shadow-lg shadow-mocha-crust/50'
-              : 'bg-mocha-card/85 border-mocha-surface1 hover:border-mocha-surface2'
+          const rowWrap = document.createElement('div');
+          rowWrap.className = [
+            'w-full rounded-xl bg-mocha-mantle/55 border border-mocha-surface0/85 overflow-hidden transition-opacity duration-150',
+            inLoop ? 'opacity-100' : 'opacity-35 hover:opacity-75',
           ].join(' ');
 
-          // ---- Card Header (Chord Names & Bar Number) ----
-          const header = document.createElement('div');
-          header.className = 'flex items-center justify-between px-4 pt-3 pb-1.5 cursor-pointer';
-          header.addEventListener('click', () => selectBar(barIdx, 0, false));
-
-          const primaryChord = CHORDS[barObj.chord];
-          if (barObj.splitChord) {
-            const secondChord = CHORDS[barObj.splitChord];
-            header.innerHTML = `
-              <div class="grid grid-cols-2 w-full items-baseline gap-2">
-                <div class="flex items-baseline gap-2">
-                  <span class="font-mono text-[11px] font-semibold text-mocha-overlay0">0${barObj.bar}</span>
-                  <span class="font-mono text-lg sm:text-xl font-bold text-mocha-text tracking-tight">${primaryChord.name}</span>
-                  <span class="text-[10px] font-mono text-mocha-overlay0 uppercase">1–4</span>
-                </div>
-                <div class="flex items-baseline gap-2 pl-2 border-l border-dashed border-mocha-surface2">
-                  <span class="font-mono text-lg sm:text-xl font-bold text-mocha-peach tracking-tight">${secondChord.name}</span>
-                  <span class="text-[10px] font-mono text-mocha-peach/80 uppercase">Beat 3 (5–8)</span>
-                </div>
-              </div>
-            `;
-          } else {
-            header.innerHTML = `
-              <div class="flex items-baseline gap-2.5">
-                <span class="font-mono text-[11px] font-semibold text-mocha-overlay0">0${barObj.bar}</span>
-                <span class="font-mono text-lg sm:text-xl font-bold text-mocha-text tracking-tight">${primaryChord.name}</span>
-              </div>
-              <span class="text-[11px] font-mono text-mocha-overlay0">4/4</span>
-            `;
-          }
-          card.appendChild(header);
-
-          // ---- Custom SVG Tablature Staff ----
-          const viewH = state.showStrokes ? 196 : 172;
-          const svg = el('svg', {
-            viewBox: `0 0 460 ${viewH}`,
-            class: 'w-full h-auto block px-1.5 pb-2',
-            role: 'img',
-            'aria-label': `Bar ${barObj.bar} tablature`
+          const svg = svgEl('svg', {
+            viewBox: `0 0 ${m.vw} ${m.vh}`,
+            class: 'w-full h-auto block',
           });
 
-          // Subtle vertical beat guide lines (beats 1, 2, 3, 4)
-          for (let b = 0; b < 4; b++) {
-            const x = TAB_LEFT + b * (TAB_COL_W * 2);
-            if (b === 0) continue;
-            const isMidSplit = b === 2 && Boolean(barObj.splitChord);
-            svg.appendChild(el('line', {
-              x1: x,
-              y1: stringY(0) - 8,
-              x2: x,
-              y2: stringY(5) + 8,
-              stroke: isMidSplit ? '#fab387' : '#313244',
-              'stroke-width': isMidSplit ? '1.6' : '1',
-              'stroke-dasharray': isMidSplit ? '4 3' : '2 3',
-              opacity: isMidSplit ? '0.65' : '0.9'
-            }));
-          }
-
-          // Vertical Playhead Indicator (hidden until active)
-          const playhead = el('line', {
-            id: `playhead-${barIdx}`,
-            x1: colX(0),
-            y1: stringY(0) - 12,
-            x2: colX(0),
-            y2: stringY(5) + 12,
-            stroke: '#fab387',
-            'stroke-width': '2',
-            opacity: '0',
-            'stroke-linecap': 'round'
-          });
-          svg.appendChild(playhead);
-
-          // 6 Horizontal String Lines + Left String Labels
+          // Left margin string names ONCE per row (e B G D A E) + weighted string lines
           for (let s = 0; s < 6; s++) {
-            const y = stringY(s);
-            // String label (e, B, G, D, A, E)
-            svg.appendChild(el('text', {
-              x: 20,
-              y: y + 4.5,
-              'text-anchor': 'middle',
-              fill: s === 5 ? '#cdd6f4' : '#a6adc8',
-              'font-family': 'JetBrains Mono, monospace',
-              'font-size': '13',
-              'font-weight': s >= 3 ? '700' : '600'
-            }, STRING_NAMES[s]));
+            const y = m.topY + s * m.strGap;
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  x: m.strLabelX,
+                  y: y + m.strLabelSize * 0.34,
+                  'text-anchor': 'middle',
+                  fill: '#a6adc8',
+                  'font-family': 'JetBrains Mono, monospace',
+                  'font-size': m.strLabelSize,
+                  'font-weight': '600',
+                },
+                TAB_STRINGS[s]
+              )
+            );
 
-            // String line (thicker for lower strings)
-            svg.appendChild(el('line', {
-              x1: TAB_LEFT,
-              y1: y,
-              x2: TAB_RIGHT,
-              y2: y,
-              stroke: '#585b70',
-              'stroke-width': STRING_WEIGHTS[s],
-              'stroke-linecap': 'round'
-            }));
+            svg.appendChild(
+              svgEl('line', {
+                x1: m.marginX,
+                y1: y,
+                x2: m.endX,
+                y2: y,
+                stroke: '#45475a',
+                'stroke-width': TAB_LINE_WEIGHTS[s],
+              })
+            );
           }
 
-          // Left & Right Barlines
-          svg.appendChild(el('line', {
-            x1: TAB_LEFT, y1: stringY(0), x2: TAB_LEFT, y2: stringY(5),
-            stroke: '#6c7086', 'stroke-width': '2'
-          }));
-          svg.appendChild(el('line', {
-            x1: TAB_RIGHT, y1: stringY(0), x2: TAB_RIGHT, y2: stringY(5),
-            stroke: barIdx === 7 ? '#89b4fa' : '#6c7086',
-            'stroke-width': barIdx === 7 ? '3' : '2'
-          }));
+          // Barlines (Left, Middle, Right)
+          [m.marginX, midX, m.endX].forEach((bx, idx) => {
+            const isFinal = row === 3 && idx === 2;
+            svg.appendChild(
+              svgEl('line', {
+                x1: bx,
+                y1: m.topY,
+                x2: bx,
+                y2: bottomY,
+                stroke: isFinal ? '#89b4fa' : '#585b70',
+                'stroke-width': isFinal ? 2.6 : 1.8,
+              })
+            );
+          });
 
-          // 8 Eighth-Note Interactive Badges + Pick Stroke Indicators
-          barObj.notes.forEach((note, noteIdx) => {
-            const cx = colX(noteIdx);
-            const cy = stringY(note.s);
-            const isDown = note.p === 'D';
+          // Render both bars in this row
+          [barIdxA, barIdxB].forEach((bIdx, side) => {
+            const barData = bars[bIdx];
+            const barStartX = m.marginX + side * barWidth;
+            const colW = barWidth / 8;
 
-            const group = el('g', {
-              id: `note-${barIdx}-${noteIdx}`,
-              class: 'note-group',
-              tabindex: '0',
-              role: 'button',
-              'aria-label': `Bar ${barObj.bar}, beat ${noteIdx + 1}, string ${STRING_NAMES[note.s]}, fret ${note.f}, ${isDown ? 'downstroke' : 'upstroke'}`
-            });
+            // Bar number + Chord symbol above staff
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  x: barStartX + 6,
+                  y: m.chordY,
+                  fill: '#6c7086',
+                  'font-family': 'JetBrains Mono, monospace',
+                  'font-size': m.barNumSize,
+                  'font-weight': '600',
+                },
+                String(barData.num)
+              )
+            );
 
-            // Generous invisible touch/click column target
-            group.appendChild(el('rect', {
-              x: cx - TAB_COL_W / 2,
-              y: 6,
-              width: TAB_COL_W,
-              height: viewH - 10,
-              fill: 'transparent'
-            }));
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  id: `bar-chord-${bIdx}-0`,
+                  x: barStartX + 20,
+                  y: m.chordY,
+                  fill: '#89b4fa',
+                  'font-family': 'JetBrains Mono, monospace',
+                  'font-size': m.chordSize,
+                  'font-weight': '700',
+                },
+                CHORDS[barData.chord].label
+              )
+            );
 
-            // Outer Glow Ring (only visible when active)
-            group.appendChild(el('rect', {
-              class: 'active-glow',
-              x: cx - 19,
-              y: cy - 16,
-              width: 38,
-              height: 32,
-              rx: 13,
-              fill: 'none',
-              stroke: '#fab387',
-              'stroke-width': '2.5',
-              opacity: '0'
-            }));
-
-            // Main Fret Pill Badge
-            group.appendChild(el('rect', {
-              class: 'note-pill',
-              x: cx - 15,
-              y: cy - 12.5,
-              width: 30,
-              height: 25,
-              rx: 10,
-              fill: '#313244',
-              stroke: '#6c7086',
-              'stroke-width': '1.6'
-            }));
-
-            // Fret Number Text
-            group.appendChild(el('text', {
-              class: 'note-num',
-              x: cx,
-              y: cy + 5.2,
-              'text-anchor': 'middle',
-              fill: '#cdd6f4',
-              'font-family': 'JetBrains Mono, monospace',
-              'font-size': '15.5',
-              'font-weight': '700'
-            }, String(note.f)));
-
-            // Optional Pick Stroke Label below string E
-            if (state.showStrokes) {
-              group.appendChild(el('text', {
-                class: 'pick-label',
-                x: cx,
-                y: 184,
-                'text-anchor': 'middle',
-                fill: isDown ? '#89b4fa' : '#a6e3a1',
-                'font-family': 'JetBrains Mono, monospace',
-                'font-size': '12',
-                'font-weight': '600',
-                opacity: '0.88'
-              }, isDown ? 'D↓' : 'U↑'));
+            // Mid-bar chord divider on Bar 8 Beat 3
+            if (barData.midChord) {
+              const splitX = barStartX + 4 * colW;
+              svg.appendChild(
+                svgEl('line', {
+                  x1: splitX,
+                  y1: m.topY - 4,
+                  x2: splitX,
+                  y2: bottomY + 4,
+                  stroke: '#585b70',
+                  'stroke-width': '1.2',
+                  'stroke-dasharray': '3 3',
+                })
+              );
+              svg.appendChild(
+                svgEl(
+                  'text',
+                  {
+                    id: `bar-chord-${bIdx}-1`,
+                    x: splitX + colW * 0.5,
+                    y: m.chordY,
+                    'text-anchor': 'middle',
+                    fill: '#89b4fa',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': m.chordSize,
+                    'font-weight': '700',
+                  },
+                  CHORDS[barData.midChord].label
+                )
+              );
             }
 
-            // Click / Enter handler: Jump playhead & preview pluck
-            const onActivate = (e) => {
-              e.stopPropagation();
-              jumpAndPreview(barIdx, noteIdx);
-            };
-            group.addEventListener('click', onActivate);
-            group.addEventListener('keydown', (e) => {
-              if (e.key === 'Enter') onActivate(e);
-            });
+            // Vertical Playhead Cursor
+            svg.appendChild(
+              svgEl('line', {
+                id: `playhead-${bIdx}`,
+                x1: barStartX + colW * 0.5,
+                y1: m.topY - 6,
+                x2: barStartX + colW * 0.5,
+                y2: bottomY + 6,
+                stroke: '#fab387',
+                'stroke-width': '1.8',
+                opacity: '0',
+                'stroke-linecap': 'round',
+              })
+            );
 
-            // Hover preview of chord diagram when not playing
-            group.addEventListener('mouseenter', () => {
-              if (!state.isPlaying) {
-                renderChordDiagram(barIdx, noteIdx, null);
+            // 8 Eighth Notes
+            barData.notes.forEach((note, nIdx) => {
+              const cx = barStartX + colW * (nIdx + 0.5);
+              const cy = m.topY + STRING_TO_TAB_ROW[note.str] * m.strGap;
+              const judged = state.judgments[bIdx][nIdx];
+
+              const classes = ['tab-note'];
+              if (judged) classes.push(`judged-${judged}`);
+
+              const g = svgEl('g', {
+                id: `note-${bIdx}-${nIdx}`,
+                class: classes.join(' '),
+                'data-cx': cx,
+              });
+
+              // Touch target
+              g.appendChild(
+                svgEl('rect', {
+                  x: barStartX + nIdx * colW,
+                  y: m.topY - 12,
+                  width: colW,
+                  height: bottomY - m.topY + 24,
+                  fill: 'transparent',
+                })
+              );
+
+              // Active playhead halo
+              g.appendChild(
+                svgEl('rect', {
+                  class: 'note-halo',
+                  x: cx - (m.pillW + 8) / 2,
+                  y: cy - (m.pillH + 8) / 2,
+                  width: m.pillW + 8,
+                  height: m.pillH + 8,
+                  rx: m.pillRx + 3,
+                  fill: '#fab387',
+                  opacity: '0',
+                })
+              );
+
+              // Hit pop ring (triggered dynamically when Perfect/Good lands)
+              g.appendChild(
+                svgEl('rect', {
+                  class: 'hit-pop-ring',
+                  x: cx - (m.pillW + 6) / 2,
+                  y: cy - (m.pillH + 6) / 2,
+                  width: m.pillW + 6,
+                  height: m.pillH + 6,
+                  rx: m.pillRx + 2,
+                  fill: 'none',
+                  stroke: '#a6e3a1',
+                  'stroke-width': '2',
+                  opacity: '0',
+                })
+              );
+
+              // Note badge background
+              g.appendChild(
+                svgEl('rect', {
+                  class: 'note-bg',
+                  x: cx - m.pillW / 2,
+                  y: cy - m.pillH / 2,
+                  width: m.pillW,
+                  height: m.pillH,
+                  rx: m.pillRx,
+                  fill: '#191926',
+                  stroke: 'none',
+                })
+              );
+
+              // Fret number
+              g.appendChild(
+                svgEl(
+                  'text',
+                  {
+                    class: 'note-digit',
+                    x: cx,
+                    y: cy + m.digitSize * 0.35,
+                    'text-anchor': 'middle',
+                    fill: '#cdd6f4',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': m.digitSize,
+                    'font-weight': '700',
+                  },
+                  String(note.fret)
+                )
+              );
+
+              // Optional Pick Strokes (D / U)
+              if (state.showStrokes) {
+                g.appendChild(
+                  svgEl(
+                    'text',
+                    {
+                      x: cx,
+                      y: m.strokeY,
+                      'text-anchor': 'middle',
+                      fill: note.stroke === 'D' ? '#89b4fa' : '#a6e3a1',
+                      'font-family': 'JetBrains Mono, monospace',
+                      'font-size': m.strokeSize,
+                      'font-weight': '600',
+                      opacity: '0.86',
+                    },
+                    note.stroke
+                  )
+                );
               }
-            });
 
-            svg.appendChild(group);
+              g.addEventListener('click', () => jumpToNote(bIdx, nIdx, true));
+              svg.appendChild(g);
+            });
           });
 
-          card.appendChild(svg);
-          dom.tabGrid.appendChild(card);
-        });
+          rowWrap.appendChild(svg);
+          dom.tabRows.appendChild(rowWrap);
+        }
 
-        // Re-apply active visual highlight if needed
-        highlightNoteVisual(state.currentBar, state.currentNote, state.isPlaying);
+        prevNoteNode = null;
+        prevPlayheadNode = null;
+        prevChordNode = null;
+        applyPlayheadVisual(state.activeBar, state.activeNote);
       }
 
-      // =========================================================================
-      // 6. LIVE CHORD & FINGER DIAGRAM RENDERER (WITH REAL-TIME PLUCK PULSE)
-      // =========================================================================
-      // Chord box string order left-to-right: E(5), A(4), D(3), G(2), B(1), e(0)
-      const CHORD_STRING_ORDER = [5, 4, 3, 2, 1, 0];
+      // =======================================================================
+      // 7. MINI CHORD FRETBOARD DIAGRAM RENDERER
+      // =======================================================================
+      function renderMiniChord(barIdx, noteIdx, highlightStr = null) {
+        if (!state.showChord) return;
 
-      function renderChordDiagram(barIdx, noteIdx, pluckedStringIdx = null) {
-        const chordKey = getChordKeyAt(barIdx, noteIdx);
+        const chordKey = getChordKeyFor(barIdx, noteIdx);
         const chord = CHORDS[chordKey];
-        const barObj = VERSIONS[state.version].bars[barIdx];
-
-        // Update textual header & tip
-        dom.chordTitle.textContent = chord.name;
-        dom.chordTip.textContent = chord.tip;
-        if (barObj.splitChord) {
-          dom.chordBarBadge.textContent = noteIdx < 4 ? `Bar ${barObj.bar} · Beats 1–2` : `Bar ${barObj.bar} · Beats 3–4`;
-        } else {
-          dom.chordBarBadge.textContent = `Bar ${barObj.bar}`;
-        }
-
+        const barObj = ARRANGEMENTS[state.mode].bars[barIdx];
         const noteObj = barObj.notes[noteIdx];
+
+        dom.chordName.textContent = chord.label;
+        dom.chordBarLabel.textContent = barObj.midChord
+          ? `Bar ${barObj.num} · ${noteIdx < 4 ? '1–2' : '3–4'}`
+          : `Bar ${barObj.num}`;
+
         if (noteObj) {
-          const pitch = getPitchLabel(noteObj.s, noteObj.f);
-          dom.chordNoteReadout.textContent = `${STRING_NAMES[noteObj.s]} string · Fret ${noteObj.f} (${pitch})`;
+          const midi = getMidiPitch(noteObj.str, noteObj.fret);
+          dom.chordNoteDetail.textContent = `${noteObj.str} string · Fret ${noteObj.fret} (${formatNoteName(midi)})`;
         }
 
-        // Build clean SVG Fretboard Box
-        const svg = dom.chordSvg;
+        const svg = dom.miniChordSvg;
         svg.innerHTML = '';
 
-        const leftX = 44;
-        const stringSpacing = 32;
-        const topY = 48;
-        const fretSpacing = 38;
-        const numFrets = 4;
-        const bottomY = topY + numFrets * fretSpacing; // 200
-        const rightX = leftX + 5 * stringSpacing;      // 204
+        const leftX = 24;
+        const strStep = 19;
+        const topY = 17;
+        const fretStep = 14.5;
+        const rightX = leftX + 5 * strStep;
+        const botY = topY + 4 * fretStep;
 
-        // Fretboard subtle dark background
-        svg.appendChild(el('rect', {
-          x: leftX,
-          y: topY,
-          width: rightX - leftX,
-          height: bottomY - topY,
-          fill: '#1e1e2e',
-          rx: 4
-        }));
-
-        // Horizontal Fret Wires + Left Fret Numbers (1–4)
-        for (let f = 1; f <= numFrets; f++) {
-          const fy = topY + f * fretSpacing;
-          svg.appendChild(el('line', {
-            x1: leftX,
-            y1: fy,
-            x2: rightX,
-            y2: fy,
-            stroke: '#45475a',
-            'stroke-width': '1.6'
-          }));
-          svg.appendChild(el('text', {
-            x: 20,
-            y: topY + (f - 0.5) * fretSpacing + 5,
-            'text-anchor': 'middle',
-            fill: '#6c7086',
-            'font-family': 'JetBrains Mono, monospace',
-            'font-size': '13',
-            'font-weight': '600'
-          }, String(f)));
+        for (let f = 1; f <= 4; f++) {
+          const fy = topY + f * fretStep;
+          svg.appendChild(
+            svgEl('line', {
+              x1: leftX,
+              y1: fy,
+              x2: rightX,
+              y2: fy,
+              stroke: '#45475a',
+              'stroke-width': '1.2',
+            })
+          );
+          svg.appendChild(
+            svgEl(
+              'text',
+              {
+                x: 10,
+                y: topY + (f - 0.5) * fretStep + 3.5,
+                'text-anchor': 'middle',
+                fill: '#6c7086',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': '9.5',
+                'font-weight': '600',
+              },
+              String(f)
+            )
+          );
         }
 
-        // Thick Nut Line at Top
-        svg.appendChild(el('line', {
-          x1: leftX - 1.5,
-          y1: topY,
-          x2: rightX + 1.5,
-          y2: topY,
-          stroke: '#cdd6f4',
-          'stroke-width': '5.5',
-          'stroke-linecap': 'round'
-        }));
-
-        // 6 Vertical String Lines + Open/Mute Markers + Finger Dots + Bottom Labels
-        CHORD_STRING_ORDER.forEach((stringIdx, col) => {
-          const sx = leftX + col * stringSpacing;
-          const spec = chord.strings[stringIdx];
-          const isPlucked = pluckedStringIdx === stringIdx;
-
-          // Vertical String Line
-          svg.appendChild(el('line', {
-            x1: sx,
+        // Nut
+        svg.appendChild(
+          svgEl('line', {
+            x1: leftX - 1,
             y1: topY,
-            x2: sx,
-            y2: bottomY,
-            stroke: isPlucked ? '#fab387' : (spec === 'X' ? '#313244' : '#6c7086'),
-            'stroke-width': isPlucked ? STRING_WEIGHTS[stringIdx] + 1.4 : STRING_WEIGHTS[stringIdx],
-            'stroke-linecap': 'round'
-          }));
+            x2: rightX + 1,
+            y2: topY,
+            stroke: '#cdd6f4',
+            'stroke-width': '3.5',
+            'stroke-linecap': 'round',
+          })
+        );
 
-          // Bottom String Label (E A D G B e)
-          svg.appendChild(el('text', {
-            x: sx,
-            y: bottomY + 24,
-            'text-anchor': 'middle',
-            fill: isPlucked ? '#fab387' : (spec === 'X' ? '#585b70' : '#a6adc8'),
-            'font-family': 'JetBrains Mono, monospace',
-            'font-size': '13.5',
-            'font-weight': isPlucked ? '800' : '600'
-          }, STRING_NAMES[stringIdx]));
+        CHORD_STRINGS.forEach((sName, col) => {
+          const sx = leftX + col * strStep;
+          const fretVal = chord.shape[col];
+          const fingerVal = chord.fingers[col];
+          const isPlucked = highlightStr === sName;
 
-          // Top Mute (X) or Open (O) or Fretted Finger Dot
-          if (spec === 'X') {
-            svg.appendChild(el('text', {
-              x: sx,
-              y: topY - 16,
-              'text-anchor': 'middle',
-              fill: '#585b70',
-              'font-family': 'Inter, sans-serif',
-              'font-size': '15',
-              'font-weight': '700'
-            }, '×'));
-          } else if (spec.fret === 0) {
-            if (isPlucked) {
-              svg.appendChild(el('circle', {
+          svg.appendChild(
+            svgEl('line', {
+              x1: sx,
+              y1: topY,
+              x2: sx,
+              y2: botY,
+              stroke: isPlucked ? '#fab387' : fretVal === 'x' ? '#313244' : '#6c7086',
+              'stroke-width': isPlucked ? '2.2' : '1.3',
+            })
+          );
+
+          if (fretVal === 'x') {
+            svg.appendChild(
+              svgEl(
+                'text',
+                {
+                  x: sx,
+                  y: topY - 5.5,
+                  'text-anchor': 'middle',
+                  fill: '#6c7086',
+                  'font-family': 'Inter, sans-serif',
+                  'font-size': '10.5',
+                  'font-weight': '700',
+                },
+                '×'
+              )
+            );
+          } else if (fretVal === 0) {
+            svg.appendChild(
+              svgEl('circle', {
                 cx: sx,
-                cy: topY - 21,
-                r: 9.5,
-                fill: 'none',
-                stroke: '#fab387',
-                'stroke-width': '2.5',
-                class: 'ripple-ring'
-              }));
-            }
-            svg.appendChild(el('circle', {
-              cx: sx,
-              cy: topY - 21,
-              r: 7.5,
-              fill: isPlucked ? '#fab387' : 'none',
-              stroke: isPlucked ? '#fab387' : '#a6e3a1',
-              'stroke-width': '2.4'
-            }));
+                cy: topY - 8.5,
+                r: 4.2,
+                fill: isPlucked ? '#fab387' : 'none',
+                stroke: isPlucked ? '#fab387' : '#a6e3a1',
+                'stroke-width': '1.8',
+              })
+            );
           } else {
-            const dotY = topY + (spec.fret - 0.5) * fretSpacing;
-
-            // Real-time pluck ripple glow
-            if (isPlucked) {
-              svg.appendChild(el('circle', {
+            const cy = topY + (fretVal - 0.5) * fretStep;
+            svg.appendChild(
+              svgEl('circle', {
                 cx: sx,
-                cy: dotY,
-                r: 14,
-                fill: 'none',
-                stroke: '#fab387',
-                'stroke-width': '2.8',
-                class: 'ripple-ring'
-              }));
-            }
-
-            // Finger Circle
-            svg.appendChild(el('circle', {
-              cx: sx,
-              cy: dotY,
-              r: isPlucked ? 14 : 12.5,
-              fill: isPlucked ? '#fab387' : '#89b4fa',
-              stroke: isPlucked ? '#fde2cf' : '#181825',
-              'stroke-width': '2'
-            }));
-
-            // Finger Number
-            if (spec.finger) {
-              svg.appendChild(el('text', {
-                x: sx,
-                y: dotY + 4.8,
-                'text-anchor': 'middle',
-                fill: '#11111b',
-                'font-family': 'JetBrains Mono, monospace',
-                'font-size': '13.5',
-                'font-weight': '800'
-              }, String(spec.finger)));
+                cy,
+                r: isPlucked ? 6.8 : 6.2,
+                fill: isPlucked ? '#fab387' : '#89b4fa',
+              })
+            );
+            if (fingerVal > 0) {
+              svg.appendChild(
+                svgEl(
+                  'text',
+                  {
+                    x: sx,
+                    y: cy + 3.4,
+                    'text-anchor': 'middle',
+                    fill: '#11111b',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': '9.5',
+                    'font-weight': '800',
+                  },
+                  String(fingerVal)
+                )
+              );
             }
           }
         });
       }
 
-      // =========================================================================
-      // 7. PLAYHEAD & VISUAL HIGHLIGHTING
-      // =========================================================================
-      let lastHighlightedNoteEl = null;
-      let lastHighlightedBarEl = null;
+      // =======================================================================
+      // 8. LIVE SCORING, JUDGMENT UPDATES & GRADE CARD MODAL
+      // =======================================================================
+      function updateMicStripLevel(level, aboveGate) {
+        dom.micMeterFill.style.width = `${Math.round(level * 100)}%`;
+        dom.micDot.className = aboveGate
+          ? 'w-2 h-2 rounded-full bg-mocha-green shadow-[0_0_6px_#a6e3a1] transition-colors shrink-0'
+          : 'w-2 h-2 rounded-full bg-mocha-surface2 transition-colors shrink-0';
+      }
 
-      function highlightNoteVisual(barIdx, noteIdx, isPluckActive) {
-        // Clear previous note highlight
-        if (lastHighlightedNoteEl) {
-          lastHighlightedNoteEl.classList.remove('is-active');
-          const oldGlow = lastHighlightedNoteEl.querySelector('.active-glow');
-          if (oldGlow) oldGlow.setAttribute('opacity', '0');
+      function updateLiveScorePill() {
+        const pct = getRunAccuracyPct();
+        if (pct === null) {
+          dom.liveGradeLetter.textContent = '—';
+          dom.liveGradeLetter.style.color = '#a6adc8';
+          dom.liveGradePct.textContent = '--%';
+          dom.liveGradeStreak.textContent = '0x';
+          return;
+        }
+        const tier = computeGradeTier(pct);
+        dom.liveGradeLetter.textContent = tier.letter;
+        dom.liveGradeLetter.style.color = tier.color;
+        dom.liveGradePct.textContent = `${pct}%`;
+        dom.liveGradeStreak.textContent = `${state.streak}x`;
+      }
+
+      function resetScoreRun(rerenderClasses = true) {
+        if (state.runFinishingTimer) {
+          clearTimeout(state.runFinishingTimer);
+          state.runFinishingTimer = null;
+        }
+        state.pendingEvalNotes = [];
+        state.perfectCount = 0;
+        state.goodCount = 0;
+        state.missCount = 0;
+        state.streak = 0;
+        state.bestStreak = 0;
+        for (let b = 0; b < 8; b++) {
+          state.judgments[b].fill(null);
+        }
+        if (rerenderClasses) {
+          document.querySelectorAll('.tab-note').forEach((el) => {
+            el.classList.remove('judged-perfect', 'judged-good', 'judged-miss');
+          });
+        }
+        updateLiveScorePill();
+      }
+
+      function resolveEvaluatedNote(item, verdict) {
+        if (item.resolved) return;
+        item.resolved = true;
+
+        state.judgments[item.barIdx][item.noteIdx] = verdict;
+
+        if (verdict === 'perfect') {
+          state.perfectCount++;
+          state.streak++;
+          if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        } else if (verdict === 'good') {
+          state.goodCount++;
+          state.streak++;
+          if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+        } else {
+          state.missCount++;
+          state.streak = 0;
         }
 
-        // Clear previous bar active styling & playhead
-        if (lastHighlightedBarEl) {
-          lastHighlightedBarEl.classList.remove('ring-2', 'ring-mocha-peach/80', 'border-mocha-peach/60', 'bg-mocha-surface0/40');
-          const prevBarIdx = Number(lastHighlightedBarEl.dataset.bar);
-          const oldPh = document.getElementById(`playhead-${prevBarIdx}`);
-          if (oldPh) oldPh.setAttribute('opacity', '0');
+        // Color TAB note badge & trigger crisp halo pop
+        const node = document.getElementById(`note-${item.barIdx}-${item.noteIdx}`);
+        if (node) {
+          node.classList.remove('judged-perfect', 'judged-good', 'judged-miss');
+          node.classList.add(`judged-${verdict}`);
+
+          if (verdict === 'perfect' || verdict === 'good') {
+            const popRing = node.querySelector('.hit-pop-ring');
+            if (popRing) {
+              popRing.setAttribute('stroke', verdict === 'perfect' ? '#a6e3a1' : '#89b4fa');
+              popRing.classList.remove('hit-pop-anim');
+              // Force reflow to restart animation cleanly
+              void popRing.getBoundingClientRect();
+              popRing.classList.add('hit-pop-anim');
+            }
+          }
         }
 
-        const barCard = document.getElementById(`bar-card-${barIdx}`);
-        const noteEl = document.getElementById(`note-${barIdx}-${noteIdx}`);
-        const playhead = document.getElementById(`playhead-${barIdx}`);
+        updateLiveScorePill();
+      }
 
-        if (barCard) {
-          barCard.classList.add('ring-2', 'ring-mocha-peach/80', 'border-mocha-peach/60');
-          lastHighlightedBarEl = barCard;
+      function openGradeModal() {
+        const pct = getRunAccuracyPct() ?? 0;
+        const tier = computeGradeTier(pct);
+        const loopLabel = LOOP_MODES[state.loopIdx].label;
+        const modeTag = state.mode === 'Em' && state.capo3Pitch ? 'Em (Capo 3)' : state.mode;
+
+        dom.modalRunMeta.textContent = `${modeTag} · ${state.bpm} BPM · Bars ${loopLabel}`;
+        dom.modalGradeLetter.textContent = tier.letter;
+        dom.modalGradeLetter.style.color = tier.color;
+        dom.modalGradeCrest.style.borderColor = tier.color;
+        dom.modalGradeCrest.style.boxShadow = `0 0 24px ${tier.color}26`;
+        dom.modalTitle.textContent = tier.title;
+        dom.modalAccuracy.textContent = `${pct}%`;
+        dom.modalStreak.textContent = `${state.bestStreak}x`;
+        dom.modalPerfect.textContent = String(state.perfectCount);
+        dom.modalGood.textContent = String(state.goodCount);
+        dom.modalMiss.textContent = String(state.missCount);
+
+        // Compute per-bar accuracy & populate 8-bar mini chart
+        const bars = ARRANGEMENTS[state.mode].bars;
+        dom.modalBarChart.innerHTML = '';
+
+        let worstBarIdx = -1;
+        let worstBarPct = 101;
+        const barPcts = new Array(8).fill(null);
+
+        for (let b = 0; b < 8; b++) {
+          let evalInBar = 0;
+          let ptsInBar = 0;
+          for (let n = 0; n < 8; n++) {
+            const v = state.judgments[b][n];
+            if (v !== null) {
+              evalInBar++;
+              if (v === 'perfect') ptsInBar += 100;
+              else if (v === 'good') ptsInBar += 75;
+            }
+          }
+
+          const col = document.createElement('div');
+          col.className = 'flex flex-col items-center justify-end h-full gap-1';
+
+          if (evalInBar > 0) {
+            const bPct = Math.round((ptsInBar / (evalInBar * 100)) * 100);
+            barPcts[b] = bPct;
+            if (bPct < worstBarPct) {
+              worstBarPct = bPct;
+              worstBarIdx = b;
+            }
+
+            const barColor =
+              bPct >= 85 ? '#a6e3a1' :
+              bPct >= 70 ? '#89b4fa' :
+              bPct >= 45 ? '#fab387' : '#f38ba8';
+
+            const hPct = Math.max(14, bPct);
+            col.innerHTML = `
+              <span class="font-mono text-[9px] text-mocha-subtext">${bPct}%</span>
+              <div class="w-full flex-1 bg-mocha-surface0/60 rounded-md flex items-end overflow-hidden">
+                <div class="w-full rounded-md transition-all" style="height:${hPct}%;background:${barColor}"></div>
+              </div>
+              <span class="font-mono text-[10px] font-bold text-mocha-text">${b + 1}</span>
+            `;
+          } else {
+            col.innerHTML = `
+              <span class="font-mono text-[9px] text-mocha-overlay0">—</span>
+              <div class="w-full flex-1 bg-mocha-surface0/30 rounded-md"></div>
+              <span class="font-mono text-[10px] text-mocha-overlay0">${b + 1}</span>
+            `;
+          }
+          dom.modalBarChart.appendChild(col);
         }
 
-        if (noteEl) {
-          noteEl.classList.add('is-active');
-          const glow = noteEl.querySelector('.active-glow');
-          if (glow) glow.setAttribute('opacity', isPluckActive ? '0.95' : '0.45');
-          lastHighlightedNoteEl = noteEl;
+        // Smart Coaching Line
+        const totalHits = state.perfectCount + state.goodCount;
+        const totalEvaluated = totalHits + state.missCount;
+
+        if (totalEvaluated === 0) {
+          dom.modalCoaching.textContent = 'Press Play to run a pass and grade your guitar playing live.';
+        } else if (totalHits === 0) {
+          dom.modalCoaching.textContent = 'No notes detected — move closer to your mic or set Mic Sensitivity to High in ⚙️.';
+        } else if (pct >= 95 && worstBarPct >= 85) {
+          dom.modalCoaching.textContent = 'Clean pass across all bars! Try nudging tempo up +5 BPM.';
+        } else if (worstBarIdx !== -1) {
+          const bData = bars[worstBarIdx];
+          const cLabel = bData.midChord
+            ? `${CHORDS[bData.chord].label}/${CHORDS[bData.midChord].label}`
+            : CHORDS[bData.chord].label;
+          dom.modalCoaching.textContent = `Work on Bar ${worstBarIdx + 1} · ${cLabel} (${worstBarPct}%) — tap its notes on the sheet to check pitch.`;
         }
 
-        if (playhead) {
-          const x = colX(noteIdx);
-          playhead.setAttribute('x1', String(x));
-          playhead.setAttribute('x2', String(x));
-          playhead.setAttribute('opacity', isPluckActive ? '0.55' : '0.28');
+        // Check if Bars 1–4 vs Bars 5–8 has a noticeably weaker half (when full 1–8 was played)
+        const firstHalf = barPcts.slice(0, 4).filter((v) => v !== null);
+        const secondHalf = barPcts.slice(4, 8).filter((v) => v !== null);
+        if (firstHalf.length === 4 && secondHalf.length === 4) {
+          const avg1 = firstHalf.reduce((a, b) => a + b, 0) / 4;
+          const avg2 = secondHalf.reduce((a, b) => a + b, 0) / 4;
+          if (avg1 + 10 < avg2) {
+            dom.btnModalWeak.textContent = 'Loop Bars 1–4';
+            dom.btnModalWeak.dataset.targetLoop = '1';
+            dom.btnModalWeak.classList.remove('hidden');
+            dom.btnModalWeak.classList.add('inline-flex');
+          } else if (avg2 + 10 < avg1) {
+            dom.btnModalWeak.textContent = 'Loop Bars 5–8';
+            dom.btnModalWeak.dataset.targetLoop = '2';
+            dom.btnModalWeak.classList.remove('hidden');
+            dom.btnModalWeak.classList.add('inline-flex');
+          } else {
+            dom.btnModalWeak.classList.add('hidden');
+            dom.btnModalWeak.classList.remove('inline-flex');
+          }
+        } else {
+          dom.btnModalWeak.classList.add('hidden');
+          dom.btnModalWeak.classList.remove('inline-flex');
+        }
+
+        dom.gradeModal.classList.remove('hidden');
+        dom.gradeModal.classList.add('flex');
+      }
+
+      function closeGradeModal() {
+        dom.gradeModal.classList.add('hidden');
+        dom.gradeModal.classList.remove('flex');
+      }
+
+      // =======================================================================
+      // 9. PRECISION LOOKAHEAD PLAYBACK & SCORING SCHEDULER
+      // =======================================================================
+      let prevNoteNode = null;
+      let prevPlayheadNode = null;
+      let prevChordNode = null;
+
+      function applyPlayheadVisual(barIdx, noteIdx) {
+        if (prevNoteNode) prevNoteNode.classList.remove('is-active');
+        if (prevPlayheadNode) prevPlayheadNode.setAttribute('opacity', '0');
+        if (prevChordNode) prevChordNode.setAttribute('fill', '#89b4fa');
+
+        const noteNode = document.getElementById(`note-${barIdx}-${noteIdx}`);
+        const phNode = document.getElementById(`playhead-${barIdx}`);
+        const barObj = ARRANGEMENTS[state.mode].bars[barIdx];
+        const chordSubIdx = barObj.midChord && noteIdx >= 4 ? 1 : 0;
+        const chordNode = document.getElementById(`bar-chord-${barIdx}-${chordSubIdx}`);
+
+        if (noteNode) {
+          noteNode.classList.add('is-active');
+          prevNoteNode = noteNode;
+          if (phNode) {
+            const cx = noteNode.getAttribute('data-cx');
+            phNode.setAttribute('x1', cx);
+            phNode.setAttribute('x2', cx);
+            phNode.setAttribute('opacity', state.isPlaying ? '0.55' : '0.3');
+            prevPlayheadNode = phNode;
+          }
+        }
+
+        if (chordNode) {
+          chordNode.setAttribute('fill', '#fab387');
+          prevChordNode = chordNode;
         }
       }
 
-      // =========================================================================
-      // 8. PRECISION LOOKAHEAD PLAYBACK SCHEDULER
-      // =========================================================================
-      let schedulerTimer = null;
-      let nextStepTime = 0;
-      let schedBar = 0;
-      let schedNote = 0;
-      let countInStep = 0;
-      const pendingVisualTimeouts = new Set();
+      let schedTimer = null;
+      let nextTime = 0;
+      let sBar = 0;
+      let sNote = 0;
+      let countStep = 0;
+      let stopAfterPassScheduled = false;
+      const visualTimers = new Set();
 
-      const LOOKAHEAD_MS = 25;
-      const SCHEDULE_AHEAD_SEC = 0.11;
-
-      function clearPendingVisuals() {
-        pendingVisualTimeouts.forEach((id) => clearTimeout(id));
-        pendingVisualTimeouts.clear();
+      function clearVisualTimers() {
+        visualTimers.forEach((id) => clearTimeout(id));
+        visualTimers.clear();
       }
 
-      function scheduleVisual(when, callback) {
-        const delayMs = Math.max(0, (when - audio.ctx.currentTime) * 1000);
+      function scheduleUI(when, fn) {
+        const ms = Math.max(0, (when - audio.ctx.currentTime) * 1000);
         const id = setTimeout(() => {
-          pendingVisualTimeouts.delete(id);
-          if (state.isPlaying) callback();
-        }, delayMs);
-        pendingVisualTimeouts.add(id);
+          visualTimers.delete(id);
+          if (state.isPlaying) fn();
+        }, ms);
+        visualTimers.add(id);
       }
 
-      function schedulerTick() {
-        if (!state.isPlaying || !audio.ctx) return;
+      function shouldPlaySynthDuringPlayback() {
+        if (!state.guitarAudio) return false;
+        if (state.scoreMode && !state.headphonesMode) return false;
+        return true;
+      }
 
-        while (nextStepTime < audio.ctx.currentTime + SCHEDULE_AHEAD_SEC) {
-          const quarterSec = 60.0 / state.bpm;
-          const eighthSec = quarterSec / 2.0;
+      function schedulerLoop() {
+        if (!state.isPlaying || !audio.ctx || stopAfterPassScheduled) return;
+
+        while (nextTime < audio.ctx.currentTime + 0.1) {
+          const beatSec = 60.0 / state.bpm;
+          const eighthSec = beatSec / 2.0;
 
           if (state.isCountingIn) {
-            const beatNumber = countInStep + 1;
-            const clickTime = nextStepTime;
-
-            // Count-in always plays 4 clear clicks (beat 1 accented)
-            audio.click(beatNumber === 1, clickTime);
-            scheduleVisual(clickTime, () => {
-              dom.countInDisplay.classList.remove('hidden');
-              dom.countInDisplay.classList.add('inline-flex');
-              dom.countInNum.textContent = String(beatNumber);
+            const num = countStep + 1;
+            const t = nextTime;
+            audio.click(num === 1, t);
+            scheduleUI(t, () => {
+              dom.badgeCountIn.textContent = String(num);
+              dom.badgeCountIn.classList.remove('hidden');
+              dom.labelPlay.classList.add('hidden');
             });
 
-            countInStep++;
-            nextStepTime += quarterSec;
+            countStep++;
+            nextTime += beatSec;
 
-            if (countInStep >= 4) {
+            if (countStep >= 4) {
               state.isCountingIn = false;
-              const hideTime = nextStepTime - 0.02;
-              scheduleVisual(hideTime, () => {
-                dom.countInDisplay.classList.add('hidden');
-                dom.countInDisplay.classList.remove('inline-flex');
+              const endCountT = nextTime - 0.02;
+              scheduleUI(endCountT, () => {
+                dom.badgeCountIn.classList.add('hidden');
+                if (state.isDesktop) dom.labelPlay.classList.remove('hidden');
               });
             }
           } else {
-            const barIdx = schedBar;
-            const noteIdx = schedNote;
-            const stepTime = nextStepTime;
-            const noteObj = VERSIONS[state.version].bars[barIdx].notes[noteIdx];
+            const bIdx = sBar;
+            const nIdx = sNote;
+            const t = nextTime;
+            const note = ARRANGEMENTS[state.mode].bars[bIdx].notes[nIdx];
+            const midi = getMidiPitch(note.str, note.fret);
 
-            // Schedule Guitar Audio
-            if (state.guitarAudio) {
-              audio.pluck(noteObj.s, noteObj.f, noteObj.p, stepTime);
+            if (shouldPlaySynthDuringPlayback()) {
+              audio.pluck(note.str, midi, note.stroke, t);
+            }
+            if (state.metronome && nIdx % 2 === 0) {
+              audio.click(nIdx === 0, t);
             }
 
-            // Schedule Metronome Click on quarter-note beats (indices 0, 2, 4, 6)
-            if (state.metronome && noteIdx % 2 === 0) {
-              audio.click(noteIdx === 0, stepTime);
+            // Enqueue note for microphone evaluation in Score mode
+            if (state.scoreMode) {
+              // Clear previous badge judgment on this note if endless looping wraps around
+              if (state.endlessScoreLoop && state.judgments[bIdx][nIdx] !== null) {
+                scheduleUI(t - 0.05, () => {
+                  state.judgments[bIdx][nIdx] = null;
+                  const el = document.getElementById(`note-${bIdx}-${nIdx}`);
+                  if (el) el.classList.remove('judged-perfect', 'judged-good', 'judged-miss');
+                });
+              }
+
+              const winAfter = Math.min(eighthSec * 0.9, 0.420);
+              state.pendingEvalNotes.push({
+                barIdx: bIdx,
+                noteIdx: nIdx,
+                midi,
+                targetFreq: midiToFreq(midi),
+                scheduledTime: t,
+                stepDur: eighthSec,
+                windowStart: t - 0.130,
+                windowEnd: t + winAfter,
+                preSampled: false,
+                preEnergy: 0,
+                preRms: 0,
+                goodCandidateAt: null,
+                resolved: false,
+              });
             }
 
-            // Schedule Synchronized Visual Update
-            scheduleVisual(stepTime, () => {
-              state.currentBar = barIdx;
-              state.currentNote = noteIdx;
-              state.selectedBar = barIdx;
-              state.selectedNote = noteIdx;
-              highlightNoteVisual(barIdx, noteIdx, true);
-              renderChordDiagram(barIdx, noteIdx, noteObj.s);
+            scheduleUI(t, () => {
+              state.activeBar = bIdx;
+              state.activeNote = nIdx;
+              applyPlayheadVisual(bIdx, nIdx);
+              renderMiniChord(bIdx, nIdx, note.str);
             });
 
-            // Advance pointer within active loop boundaries
-            const [loopStart, loopEnd] = getLoopBounds();
-            schedNote++;
-            if (schedNote >= 8) {
-              schedNote = 0;
-              schedBar++;
-              if (schedBar > loopEnd) {
-                schedBar = loopStart;
-              }
+            const [loopStart, loopEnd] = getLoopRange();
+            const isLastNoteOfLoop = bIdx === loopEnd && nIdx === 7;
+
+            if (state.scoreMode && !state.endlessScoreLoop && isLastNoteOfLoop) {
+              // Allow the final note's evaluation window + latency to finish cleanly, then show Grade Card
+              stopAfterPassScheduled = true;
+              const winAfter = Math.min(eighthSec * 0.9, 0.420);
+              const finishDelayMs = Math.max(80, (t + winAfter + MIC_LATENCY_SEC + 0.045 - audio.ctx.currentTime) * 1000);
+              state.runFinishingTimer = setTimeout(() => {
+                state.runFinishingTimer = null;
+                // Resolve any remaining unresolved notes before opening modal
+                state.pendingEvalNotes.forEach((item) => {
+                  if (!item.resolved) {
+                    resolveEvaluatedNote(item, item.goodCandidateAt !== null ? 'good' : 'miss');
+                  }
+                });
+                stopPlayback();
+                state.activeBar = loopStart;
+                state.activeNote = 0;
+                applyPlayheadVisual(loopStart, 0);
+                openGradeModal();
+              }, finishDelayMs);
+              break;
             }
 
-            nextStepTime += eighthSec;
+            sNote++;
+            if (sNote >= 8) {
+              sNote = 0;
+              sBar = sBar + 1 > loopEnd ? loopStart : sBar + 1;
+            }
+            nextTime += eighthSec;
           }
         }
       }
 
-      function startPlayback() {
-        if (!audio.ensureContext()) return;
-        clearPendingVisuals();
+      function startPlayback(forceFromLoopStart = false) {
+        if (!audio.init()) return;
+        closeGradeModal();
+        clearVisualTimers();
 
-        const [loopStart, loopEnd] = getLoopBounds();
-        if (state.currentBar < loopStart || state.currentBar > loopEnd) {
-          state.currentBar = loopStart;
-          state.currentNote = 0;
+        const [loopStart, loopEnd] = getLoopRange();
+        if (forceFromLoopStart || state.activeBar < loopStart || state.activeBar > loopEnd) {
+          state.activeBar = loopStart;
+          state.activeNote = 0;
         }
 
+        // If starting a fresh graded run in Score mode, clear prior pass judgments cleanly
+        if (state.scoreMode) {
+          const alreadyHasJudgments = state.perfectCount + state.goodCount + state.missCount > 0;
+          if (forceFromLoopStart || (alreadyHasJudgments && state.activeBar === loopStart && state.activeNote === 0)) {
+            resetScoreRun(true);
+          } else {
+            state.pendingEvalNotes = [];
+          }
+        }
+
+        stopAfterPassScheduled = false;
         state.isPlaying = true;
-        schedBar = state.currentBar;
-        schedNote = state.currentNote;
+        sBar = state.activeBar;
+        sNote = state.activeNote;
+        state.isCountingIn = state.countIn && sNote === 0;
+        countStep = 0;
+        nextTime = audio.ctx.currentTime + 0.04;
 
-        // Only run 4-beat count-in if enabled AND starting at beat 1 of a bar
-        state.isCountingIn = state.countIn && schedNote === 0;
-        countInStep = 0;
-        nextStepTime = audio.ctx.currentTime + 0.05;
-
-        updateTransportUI();
-        schedulerTick();
-        schedulerTimer = setInterval(schedulerTick, LOOKAHEAD_MS);
+        syncPlayButtonUI();
+        schedulerLoop();
+        schedTimer = setInterval(schedulerLoop, 25);
       }
 
       function stopPlayback() {
         state.isPlaying = false;
         state.isCountingIn = false;
-        if (schedulerTimer) {
-          clearInterval(schedulerTimer);
-          schedulerTimer = null;
+        stopAfterPassScheduled = false;
+        if (schedTimer) {
+          clearInterval(schedTimer);
+          schedTimer = null;
         }
-        clearPendingVisuals();
-        dom.countInDisplay.classList.add('hidden');
-        dom.countInDisplay.classList.remove('inline-flex');
-        updateTransportUI();
-        highlightNoteVisual(state.currentBar, state.currentNote, false);
-        renderChordDiagram(state.currentBar, state.currentNote, null);
+        if (state.runFinishingTimer) {
+          clearTimeout(state.runFinishingTimer);
+          state.runFinishingTimer = null;
+        }
+        clearVisualTimers();
+        state.pendingEvalNotes = [];
+        dom.badgeCountIn.classList.add('hidden');
+        syncPlayButtonUI();
+        applyPlayheadVisual(state.activeBar, state.activeNote);
+        renderMiniChord(state.activeBar, state.activeNote, null);
       }
 
       function togglePlayback() {
-        if (state.isPlaying) {
-          stopPlayback();
-        } else {
-          startPlayback();
-        }
+        if (state.isPlaying) stopPlayback();
+        else startPlayback(false);
       }
 
-      function restartPlayback() {
+      function restartLoop() {
         const wasPlaying = state.isPlaying;
         stopPlayback();
-        const [loopStart] = getLoopBounds();
-        state.currentBar = loopStart;
-        state.currentNote = 0;
-        state.selectedBar = loopStart;
-        state.selectedNote = 0;
-        highlightNoteVisual(loopStart, 0, false);
-        renderChordDiagram(loopStart, 0, null);
-        if (wasPlaying) {
-          startPlayback();
-        }
+        const [loopStart] = getLoopRange();
+        state.activeBar = loopStart;
+        state.activeNote = 0;
+        if (state.scoreMode) resetScoreRun(true);
+        applyPlayheadVisual(loopStart, 0);
+        renderMiniChord(loopStart, 0, null);
+        if (wasPlaying) startPlayback(true);
       }
 
-      function jumpAndPreview(barIdx, noteIdx) {
-        // If user clicks outside current sub-loop, switch seamlessly to Full (1-8)
-        const [loopStart, loopEnd] = getLoopBounds();
+      function jumpToNote(barIdx, noteIdx, previewSound = true) {
+        const [loopStart, loopEnd] = getLoopRange();
         if (barIdx < loopStart || barIdx > loopEnd) {
-          setLoopMode('full');
+          state.loopIdx = 0;
+          syncLoopButtonUI();
+          renderTabSheet();
         }
 
-        state.currentBar = barIdx;
-        state.currentNote = noteIdx;
-        state.selectedBar = barIdx;
-        state.selectedNote = noteIdx;
+        state.activeBar = barIdx;
+        state.activeNote = noteIdx;
 
-        const noteObj = VERSIONS[state.version].bars[barIdx].notes[noteIdx];
-        if (state.guitarAudio) {
-          audio.pluck(noteObj.s, noteObj.f, noteObj.p);
+        const note = ARRANGEMENTS[state.mode].bars[barIdx].notes[noteIdx];
+        // Allow manual note ear-check when paused even if Score mode muted playback synth
+        if (previewSound && (shouldPlaySynthDuringPlayback() || !state.isPlaying)) {
+          audio.pluck(note.str, getMidiPitch(note.str, note.fret), note.stroke);
         }
 
         if (state.isPlaying) {
-          // Resync live scheduler immediately to clicked position
-          clearPendingVisuals();
+          clearVisualTimers();
           state.isCountingIn = false;
-          dom.countInDisplay.classList.add('hidden');
-          dom.countInDisplay.classList.remove('inline-flex');
-
-          const eighthSec = (60.0 / state.bpm) / 2.0;
-          const [ls, le] = getLoopBounds();
+          stopAfterPassScheduled = false;
+          state.pendingEvalNotes = [];
+          dom.badgeCountIn.classList.add('hidden');
+          const [ls, le] = getLoopRange();
           let nextN = noteIdx + 1;
           let nextB = barIdx;
           if (nextN >= 8) {
             nextN = 0;
             nextB = nextB + 1 > le ? ls : nextB + 1;
           }
-          schedBar = nextB;
-          schedNote = nextN;
-          nextStepTime = audio.ctx.currentTime + eighthSec;
+          sBar = nextB;
+          sNote = nextN;
+          nextTime = audio.ctx.currentTime + 60.0 / state.bpm / 2.0;
         }
 
-        highlightNoteVisual(barIdx, noteIdx, true);
-        renderChordDiagram(barIdx, noteIdx, noteObj.s);
+        applyPlayheadVisual(barIdx, noteIdx);
+        renderMiniChord(barIdx, noteIdx, note.str);
       }
 
-      function selectBar(barIdx, noteIdx = 0, playPreview = false) {
-        if (playPreview) {
-          jumpAndPreview(barIdx, noteIdx);
-        } else {
-          const [loopStart, loopEnd] = getLoopBounds();
-          if (barIdx < loopStart || barIdx > loopEnd) {
-            setLoopMode('full');
+      // =======================================================================
+      // 10. SCORE MODE ACTIVATION & UI SYNCHRONIZATION
+      // =======================================================================
+      async function toggleScoreMode() {
+        if (!state.scoreMode) {
+          try {
+            state.scoreMode = true;
+            await micListener.start();
+
+            // Save user's normal playback settings & prevent speaker feedback automatically
+            state.savedPrefsBeforeScore = {
+              guitarAudio: state.guitarAudio,
+              metronome: state.metronome,
+              countIn: state.countIn,
+            };
+
+            if (!state.headphonesMode) {
+              state.guitarAudio = false;
+            }
+            state.metronome = true;
+            state.countIn = true;
+
+            resetScoreRun(true);
+            syncScoreModeUI();
+            syncAllSettingsSwitches();
+
+            if (!state.headphonesMode) {
+              showToast('Mic Score ON · Guitar synth muted & Metronome enabled', '#a6e3a1', 3000);
+            } else {
+              showToast('Mic Score ON · Headphones Mode active', '#cba6f7', 2400);
+            }
+          } catch (err) {
+            state.scoreMode = false;
+            micListener.stop();
+            syncScoreModeUI();
+            showToast(
+              'Microphone blocked — allow mic access in your browser address bar to score your playing.',
+              '#f38ba8',
+              4800
+            );
           }
-          state.currentBar = barIdx;
-          state.currentNote = noteIdx;
-          state.selectedBar = barIdx;
-          state.selectedNote = noteIdx;
-          highlightNoteVisual(barIdx, noteIdx, false);
-          renderChordDiagram(barIdx, noteIdx, null);
+        } else {
+          if (state.isPlaying) stopPlayback();
+          state.scoreMode = false;
+          micListener.stop();
+          closeGradeModal();
+          resetScoreRun(true);
+
+          // Restore previous normal playback settings
+          if (state.savedPrefsBeforeScore) {
+            state.guitarAudio = state.savedPrefsBeforeScore.guitarAudio;
+            state.metronome = state.savedPrefsBeforeScore.metronome;
+            state.countIn = state.savedPrefsBeforeScore.countIn;
+            state.savedPrefsBeforeScore = null;
+          }
+
+          syncScoreModeUI();
+          syncAllSettingsSwitches();
         }
       }
 
-      // =========================================================================
-      // 9. UI CONTROLS & EVENT BINDINGS
-      // =========================================================================
-      function updateTransportUI() {
+      function syncScoreModeUI() {
+        dom.btnScoreMode.setAttribute('aria-pressed', String(state.scoreMode));
+        if (state.scoreMode) {
+          dom.micStrip.classList.remove('hidden');
+          dom.btnScoreMode.className =
+            'h-10 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-mauve/20 text-mocha-mauve border-mocha-mauve/50 shadow-sm';
+          dom.subGuitarAudio.textContent = state.headphonesMode
+            ? 'Headphones ON (synth audible)'
+            : 'Auto-muted in Score mode';
+          // Adjust sticky offset of mobile chord drawer when 30px mic strip is visible
+          dom.chordPanel.classList.remove('top-12');
+          dom.chordPanel.classList.add('top-[78px]');
+        } else {
+          dom.micStrip.classList.add('hidden');
+          dom.btnScoreMode.className =
+            'h-10 px-2.5 sm:px-3.5 rounded-xl border text-xs font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0';
+          dom.subGuitarAudio.textContent = 'Synthesized steel-string plucks';
+          dom.chordPanel.classList.remove('top-[78px]');
+          dom.chordPanel.classList.add('top-12');
+        }
+      }
+
+      function syncPlayButtonUI() {
         if (state.isPlaying) {
           dom.iconPlay.classList.add('hidden');
           dom.iconPause.classList.remove('hidden');
           dom.labelPlay.textContent = 'Pause';
-          dom.btnPlay.classList.remove('bg-mocha-blue', 'hover:bg-mocha-lavender');
-          dom.btnPlay.classList.add('bg-mocha-peach', 'hover:bg-mocha-peach/90');
-          dom.chordLiveDot.classList.remove('hidden');
+          dom.btnPlay.classList.replace('bg-mocha-blue', 'bg-mocha-peach');
+          dom.btnPlay.classList.replace('hover:bg-mocha-blue/90', 'hover:bg-mocha-peach/90');
         } else {
           dom.iconPlay.classList.remove('hidden');
           dom.iconPause.classList.add('hidden');
           dom.labelPlay.textContent = 'Play';
-          dom.btnPlay.classList.add('bg-mocha-blue', 'hover:bg-mocha-lavender');
-          dom.btnPlay.classList.remove('bg-mocha-peach', 'hover:bg-mocha-peach/90');
-          dom.chordLiveDot.classList.add('hidden');
+          if (state.isDesktop) dom.labelPlay.classList.remove('hidden');
+          dom.btnPlay.classList.replace('bg-mocha-peach', 'bg-mocha-blue');
+          dom.btnPlay.classList.replace('hover:bg-mocha-peach/90', 'hover:bg-mocha-blue/90');
         }
       }
 
-      function setVersion(versionKey) {
-        if (state.version === versionKey) return;
-        state.version = versionKey;
+      function setMode(newMode) {
+        if (state.mode === newMode) return;
+        state.mode = newMode;
+        if (state.scoreMode) resetScoreRun(false);
+        syncModePillsUI();
+      }
 
-        const isNoCapo = versionKey === 'nocapo';
-        dom.modeNoCapo.setAttribute('aria-selected', String(isNoCapo));
-        dom.modeOpen.setAttribute('aria-selected', String(!isNoCapo));
+      function syncModePillsUI() {
+        const isGm = state.mode === 'Gm';
+        dom.pillGm.setAttribute('aria-selected', String(isGm));
+        dom.pillEm.setAttribute('aria-selected', String(!isGm));
 
-        if (isNoCapo) {
-          dom.modeNoCapo.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm';
-          dom.modeOpen.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text';
+        dom.pillEm.textContent = !isGm && state.capo3Pitch ? 'Em+3' : 'Em';
+
+        if (isGm) {
+          dom.pillGm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition bg-mocha-blue text-mocha-crust';
+          dom.pillEm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text';
+          dom.rowCapo3.classList.add('hidden');
+          dom.rowCapo3.classList.remove('flex');
         } else {
-          dom.modeOpen.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue bg-mocha-blue text-mocha-crust shadow-sm';
-          dom.modeNoCapo.className = 'px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-mocha-blue text-mocha-subtext0 hover:text-mocha-text';
+          dom.pillEm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition bg-mocha-blue text-mocha-crust';
+          dom.pillGm.className = 'px-2 py-0.5 rounded-full font-mono text-[11px] font-bold transition text-mocha-subtext hover:text-mocha-text';
+          dom.rowCapo3.classList.remove('hidden');
+          dom.rowCapo3.classList.add('flex');
         }
 
-        renderTabGrid();
-        renderChordDiagram(state.currentBar, state.currentNote, null);
+        renderTabSheet();
+        renderMiniChord(state.activeBar, state.activeNote, null);
+      }
+
+      function syncChordPanelUI() {
+        dom.btnChordToggle.setAttribute('aria-pressed', String(state.showChord));
+        if (state.showChord) {
+          dom.chordPanel.classList.remove('hidden');
+          dom.btnChordToggle.className = 'h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40';
+          renderMiniChord(state.activeBar, state.activeNote, null);
+        } else {
+          dom.chordPanel.classList.add('hidden');
+          dom.btnChordToggle.className = 'h-8 px-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition active:scale-95 bg-mocha-base text-mocha-subtext border-mocha-surface0 hover:text-mocha-text';
+        }
       }
 
       function setBpm(val) {
-        const clamped = Math.max(40, Math.min(110, Number(val)));
+        const clamped = Math.max(40, Math.min(110, Math.round(Number(val))));
         state.bpm = clamped;
+        dom.bpmText.textContent = String(clamped);
+        dom.bpmPopoverVal.textContent = `${clamped} BPM`;
         dom.bpmSlider.value = String(clamped);
-        dom.bpmValue.textContent = String(clamped);
 
-        dom.bpmPresets.forEach((btn) => {
-          const preset = Number(btn.dataset.bpm);
-          if (preset === clamped) {
-            btn.className = 'bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-blue/20 text-mocha-blue border border-mocha-blue/40 transition-colors';
-          } else {
-            btn.className = 'bpm-preset px-2.5 py-1 rounded-lg text-xs font-mono font-semibold bg-mocha-surface0/80 hover:bg-mocha-surface1 text-mocha-subtext0 hover:text-mocha-text border border-transparent transition-colors';
-          }
+        dom.bpmChips.forEach((chip) => {
+          const match = Number(chip.dataset.bpm) === clamped;
+          chip.className = match
+            ? 'bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-blue/20 text-mocha-blue border border-mocha-blue/40 transition'
+            : 'bpm-chip py-1.5 rounded-lg font-mono text-[11px] font-semibold bg-mocha-base hover:bg-mocha-surface0 text-mocha-subtext border border-mocha-surface0 transition';
         });
       }
 
-      function setLoopMode(mode) {
-        state.loopMode = mode;
-        dom.loopBtns.forEach((btn) => {
-          const active = btn.dataset.loop === mode;
-          btn.className = active
-            ? 'loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-mocha-surface0 text-mocha-blue border border-mocha-blue/40'
-            : 'loop-btn px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors text-mocha-subtext0 hover:text-mocha-text border border-transparent';
-        });
-
-        const [loopStart, loopEnd] = getLoopBounds();
-        if (state.currentBar < loopStart || state.currentBar > loopEnd) {
-          state.currentBar = loopStart;
-          state.currentNote = 0;
-          state.selectedBar = loopStart;
-          state.selectedNote = 0;
-          if (state.isPlaying) {
-            schedBar = loopStart;
-            schedNote = 0;
-          }
-        }
-        renderTabGrid();
-        renderChordDiagram(state.currentBar, state.currentNote, null);
+      function syncLoopButtonUI() {
+        const mode = LOOP_MODES[state.loopIdx];
+        dom.labelLoop.textContent = mode.label;
+        const isSubLoop = state.loopIdx !== 0;
+        dom.btnLoop.className = isSubLoop
+          ? 'h-10 px-2.5 sm:px-3 rounded-xl border text-xs font-mono font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40'
+          : 'h-10 px-2.5 sm:px-3 rounded-xl border text-xs font-mono font-semibold inline-flex items-center gap-1.5 active:scale-95 transition bg-mocha-base text-mocha-text border-mocha-surface0 hover:bg-mocha-surface0';
       }
 
-      function styleToggleButton(btn, isOn) {
-        btn.setAttribute('aria-pressed', String(isOn));
-        const dot = btn.querySelector('span');
-        if (isOn) {
-          btn.className = 'toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-blue/15 text-mocha-blue border-mocha-blue/40';
-          if (dot) dot.className = 'w-2 h-2 rounded-full bg-mocha-blue';
+      function syncSwitchUI(btn, on) {
+        btn.setAttribute('aria-checked', String(on));
+        const knob = btn.firstElementChild;
+        if (on) {
+          btn.className = 'w-9 h-5 rounded-full bg-mocha-blue p-0.5 transition-colors relative shrink-0';
+          knob.className = 'block w-4 h-4 rounded-full bg-mocha-crust translate-x-4 transition-transform';
         } else {
-          btn.className = 'toggle-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all bg-mocha-surface0/60 text-mocha-subtext0 border-mocha-surface1 hover:text-mocha-text';
-          if (dot) dot.className = 'w-2 h-2 rounded-full bg-mocha-overlay0';
+          btn.className = 'w-9 h-5 rounded-full bg-mocha-surface0 p-0.5 transition-colors relative shrink-0';
+          knob.className = 'block w-4 h-4 rounded-full bg-mocha-subtext translate-x-0 transition-transform';
         }
       }
 
-      // Bindings
-      dom.modeNoCapo.addEventListener('click', () => setVersion('nocapo'));
-      dom.modeOpen.addEventListener('click', () => setVersion('open'));
-      dom.btnPlay.addEventListener('click', togglePlayback);
-      dom.btnRestart.addEventListener('click', restartPlayback);
+      function syncAllSettingsSwitches() {
+        const effectiveAudio = state.scoreMode && !state.headphonesMode ? false : state.guitarAudio;
+        syncSwitchUI(dom.swAudio, effectiveAudio);
+        syncSwitchUI(dom.swMetro, state.metronome);
+        syncSwitchUI(dom.swCountIn, state.countIn);
+        syncSwitchUI(dom.swStrokes, state.showStrokes);
+        syncSwitchUI(dom.swCapo3, state.capo3Pitch);
+        syncSwitchUI(dom.swHeadphones, state.headphonesMode);
+        syncSwitchUI(dom.swEndless, state.endlessScoreLoop);
+      }
 
-      dom.bpmSlider.addEventListener('input', (e) => setBpm(e.target.value));
-      dom.bpmPresets.forEach((btn) => {
-        btn.addEventListener('click', () => setBpm(btn.dataset.bpm));
-      });
-
-      dom.loopBtns.forEach((btn) => {
-        btn.addEventListener('click', () => setLoopMode(btn.dataset.loop));
-      });
-
-      dom.toggleAudio.addEventListener('click', () => {
-        state.guitarAudio = !state.guitarAudio;
-        styleToggleButton(dom.toggleAudio, state.guitarAudio);
-      });
-
-      dom.toggleMetronome.addEventListener('click', () => {
-        state.metronome = !state.metronome;
-        styleToggleButton(dom.toggleMetronome, state.metronome);
-      });
-
-      dom.toggleStrokes.addEventListener('click', () => {
-        state.showStrokes = !state.showStrokes;
-        styleToggleButton(dom.toggleStrokes, state.showStrokes);
-        renderTabGrid();
-      });
-
-      dom.toggleCountIn.addEventListener('click', () => {
-        state.countIn = !state.countIn;
-        styleToggleButton(dom.toggleCountIn, state.countIn);
-      });
-
-      // Wide-monitor column switcher (2 vs 4 bars per row)
-      if (dom.cols2 && dom.cols4) {
-        dom.cols2.addEventListener('click', () => {
-          state.gridCols = 2;
-          dom.cols2.className = 'px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue';
-          dom.cols4.className = 'px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text';
-          renderTabGrid();
-        });
-        dom.cols4.addEventListener('click', () => {
-          state.gridCols = 4;
-          dom.cols4.className = 'px-2.5 py-1 rounded-md font-semibold bg-mocha-surface0 text-mocha-blue';
-          dom.cols2.className = 'px-2.5 py-1 rounded-md font-semibold text-mocha-subtext0 hover:text-mocha-text';
-          renderTabGrid();
+      function setSensitivity(level) {
+        state.sensitivity = level;
+        dom.labelSens.textContent = SENSITIVITY_CONFIG[level].label;
+        dom.sensBtns.forEach((btn) => {
+          const active = btn.dataset.sens === level;
+          btn.className = active
+            ? 'sens-btn py-1 rounded-lg text-xs font-semibold bg-mocha-surface0 text-mocha-blue transition'
+            : 'sens-btn py-1 rounded-lg text-xs font-semibold text-mocha-subtext hover:text-mocha-text transition';
         });
       }
 
-      // Keyboard Shortcuts: Spacebar (Play/Pause), R (Restart), Left/Right (Step note)
+      function closeAllPopovers() {
+        dom.bpmPopover.classList.add('hidden');
+        dom.btnBpmPill.setAttribute('aria-expanded', 'false');
+        dom.settingsPopover.classList.add('hidden');
+        dom.btnSettings.setAttribute('aria-expanded', 'false');
+      }
+
+      // =======================================================================
+      // 11. EVENT LISTENERS
+      // =======================================================================
+      dom.pillGm.addEventListener('click', () => setMode('Gm'));
+      dom.pillEm.addEventListener('click', () => setMode('Em'));
+
+      dom.btnChordToggle.addEventListener('click', () => {
+        state.showChord = !state.showChord;
+        syncChordPanelUI();
+      });
+      dom.btnChordClose.addEventListener('click', () => {
+        state.showChord = false;
+        syncChordPanelUI();
+      });
+
+      dom.btnSettings.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = dom.settingsPopover.classList.contains('hidden');
+        closeAllPopovers();
+        if (opening) {
+          dom.settingsPopover.classList.remove('hidden');
+          dom.btnSettings.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      dom.btnLiveGrade.addEventListener('click', () => openGradeModal());
+
+      dom.btnPlay.addEventListener('click', togglePlayback);
+      dom.btnScoreMode.addEventListener('click', toggleScoreMode);
+      dom.btnRestart.addEventListener('click', restartLoop);
+
+      dom.btnBpmPill.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const opening = dom.bpmPopover.classList.contains('hidden');
+        closeAllPopovers();
+        if (opening) {
+          dom.bpmPopover.classList.remove('hidden');
+          dom.btnBpmPill.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      dom.btnBpmMinus.addEventListener('click', () => setBpm(state.bpm - 5));
+      dom.btnBpmPlus.addEventListener('click', () => setBpm(state.bpm + 5));
+      dom.bpmSlider.addEventListener('input', (e) => setBpm(e.target.value));
+      dom.bpmChips.forEach((chip) => {
+        chip.addEventListener('click', () => setBpm(chip.dataset.bpm));
+      });
+
+      dom.btnLoop.addEventListener('click', () => {
+        state.loopIdx = (state.loopIdx + 1) % LOOP_MODES.length;
+        const [loopStart, loopEnd] = getLoopRange();
+        if (state.activeBar < loopStart || state.activeBar > loopEnd) {
+          state.activeBar = loopStart;
+          state.activeNote = 0;
+          if (state.isPlaying) {
+            sBar = loopStart;
+            sNote = 0;
+          }
+        }
+        if (state.scoreMode && !state.isPlaying) resetScoreRun(false);
+        syncLoopButtonUI();
+        renderTabSheet();
+        renderMiniChord(state.activeBar, state.activeNote, null);
+      });
+
+      // Settings Toggles
+      dom.swAudio.addEventListener('click', () => {
+        if (state.scoreMode && !state.headphonesMode) {
+          // Turning Guitar Audio ON while in Score Mode automatically enables Headphones Mode
+          state.headphonesMode = true;
+          state.guitarAudio = true;
+          syncScoreModeUI();
+          syncAllSettingsSwitches();
+          return;
+        }
+        state.guitarAudio = !state.guitarAudio;
+        syncAllSettingsSwitches();
+      });
+
+      dom.swMetro.addEventListener('click', () => {
+        state.metronome = !state.metronome;
+        syncAllSettingsSwitches();
+      });
+
+      dom.swCountIn.addEventListener('click', () => {
+        state.countIn = !state.countIn;
+        syncAllSettingsSwitches();
+      });
+
+      dom.swStrokes.addEventListener('click', () => {
+        state.showStrokes = !state.showStrokes;
+        syncAllSettingsSwitches();
+        renderTabSheet();
+      });
+
+      dom.swCapo3.addEventListener('click', () => {
+        state.capo3Pitch = !state.capo3Pitch;
+        syncAllSettingsSwitches();
+        syncModePillsUI();
+      });
+
+      dom.sensBtns.forEach((btn) => {
+        btn.addEventListener('click', () => setSensitivity(btn.dataset.sens));
+      });
+
+      dom.swHeadphones.addEventListener('click', () => {
+        state.headphonesMode = !state.headphonesMode;
+        if (state.scoreMode) {
+          state.guitarAudio = state.headphonesMode;
+        }
+        syncScoreModeUI();
+        syncAllSettingsSwitches();
+      });
+
+      dom.swEndless.addEventListener('click', () => {
+        state.endlessScoreLoop = !state.endlessScoreLoop;
+        syncAllSettingsSwitches();
+      });
+
+      // Grade Card Modal Actions
+      dom.btnModalX.addEventListener('click', closeGradeModal);
+      dom.btnModalClose.addEventListener('click', closeGradeModal);
+      dom.gradeModal.addEventListener('click', (e) => {
+        if (e.target === dom.gradeModal) closeGradeModal();
+      });
+
+      dom.btnModalRetry.addEventListener('click', () => {
+        closeGradeModal();
+        startPlayback(true);
+      });
+
+      dom.btnModalWeak.addEventListener('click', () => {
+        const targetIdx = Number(dom.btnModalWeak.dataset.targetLoop || 1);
+        state.loopIdx = targetIdx;
+        syncLoopButtonUI();
+        closeGradeModal();
+        renderTabSheet();
+        startPlayback(true);
+      });
+
+      dom.bpmPopover.addEventListener('click', (e) => e.stopPropagation());
+      dom.settingsPopover.addEventListener('click', (e) => e.stopPropagation());
+      document.addEventListener('click', () => closeAllPopovers());
+
+      desktopQuery.addEventListener('change', (e) => {
+        state.isDesktop = e.matches;
+        renderTabSheet();
+      });
+
+      // Desktop Keyboard Shortcuts
       window.addEventListener('keydown', (e) => {
-        const tag = document.activeElement?.tagName;
-        const type = document.activeElement?.getAttribute?.('type');
-        const isTextInput = tag === 'TEXTAREA' || (tag === 'INPUT' && type !== 'range');
-        if (isTextInput) return;
+        if (e.key === 'Escape') {
+          closeAllPopovers();
+          closeGradeModal();
+          return;
+        }
+        if (document.activeElement?.tagName === 'INPUT') return;
 
         if (e.code === 'Space') {
           e.preventDefault();
           togglePlayback();
         } else if (e.key === 'r' || e.key === 'R') {
           e.preventDefault();
-          restartPlayback();
-        } else if (e.key === 'ArrowRight' && tag !== 'INPUT') {
+          restartLoop();
+        } else if (e.key === 'c' || e.key === 'C') {
           e.preventDefault();
-          const [ls, le] = getLoopBounds();
-          let n = state.currentNote + 1;
-          let b = state.currentBar;
+          state.showChord = !state.showChord;
+          syncChordPanelUI();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          const [ls, le] = getLoopRange();
+          let n = state.activeNote + 1;
+          let b = state.activeBar;
           if (n >= 8) {
             n = 0;
             b = b + 1 > le ? ls : b + 1;
           }
-          jumpAndPreview(b, n);
-        } else if (e.key === 'ArrowLeft' && tag !== 'INPUT') {
+          jumpToNote(b, n, true);
+        } else if (e.key === 'ArrowLeft') {
           e.preventDefault();
-          const [ls, le] = getLoopBounds();
-          let n = state.currentNote - 1;
-          let b = state.currentBar;
+          const [ls, le] = getLoopRange();
+          let n = state.activeNote - 1;
+          let b = state.activeBar;
           if (n < 0) {
             n = 7;
             b = b - 1 < ls ? le : b - 1;
           }
-          jumpAndPreview(b, n);
+          jumpToNote(b, n, true);
         }
       });
 
-      // =========================================================================
-      // 10. INITIAL RENDER
-      // =========================================================================
+      // =======================================================================
+      // 12. INITIALIZE
+      // =======================================================================
       setBpm(60);
-      renderTabGrid();
-      renderChordDiagram(0, 0, null);
+      setSensitivity('normal');
+      syncChordPanelUI();
+      syncAllSettingsSwitches();
+      syncModePillsUI();
     })();
   </script>
 </body>
